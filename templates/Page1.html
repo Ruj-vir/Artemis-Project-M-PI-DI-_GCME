@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis Project Interface</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ตั้งค่าพื้นฐาน */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000; /* พื้นหลังดำตามขอบภาพ */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ส่วนหัวด้านบนสุด (สีน้ำเงิน) */
+        header {
+            background-color: #2b5797; /* สีน้ำเงินเข้ม */
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 50px;
+        }
+
+        .brand {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .warning-tag {
+            background-color: #fff200; /* สีเหลือง */
+            color: black;
+            padding: 5px 10px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* Container สีขาวตรงกลาง */
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(to bottom, #000 0%, #111 100%); /* พื้นหลังเข้ม */
+        }
+
+        .card {
+            background-color: #f0f2f5;
+            width: 100%;
+            max-width: 900px;
+            height: 550px;
+            border-radius: 40px; /* มุมมนมากตามภาพ */
+            padding: 20px 40px;
+            box-sizing: border-box;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ปุ่มนำทางมุมขวาบนของ Card */
+        .top-nav {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .top-nav div {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* หัวข้อ Project Name */
+        h1 {
+            text-align: center;
+            font-weight: normal;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+
+        /* ช่องค้นหา */
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #6d9eeb;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        /* ส่วนตาราง */
+        .table-wrapper {
+            border: 1px solid #6d9eeb;
+            height: 250px;
+            overflow-y: scroll; /* Scrollbar แนวตั้ง */
+            background-color: white;
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        tr {
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Zebra Striping (สลับสีบรรทัด) */
+        tr:nth-child(even) {
+            background-color: #fff;
+        }
+        tr:nth-child(odd) {
+            background-color: #dbe9f5; /* สีฟ้าอ่อนตามภาพ */
+        }
+        
+        /* Highlight แถวแรกเหมือนถูกเลือก */
+        tr.selected {
+            background-color: #b8d2ea; 
+        }
+
+        td {
+            padding: 8px 10px;
+            color: #555;
+        }
+
+        .project-name {
+            font-weight: bold;
+            color: #000;
+            font-size: 16px;
+        }
+
+        .link-text {
+            color: #2b5797;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .icons i {
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        
+        .trash-icon { color: #333; }
+
+        /* ส่วนท้าย (Footer) */
+        .footer-section {
+            margin-top: auto; /* ดันลงล่างสุด */
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .instruction-box {
+            background-color: white;
+            padding: 10px;
+            font-size: 12px;
+            color: #333;
+            max-width: 300px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: #3b6ba5;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            background-color: #2a4e7a;
+        }
+
+        /* Scrollbar custom styles (เพื่อให้เหมือนภาพ) */
+        .table-wrapper::-webkit-scrollbar {
+            width: 20px;
+        }
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-left: 1px solid #ccc;
+        }
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border: 2px solid #f1f1f1;
+        }
+        
+        /* ลูกศรขึ้นลงตรง Scrollbar (จำลองด้วย CSS ยากหน่อย แต่ทำเป็น border ได้) */
+        .scroll-arrow-up {
+            position: absolute;
+            top: 0; right: 0; width: 20px; height: 20px;
+            background: #eee; border: 1px solid #ccc;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px;
+        }
+        .scroll-arrow-down {
+            position: absolute;
+            bottom: 0; right: 0; width: 20px; height: 20px;
+            background: #eee; border: 1px solid #ccc;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">Artemis</div>
+        
+    </header>
+
+    <div class="main-container">
+        <div class="card">
+            <div class="top-nav">
+                <div><i class="fa-solid fa-circle-arrow-left"></i> Back</div>
+                <div><i class="fa-solid fa-house"></i> Home</div>
+            </div>
+
+            <h1>Project Name</h1>
+
+            <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="ค้นหา Project...">
+
+            <div class="table-wrapper">
+                <table>
+                    <tr class="selected" onclick="window.location.href='http://127.0.0.1:8000'" style="cursor: pointer;">
+                        <td width="5%" onclick="event.stopPropagation();">
+                            <span class="link-text" onclick="this.nextElementSibling.click()">Upload file</span>
+                            <input type="file" style="display: none;" onchange="alert('คุณเลือกไฟล์: ' + this.files[0].name)">
+                        </td>
+                        <td width="25%">
+                            <span class="project-name">Project 1</span>
+                            <span class="icons">
+                                <i class="fa-solid fa-user-plus" onclick="event.stopPropagation(); openModal()"></i>
+                                <i class="fa-solid fa-trash-can trash-icon" onclick="event.stopPropagation(); confirmDelete(this)" style="cursor: pointer;" title="Delete Project"></i>
+                            </span>
+                        </td>
+                        <td>Created date: 01/02/2022</td>
+                        <td>Modified date: 25/02/2024</td>
+                        <td>Modified by: 26009649</td>
+                    </tr>
+                    <tr>
+                        <td width="5%">
+    <span class="link-text" onclick="this.nextElementSibling.click()">Upload file</span>
+    
+    <input type="file" style="display: none;" onchange="alert('คุณเลือกไฟล์: ' + this.files[0].name)">
+</td>
+                        <td width="25%">
+                            <span class="project-name">Project 2</span>
+                            
+                        </td>
+                        <td>Created date: 04/01/2022</td>
+                        <td>Modified date: 04/01/2022</td>
+                        <td>Modified by: 26009649</td>
+                    </tr>
+                    <tr>
+                        <td width="5%">
+    <span class="link-text" onclick="this.nextElementSibling.click()">Upload file</span>
+    
+    <input type="file" style="display: none;" onchange="alert('คุณเลือกไฟล์: ' + this.files[0].name)">
+</td>
+                        <td width="25%">
+                            <span class="project-name">Project 3</span>
+                            <span class="icons">
+                                <i class="fa-solid fa-user-plus" onclick="openModal()"></i>
+                                <i class="fa-solid fa-trash-can trash-icon" 
+               onclick="confirmDelete(this)" 
+               style="cursor: pointer;"
+               title="Delete Project">
+            </i>
+                            </span>
+                        </td>
+                        <td>Created date: 09/10/2023</td>
+                        <td>Modified date: 09/10/2023</td>
+                        <td>Modified by: 26009649</td>
+                    </tr>
+                    <tr>
+                        <td width="5%">
+    <span class="link-text" onclick="this.nextElementSibling.click()">Upload file</span>
+    
+    <input type="file" style="display: none;" onchange="alert('คุณเลือกไฟล์: ' + this.files[0].name)">
+</td>
+                        <td width="25%">
+                            <span class="project-name">Project 4</span>
+                            <span class="icons">
+                                <i class="fa-solid fa-user-plus" onclick="openModal()"></i>
+                                <i class="fa-solid fa-trash-can trash-icon" 
+               onclick="confirmDelete(this)" 
+               style="cursor: pointer;"
+               title="Delete Project">
+            </i>
+                            </span>
+                        </td>
+                        <td>Created date: 11/09/2023</td>
+                        <td>Modified date: 11/09/2023</td>
+                        <td>Modified by: 26009649</td>
+                    </tr>
+                    <tr>
+                        <td width="5%">
+    <span class="link-text" onclick="this.nextElementSibling.click()">Upload file</span>
+    
+    <input type="file" style="display: none;" onchange="alert('คุณเลือกไฟล์: ' + this.files[0].name)">
+</td>
+                        <td><span class="project-name">Project 5</span></td>
+                        <td>Created date: 02/09/2023</td>
+                        <td>Modified date: 02/09/2023</td>
+                        <td>Modified by: 26009649</td>
+                    </tr>
+                    <tr>
+                        <td width="5%">
+    <span class="link-text" onclick="this.nextElementSibling.click()">Upload file</span>
+    
+    <input type="file" style="display: none;" onchange="alert('คุณเลือกไฟล์: ' + this.files[0].name)">
+</td>
+                        <td><span class="project-name">Project 6</span></td>
+                        <td>Created date: 18/06/2023</td>
+                        <td>Modified date: 18/06/2023</td>
+                        <td>Modified by: 26009649</td>
+                    </tr>
+                    <tr>
+                        <td width="5%">
+    <span class="link-text" onclick="this.nextElementSibling.click()">Upload file</span>
+    
+    <input type="file" style="display: none;" onchange="alert('คุณเลือกไฟล์: ' + this.files[0].name)">
+</td>
+                        <td><span class="project-name">Project 7</span></td>
+                        <td>Created date: 21/05/2023</td>
+                        <td>Modified date: 21/05/2023</td>
+                        <td>Modified by: 26009649</td>
+                    </tr>
+                    <tr>
+                        <td width="5%">
+    <span class="link-text" onclick="this.nextElementSibling.click()">Upload file</span>
+    
+    <input type="file" style="display: none;" onchange="alert('คุณเลือกไฟล์: ' + this.files[0].name)">
+</td>
+                        <td><span class="project-name">Project 8</span></td>
+                        <td>Created date: 10/11/2023</td>
+                        <td>Modified date: 10/11/2023</td>
+                        <td>Modified by: 26009649</td>
+                    </tr>
+                     <tr>
+                        <td width="5%">
+    <span class="link-text" onclick="this.nextElementSibling.click()">Upload file</span>
+    
+    <input type="file" style="display: none;" onchange="alert('คุณเลือกไฟล์: ' + this.files[0].name)">
+</td>
+                        <td><span class="project-name">Project 9</span></td>
+                        <td>Created date: 05/02/2024</td>
+                        <td>Modified date: 05/02/2024</td>
+                        <td>Modified by: 26009649</td>
+                    </tr>
+                </table>
+                
+               
+            </div>
+
+            <div class="footer-section">
+                <div >
+                    
+                </div>
+                <div class="action-buttons">
+                    <button class="btn">View</button>
+                    <button class="btn" onclick="openNewProjectModal()">New Project</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+<div id="authModal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Authorization</h2>
+
+        <div class="input-label">Add authorized user for Project 1</div>
+
+        <input type="text" class="modal-input" value="XXXX.X@pttgcgroup.com">
+
+        <div class="modal-actions">
+            <button class="btn-modal btn-send" onclick="closeModal()">Send</button>
+            <button class="btn-modal btn-cancel" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* พื้นหลังสีดำจางๆ เวลา Modal ขึ้น */
+    .modal-overlay {
+        display: none; /* ซ่อนไว้ก่อน */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* กล่อง Modal ตรงกลาง */
+    .modal-content {
+        background-color: #e3f2fd; /* สีฟ้าอ่อนตามภาพ */
+        padding: 30px;
+        border-radius: 15px;
+        width: 400px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .modal-content h2 {
+        margin-top: 0;
+        margin-bottom: 30px;
+        font-size: 24px;
+        color: #000;
+    }
+
+    .input-label {
+        text-align: left;
+        color: #777;
+        font-size: 14px;
+        margin-bottom: 5px;
+        padding-left: 5px;
+    }
+
+    /* ช่องกรอกข้อมูล */
+    .modal-input {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #3b6ba5;
+        border-radius: 8px;
+        box-sizing: border-box;
+        text-align: center;
+        color: #000;
+        margin-bottom: 30px;
+        outline: none;
+    }
+
+    /* ปุ่มกด */
+    .modal-actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .btn-modal {
+        padding: 10px 30px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        color: white;
+        background-color: #2b5797; /* สีน้ำเงินเข้ม */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .btn-modal:hover {
+        background-color: #1e3f72;
+    }
+</style>
+
+<script>
+    // ฟังก์ชันเปิด Modal
+    function openModal() {
+        document.getElementById('authModal').style.display = 'flex';
+    }
+
+    // ฟังก์ชันปิด Modal
+    function closeModal() {
+        document.getElementById('authModal').style.display = 'none';
+    }
+</script>
+<script>
+    function confirmDelete(btn) {
+        Swal.fire({
+            title: 'ยืนยันการลบ?',
+            text: "หากลบแล้วจะไม่สามารถกู้คืนข้อมูลได้!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6', /* สีฟ้า (Theme ปุ่มยืนยัน) */
+            cancelButtonColor: '#d33',    /* สีแดง (Theme ปุ่มยกเลิก) */
+            confirmButtonText: 'ใช่, ลบเลย!',
+            cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // ถ้ากดตกลง ให้ลบแถว (tr) ทิ้ง
+                btn.closest('tr').remove();
+                
+                // (Optional) เด้งบอกว่าลบเสร็จแล้ว
+                Swal.fire(
+                    'ลบเรียบร้อย!',
+                    'Project นี้ถูกลบออกจากรายการแล้ว',
+                    'success'
+                )
+            }
+        })
+    }
+</script>
+<script>
+    function filterTable() {
+        // 1. รับค่าที่พิมพ์เข้ามา และแปลงเป็นตัวพิมพ์เล็ก (เพื่อให้ค้นหาเจอไม่ว่าจะพิมพ์เล็กหรือใหญ่)
+        var input = document.getElementById("searchInput");
+        var filter = input.value.toLowerCase();
+
+        // 2. เลือกแถว (tr) ทั้งหมดในตารางที่อยู่ใน class .table-wrapper
+        var rows = document.querySelectorAll(".table-wrapper table tr");
+
+        // 3. วนลูปเช็คทีละแถว
+        rows.forEach(function(row) {
+            // ดึงข้อความทั้งหมดในแถวนั้นมา (Project Name, Date, etc.)
+            var textContent = row.innerText.toLowerCase();
+
+            // ถ้ามีคำที่ค้นหาอยู่ในข้อความแถวนั้น (หรือถ้าช่องค้นหาว่างเปล่า)
+            if (textContent.includes(filter)) {
+                row.style.display = ""; // แสดงแถว
+            } else {
+                row.style.display = "none"; // ซ่อนแถว
+            }
+        });
+    }
+</script>
+
+<div id="newProjectModal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Create New Project</h2>
+
+        <div class="input-label" style="text-align: left; margin-bottom: 5px;">Project Name:</div>
+        <input type="text" id="newProjectName" class="modal-input" placeholder="ระบุชื่อโปรเจกต์ใหม่..." style="text-align: left;">
+
+        <div class="modal-actions">
+            <button class="btn-modal btn-send" onclick="createNewProjectRow()">Create</button>
+            <button class="btn-modal btn-cancel" onclick="closeNewProjectModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+<script>
+    // --- ส่วนจัดการ Modal New Project ---
+    function openNewProjectModal() {
+        document.getElementById('newProjectModal').style.display = 'flex';
+        document.getElementById('newProjectName').value = ''; // เคลียร์ค่าเก่า
+        document.getElementById('newProjectName').focus(); // โฟกัสช่องพิมพ์ทันที
+    }
+
+    function closeNewProjectModal() {
+        document.getElementById('newProjectModal').style.display = 'none';
+    }
+
+    // --- ฟังก์ชันสร้างแถวใหม่ลงตาราง ---
+    function createNewProjectRow() {
+        // 1. รับค่าชื่อโปรเจกต์
+        var projectName = document.getElementById('newProjectName').value;
+        
+        if (projectName.trim() === "") {
+            Swal.fire('ข้อผิดพลาด', 'กรุณาระบุชื่อ Project', 'error');
+            return;
+        }
+
+        // 2. หาวันที่ปัจจุบัน (DD/MM/YYYY)
+        var today = new Date();
+        var dateStr = today.getDate().toString().padStart(2, '0') + '/' + 
+                      (today.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                      today.getFullYear();
+
+        // 3. อ้างอิงตาราง
+        var table = document.querySelector(".table-wrapper table");
+        
+        // 4. สร้างแถวใหม่ แทรกต่อจากหัวตาราง (Index 1) หรือล่างสุด
+        // ในที่นี้ขอแทรกไว้บนสุด (row index 0) ของข้อมูล เพื่อให้เห็นชัดๆ (ถ้ามี thead ให้ระวัง index)
+        // เนื่องจากโครงสร้างเดิมไม่มี thead, row[0] คือ Project 1 (ถ้าไม่ใช่ selected) หรือ Header?
+        // ปกติควรแทรกที่ index 0 ของ tbody. สมมติแทรกเป็นแถวแรกสุดของข้อมูล:
+        var newRow = table.insertRow(0); 
+
+        // 5. ใส่ HTML เข้าไปในแถวใหม่ (Copy โครงสร้างเดิมมาเลย)
+        newRow.innerHTML = `
+            <td width="5%">
+                <span class="link-text" onclick="this.nextElementSibling.click()">Upload file</span>
+                <input type="file" style="display: none;" onchange="alert('คุณเลือกไฟล์: ' + this.files[0].name)">
+            </td>
+            <td width="25%">
+                <span class="project-name">${projectName}</span>
+                <span class="icons">
+                    <i class="fa-solid fa-user-plus" onclick="openModal()" title="Authorize User"></i>
+                    <i class="fa-solid fa-trash-can trash-icon" onclick="confirmDelete(this)" style="cursor: pointer;" title="Delete Project"></i>
+                </span>
+            </td>
+            <td>Created date: ${dateStr}</td>
+            <td>Modified date: ${dateStr}</td>
+            <td>Modified by: Me</td>
+        `;
+
+        // 6. ปิด Modal และแจ้งเตือนความสำเร็จ
+        closeNewProjectModal();
+        Swal.fire({
+            title: 'สร้างสำเร็จ!',
+            text: 'Project ใหม่ถูกเพิ่มลงในตารางแล้ว',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+        });
+    }
+</script>
+</html>
