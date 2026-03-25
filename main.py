@@ -171,6 +171,11 @@ async def flue_gas_dewpoint_page(request: Request):
     return templates.TemplateResponse("Flue_gas_dewpoint.html", {"request": request})
 
 
+@app.get("/hcl_corrosion", response_class=HTMLResponse)
+async def hcl_corrosion_page(request: Request):
+    return templates.TemplateResponse("Hydrochloric_Acid_Corrosion\u200b.html", {"request": request})
+
+
 @app.post("/h2s/calculate")
 async def h2s_calculate(data: H2SInput):
     result = calculate_h2s_susceptibility(

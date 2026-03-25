@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HCl Corrosion Analysis — Artemis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #000 0%, #111 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ─── Header ─── */
+        header {
+            background-color: #2b5797;
+            color: white;
+            padding: 0 24px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .brand { font-size: 26px; font-weight: 700; letter-spacing: 1px; }
+        .header-nav { display: flex; gap: 20px; }
+        .header-nav a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .header-nav a:hover { background: rgba(255,255,255,0.15); color: white; }
+
+        /* ─── Layout ─── */
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 30px 20px 50px;
+        }
+        .card {
+            background: #f0f2f5;
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 28px;
+            padding: 32px 40px;
+            box-shadow: 0 0 40px rgba(255,255,255,0.08);
+        }
+        .page-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a2f5a;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .page-title i { color: #2b5797; font-size: 22px; }
+
+        /* ─── Section label ─── */
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #2b5797;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #2b5797;
+            padding-bottom: 5px;
+            margin-bottom: 16px;
+        }
+
+        /* ─── Panels ─── */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+        .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+        .form-panel {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 20px 22px;
+        }
+        .form-panel-full {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 20px 22px;
+            margin-bottom: 18px;
+        }
+
+        /* ─── Fields ─── */
+        .field { margin-bottom: 14px; }
+        .field:last-child { margin-bottom: 0; }
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+        .field input, .field select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid #c0d0e8;
+            border-radius: 7px;
+            font-size: 14px;
+            color: #222;
+            background: #fafcff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .field input:focus, .field select:focus {
+            border-color: #2b5797;
+            box-shadow: 0 0 0 3px rgba(43,87,151,0.12);
+            background: white;
+        }
+        .field input::placeholder { color: #bbb; }
+        .input-row { display: flex; }
+        .input-row input { flex: 1; border-radius: 7px 0 0 7px; }
+        .unit {
+            background: #2b5797;
+            color: white;
+            padding: 9px 11px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 0 7px 7px 0;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ─── Toggle Yes/No ─── */
+        .toggle-row { display: flex; gap: 10px; }
+        .toggle-btn {
+            flex: 1;
+            padding: 9px 0;
+            border: 2px solid #c0d0e8;
+            border-radius: 7px;
+            background: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.18s;
+            color: #666;
+        }
+        .toggle-btn:hover { border-color: #2b5797; color: #2b5797; }
+        .toggle-btn.active-yes { background: #27ae60; border-color: #27ae60; color: white; }
+        .toggle-btn.active-no  { background: #e74c3c; border-color: #e74c3c; color: white; }
+
+        /* ─── Material type tabs ─── */
+        .mat-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+        .mat-tab {
+            padding: 7px 14px;
+            border: 2px solid #c0d0e8;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #666;
+            background: white;
+            transition: all 0.18s;
+        }
+        .mat-tab:hover { border-color: #2b5797; color: #2b5797; }
+        .mat-tab.active { background: #2b5797; border-color: #2b5797; color: white; }
+
+        /* ─── Conditional panels ─── */
+        .cond-panel { display: none; }
+        .cond-panel.visible { display: block; }
+
+        /* ─── Checkbox label ─── */
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 8px;
+            user-select: none;
+        }
+        .checkbox-label input[type="checkbox"] {
+            width: 15px; height: 15px;
+            accent-color: #2b5797;
+            cursor: pointer;
+        }
+        .hidden { display: none !important; }
+        .hint { font-size: 11px; color: #aaa; margin-top: 4px; }
+
+        /* ─── Info badge ─── */
+        .info-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eef3fb;
+            border: 1px solid #c0d0e8;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 12px;
+            color: #2b5797;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        /* ─── Analyze button ─── */
+        .btn-analyze {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #2b5797 0%, #3b6ba5 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 12px rgba(43,87,151,0.35);
+            transition: all 0.2s;
+            margin-bottom: 28px;
+        }
+        .btn-analyze:hover {
+            background: linear-gradient(135deg, #1e3f72 0%, #2b5797 100%);
+            transform: translateY(-1px);
+        }
+        .btn-analyze:active { transform: translateY(0); }
+        .btn-analyze i { margin-right: 8px; }
+        .btn-analyze:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        /* ─── Results ─── */
+        #resultsSection { display: none; }
+        .divider { border: none; border-top: 1px solid #d5dff0; margin: 0 0 24px 0; }
+
+        .steps-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: white;
+            border-radius: 10px;
+            padding: 11px 16px;
+            border-left: 4px solid #ddd;
+        }
+        .step-item.pass { border-left-color: #27ae60; }
+        .step-item.fail { border-left-color: #e74c3c; }
+        .step-item.info { border-left-color: #2b5797; }
+        .step-icon { font-size: 18px; width: 22px; flex-shrink: 0; text-align: center; margin-top: 1px; }
+        .step-item.pass .step-icon { color: #27ae60; }
+        .step-item.fail .step-icon { color: #e74c3c; }
+        .step-item.info .step-icon { color: #2b5797; }
+        .step-body { flex: 1; }
+        .step-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.3px; }
+        .step-detail { font-size: 13px; color: #333; margin-top: 2px; line-height: 1.5; }
+
+        /* ─── Result card ─── */
+        .result-card {
+            border-radius: 14px;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            margin-top: 16px;
+        }
+        .bg-high            { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+        .bg-medium          { background: linear-gradient(135deg, #ca6f1e, #e67e22); }
+        .bg-low             { background: linear-gradient(135deg, #9a7d0a, #d4ac0d); }
+        .bg-negligible      { background: linear-gradient(135deg, #1a7a42, #27ae60); }
+        .bg-not-susceptible { background: linear-gradient(135deg, #5d6d7e, #7f8c8d); }
+        .bg-error           { background: linear-gradient(135deg, #7d3c98, #9b59b6); }
+        .metrics { display: flex; gap: 28px; flex-wrap: wrap; }
+        .metric { text-align: center; }
+        .metric-value { font-size: 26px; font-weight: 700; line-height: 1; }
+        .metric-label { font-size: 10px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+        .result-level { text-align: right; }
+        .level-tag { font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+        .level-value { font-size: 30px; font-weight: 700; line-height: 1.1; }
+        .reason-text { font-size: 14px; opacity: 0.9; }
+
+        /* ─── Cl concentration input (for Alloys) ─── */
+        .alloy-extra { margin-top: 10px; padding-top: 10px; border-top: 1px solid #eef0f5; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">Artemis</div>
+    <nav class="header-nav">
+        <a href="javascript:history.back()"><i class="fa-solid fa-circle-arrow-left"></i> Back</a>
+        <a href="/projects"><i class="fa-solid fa-folder-open"></i> Projects</a>
+        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+    </nav>
+</header>
+
+<div class="page-wrapper">
+<div class="card">
+
+    <div class="page-title">
+        <i class="fa-solid fa-droplet"></i>
+        Hydrochloric Acid (HCl) Corrosion Analysis
+    </div>
+
+    <!-- ── Step 1: HCl Present ── -->
+    <div class="form-panel-full">
+        <div class="section-label">Step 1 — HCl Presence During Operation</div>
+        <div class="field">
+            <label>Is HCl Present When Operating?</label>
+            <div class="toggle-row">
+                <button class="toggle-btn active-yes" id="btnHclYes" onclick="setToggle('hcl','YES')">
+                    <i class="fa-solid fa-check"></i> YES
+                </button>
+                <button class="toggle-btn" id="btnHclNo" onclick="setToggle('hcl','NO')">
+                    <i class="fa-solid fa-xmark"></i> NO
+                </button>
+            </div>
+            <input type="hidden" id="hclPresent" value="YES">
+        </div>
+    </div>
+
+    <!-- ── Step 2: Water / Condensate ── -->
+    <div class="form-panel-full">
+        <div class="section-label">Step 2 — Water Droplets / Condensed Water</div>
+        <div class="field">
+            <label>Is Water Droplets or Condensed Water Present?</label>
+            <div class="toggle-row">
+                <button class="toggle-btn active-yes" id="btnWaterYes" onclick="setToggle('water','YES')">
+                    <i class="fa-solid fa-check"></i> YES
+                </button>
+                <button class="toggle-btn" id="btnWaterNo" onclick="setToggle('water','NO')">
+                    <i class="fa-solid fa-xmark"></i> NO
+                </button>
+            </div>
+            <input type="hidden" id="waterPresent" value="YES">
+        </div>
+    </div>
+
+    <!-- ── Step 3: Material + Design CR ── -->
+    <div class="form-panel-full">
+        <div class="section-label">Step 3 — Affected Materials &amp; Design Corrosion Rate</div>
+
+        <!-- Material type selector -->
+        <div class="field">
+            <label>Material Group</label>
+            <div class="mat-tabs" id="matTabs">
+                <div class="mat-tab active" data-mat="cs"       onclick="selectMat('cs')">Carbon Steel / Low Alloy</div>
+                <div class="mat-tab"        data-mat="ss300"    onclick="selectMat('ss300')">300 Series SS</div>
+                <div class="mat-tab"        data-mat="alloy825" onclick="selectMat('alloy825')">Alloy 825 / 20 / 625 / C-276</div>
+                <div class="mat-tab"        data-mat="alloyb2"  onclick="selectMat('alloyb2')">Alloy B-2 / 400</div>
+            </div>
+            <input type="hidden" id="matGroup" value="cs">
+        </div>
+
+        <!-- Specific material select -->
+        <div class="form-grid">
+            <div class="field">
+                <label>Specific Material</label>
+                <select id="materialSelect" onchange="onMaterialChange()">
+                    <!-- filled by JS -->
+                </select>
+            </div>
+            <div class="field">
+                <label>Design Corrosion Rate (Allowable)</label>
+                <div class="input-row">
+                    <input type="number" id="designCR" placeholder="e.g. 1.0" min="0.001" step="0.01">
+                    <span class="unit">mm/y</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alloy B-2/400: Oxygen/Oxidants Present? -->
+        <div id="oxygenPanel" class="cond-panel">
+            <div class="field">
+                <label>Oxygen / Oxidants Present?</label>
+                <div class="toggle-row" style="max-width: 300px;">
+                    <button class="toggle-btn" id="btnOxyYes" onclick="setToggle('oxy','YES')">
+                        <i class="fa-solid fa-check"></i> YES
+                    </button>
+                    <button class="toggle-btn active-no" id="btnOxyNo" onclick="setToggle('oxy','NO')">
+                        <i class="fa-solid fa-xmark"></i> NO
+                    </button>
+                </div>
+                <input type="hidden" id="oxygenPresent" value="NO">
+            </div>
+        </div>
+
+        <!-- Alloy groups: Cl- concentration input -->
+        <div id="clConcPanel" class="cond-panel alloy-extra">
+            <div class="field" style="max-width: 280px;">
+                <label>Cl⁻ Concentration</label>
+                <div class="input-row">
+                    <input type="number" id="clConc" placeholder="e.g. 0.6" min="0" step="0.01">
+                    <span class="unit">wt%</span>
+                </div>
+                <div class="hint">Valid range: 0.5 – &gt;0.99 wt%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Step 4 & 5: Actual CR + pH ── -->
+    <div class="form-grid">
+        <!-- Actual CR -->
+        <div class="form-panel">
+            <div class="section-label">Step 4 — Actual Corrosion Rate</div>
+            <div class="field">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="useActualCR" onchange="toggleActualCR()">
+                    Actual (Measured) CR Available?
+                </label>
+                <div id="actualCRWrapper" class="hidden">
+                    <div class="input-row">
+                        <input type="number" id="actualCR" placeholder="e.g. 2.5" min="0" step="0.01">
+                        <span class="unit">mm/y</span>
+                    </div>
+                    <div class="hint">Overrides table lookup value</div>
+                </div>
+                <div id="noCRNote" class="hint" style="margin-top: 6px;">
+                    ถ้าไม่มีค่า Actual CR ระบบจะ lookup จากตารางตาม pH และ Temperature
+                </div>
+            </div>
+        </div>
+
+        <!-- pH + Temperature -->
+        <div class="form-panel" id="phTempPanel">
+            <div class="section-label">Step 5 — Operating Conditions</div>
+
+            <div class="field">
+                <label>Operating pH</label>
+                <div class="input-row">
+                    <input type="number" id="opPH" placeholder="e.g. 2.0" min="0" max="14" step="0.01">
+                    <span class="unit">pH</span>
+                </div>
+                <div class="hint">Valid range: 0 – 6.80 (refer table)</div>
+            </div>
+
+            <div class="field">
+                <label>Operating Temperature</label>
+                <select id="opTemp">
+                    <option value="">— Select Range —</option>
+                    <option value="0">0 – 38 °C</option>
+                    <option value="1">&gt;38 – 52 °C</option>
+                    <option value="2">&gt;52 – 79 °C</option>
+                    <option value="3">&gt;79 – 93 °C</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analyze Button -->
+    <button class="btn-analyze" id="btnAnalyze" onclick="runAnalysis()">
+        <i class="fa-solid fa-magnifying-glass-chart"></i>
+        Analyze Corrosion Susceptibility
+    </button>
+
+    <!-- ─── Results ─── -->
+    <div id="resultsSection">
+        <hr class="divider">
+        <div class="section-label" style="margin-bottom: 14px;">Analysis Flowchart</div>
+        <div class="steps-list" id="stepsList"></div>
+        <div id="resultCard"></div>
+    </div>
+
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// TABLE DATA
+// ═══════════════════════════════════════════════════════════════
+
+// Carbon Steel / Low Alloy — pH vs Temp (4 cols: 0-38, >38-52, >52-79, >79-93)
+const CS_TABLE = {
+    "0-0.5":     [25.37, 25.37, 25.37, 25.37],
+    "0.51-0.80": [22.86, 25.37, 25.37, 25.37],
+    "0.81-1.25": [10.16, 25.37, 25.37, 25.37],
+    "1.26-1.75": [5.08,  17.78, 25.37, 25.37],
+    "1.76-2.25": [2.54,  7.62,  10.16, 14.22],
+    "2.26-2.75": [1.52,  3.30,  5.08,  7.11],
+    "2.76-3.25": [1.02,  1.78,  2.54,  3.56],
+    "3.26-3.75": [0.76,  1.27,  2.29,  3.18],
+    "3.76-4.25": [0.51,  1.02,  1.78,  2.54],
+    "4.26-4.75": [0.25,  0.76,  1.27,  1.78],
+    "4.76-5.25": [0.18,  0.51,  0.76,  1.02],
+    "5.26-5.75": [0.10,  0.38,  0.51,  0.76],
+    "5.76-6.25": [0.08,  0.25,  0.38,  0.51],
+    "6.26-6.80": [0.05,  0.13,  0.18,  0.25],
+};
+
+// 300 Series SS (304, 316, 321, 347) — pH vs Temp
+const SS300_TABLE = {
+    "0-0.5":     [22.86, 25.37, 25.37, 25.37],
+    "0.51-0.80": [12.70, 25.37, 25.37, 25.37],
+    "0.81-1.25": [7.62,  12.70, 17.78, 25.37],
+    "1.26-1.75": [3.81,  6.60,  10.16, 12.70],
+    "1.76-2.25": [2.03,  3.56,  5.08,  6.35],
+    "2.26-2.75": [1.27,  1.78,  2.54,  3.05],
+    "2.76-3.25": [0.76,  1.02,  1.27,  1.65],
+    "3.26-3.75": [0.51,  0.64,  0.76,  0.89],
+    "3.76-4.25": [0.25,  0.38,  0.51,  0.64],
+    "4.26-4.75": [0.13,  0.18,  0.25,  0.30],
+    "4.76-5.25": [0.10,  0.13,  0.15,  0.18],
+    "5.26-5.75": [0.08,  0.10,  0.13,  0.15],
+    "5.76-6.25": [0.05,  0.08,  0.10,  0.13],
+    "6.26-6.80": [0.03,  0.05,  0.08,  0.10],
+};
+
+// Alloy 825 / 20 / 625 / C-276 — Cl- conc vs Temp
+// structure: { alloyKey: { clRange: [t0, t1, t2, t3] } }
+const ALLOY_825_TABLE = {
+    "Alloy 825": {
+        "0.5-0.74":  [0.03, 0.08, 1.02, 5.08],
+        "0.74-0.99": [0.05, 0.13, 2.03, 10.16],
+        ">0.99":     [0.25, 1.78, 7.62, 25.37],
+    },
+    "Alloy 20": {
+        "0.5-0.74":  [0.03, 0.08, 1.02, 5.08],
+        "0.74-0.99": [0.05, 0.13, 2.03, 10.16],
+        ">0.99":     [0.25, 1.78, 7.62, 25.37],
+    },
+    "Alloy 625": {
+        "0.5-0.74":  [0.03, 0.05, 0.38, 1.91],
+        "0.74-0.99": [0.03, 0.13, 0.64, 3.18],
+        ">0.99":     [0.05, 1.78, 5.08, 10.16],
+    },
+    "Alloy C-276": {
+        "0.5-0.74":  [0.03, 0.05, 0.20, 0.76],
+        "0.74-0.99": [0.03, 0.05, 0.38, 1.91],
+        ">0.99":     [0.05, 0.25, 1.52, 7.62],
+    },
+};
+
+// Alloy B-2 / 400 — Cl- conc vs Temp vs Oxygen (Yes/No per col pair)
+// structure: { alloyKey: { clRange: { No:[t0,t1,t2,t3], Yes:[t0,t1,t2,t3] } } }
+const ALLOY_B2_TABLE = {
+    "Alloy B-2": {
+        "0.5-0.74":  { No: [0.03, 0.03, 0.05, 0.10], Yes: [0.10, 0.10, 0.20, 0.41] },
+        "0.74-0.99": { No: [0.03, 0.03, 0.13, 0.51], Yes: [0.10, 0.10, 0.51, 2.03] },
+        ">0.99":     { No: [0.05, 0.13, 0.25, 0.64], Yes: [0.20, 0.51, 1.02, 2.54] },
+    },
+    "Alloy 400": {
+        "0.5-0.74":  { No: [0.03, 0.08, 0.76, 7.62],  Yes: [0.10, 0.30, 3.05, 25.37] },
+        "0.74-0.99": { No: [0.05, 0.13, 2.03, 20.32], Yes: [0.25, 0.51, 8.13, 25.37] },
+        ">0.99":     { No: [0.48, 0.64, 3.81, 22.86], Yes: [1.02, 2.54, 15.24, 25.37] },
+    },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// MATERIAL OPTIONS PER GROUP
+// ═══════════════════════════════════════════════════════════════
+const MAT_OPTIONS = {
+    cs:       ["Carbon Steel", "Low Alloy Steel"],
+    ss300:    ["Type 304 SS", "Type 316 SS", "Type 321 SS", "Type 347 SS"],
+    alloy825: ["Alloy 825", "Alloy 20", "Alloy 625", "Alloy C-276"],
+    alloyb2:  ["Alloy B-2", "Alloy 400"],
+};
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+const state = {
+    hcl:   "YES",
+    water: "YES",
+    oxy:   "NO",
+};
+
+function setToggle(key, val) {
+    state[key] = val;
+    const yesBtn = document.getElementById(`btn${cap(key)}Yes`);
+    const noBtn  = document.getElementById(`btn${cap(key)}No`);
+    const hidden = document.getElementById(`${key}Present`) || document.getElementById(`${key}Present`);
+    if (yesBtn) yesBtn.className = "toggle-btn" + (val === "YES" ? " active-yes" : "");
+    if (noBtn)  noBtn.className  = "toggle-btn" + (val === "NO"  ? " active-no"  : "");
+    const h = document.getElementById(key === "oxy" ? "oxygenPresent" : key + "Present");
+    if (h) h.value = val;
+}
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+// ═══════════════════════════════════════════════════════════════
+// MATERIAL GROUP SWITCHING
+// ═══════════════════════════════════════════════════════════════
+function selectMat(grp) {
+    document.getElementById("matGroup").value = grp;
+    document.querySelectorAll(".mat-tab").forEach(t => {
+        t.classList.toggle("active", t.dataset.mat === grp);
+    });
+    // Populate material select
+    const sel = document.getElementById("materialSelect");
+    sel.innerHTML = MAT_OPTIONS[grp].map(m => `<option value="${m}">${m}</option>`).join("");
+
+    // Show/hide oxygen panel (only for alloyb2)
+    document.getElementById("oxygenPanel").classList.toggle("visible", grp === "alloyb2");
+
+    // Show/hide Cl- concentration (for alloy groups)
+    const needCl = grp === "alloy825" || grp === "alloyb2";
+    document.getElementById("clConcPanel").classList.toggle("visible", needCl);
+
+    // Show/hide pH panel (not needed for alloy groups — uses Cl- instead)
+    document.getElementById("phTempPanel").querySelector(".section-label").textContent =
+        needCl ? "Step 5 — Operating Temperature" : "Step 5 — Operating Conditions";
+    document.getElementById("opPH").closest(".field").style.display = needCl ? "none" : "";
+}
+
+function onMaterialChange() { /* future hooks */ }
+
+// ═══════════════════════════════════════════════════════════════
+// ACTUAL CR TOGGLE
+// ═══════════════════════════════════════════════════════════════
+function toggleActualCR() {
+    const show = document.getElementById("useActualCR").checked;
+    document.getElementById("actualCRWrapper").classList.toggle("hidden", !show);
+    document.getElementById("noCRNote").classList.toggle("hidden", show);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TABLE LOOKUP HELPERS
+// ═══════════════════════════════════════════════════════════════
+function phToRow(ph, table) {
+    for (const [range, vals] of Object.entries(table)) {
+        const [lo, hi] = range.split("-").map(Number);
+        if (ph >= lo && ph <= hi) return vals;
+    }
+    return null;
+}
+
+function clToRow(cl, tableForAlloy) {
+    if (cl >= 0.5 && cl <= 0.74)  return tableForAlloy["0.5-0.74"];
+    if (cl > 0.74 && cl <= 0.99)  return tableForAlloy["0.74-0.99"];
+    if (cl > 0.99)                 return tableForAlloy[">0.99"];
+    return null;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VALIDATE
+// ═══════════════════════════════════════════════════════════════
+function validate() {
+    const hcl      = document.getElementById("hclPresent").value;
+    const water    = document.getElementById("waterPresent").value;
+    const grp      = document.getElementById("matGroup").value;
+    const material = document.getElementById("materialSelect").value;
+    const designCR = parseFloat(document.getElementById("designCR").value);
+    const useActual= document.getElementById("useActualCR").checked;
+    const actualCR = parseFloat(document.getElementById("actualCR").value);
+    const tempIdx  = parseInt(document.getElementById("opTemp").value);
+    const opPH     = parseFloat(document.getElementById("opPH").value);
+    const clConc   = parseFloat(document.getElementById("clConc").value);
+    const oxygenPresent = document.getElementById("oxygenPresent").value;
+
+    if (!material)                          { alert("กรุณาเลือก Material"); return null; }
+    if (isNaN(designCR) || designCR <= 0)   { alert("กรุณาระบุ Design CR ที่ถูกต้อง (> 0)"); return null; }
+    if (isNaN(tempIdx))                     { alert("กรุณาเลือก Operating Temperature Range"); return null; }
+    if (useActual && (isNaN(actualCR) || actualCR <= 0)) {
+        alert("กรุณาระบุ Actual CR ที่ถูกต้อง (> 0)"); return null;
+    }
+
+    const needCl = (grp === "alloy825" || grp === "alloyb2");
+    if (!useActual) {
+        if (needCl) {
+            if (isNaN(clConc) || clConc < 0.5) {
+                alert("Cl⁻ Concentration ต้องมีค่า ≥ 0.5 wt%"); return null;
+            }
+        } else {
+            if (isNaN(opPH) || opPH < 0 || opPH > 6.8) {
+                alert("Operating pH ต้องอยู่ในช่วง 0 – 6.80"); return null;
+            }
+        }
+    }
+
+    return { hcl, water, grp, material, designCR, useActual, actualCR, tempIdx, opPH, clConc, oxygenPresent };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CORE ANALYSIS LOGIC
+// ═══════════════════════════════════════════════════════════════
+const TEMP_LABELS = ["0–38 °C", ">38–52 °C", ">52–79 °C", ">79–93 °C"];
+
+function analyze(p) {
+    const steps = [];
+
+    // STEP 1: HCl present?
+    if (p.hcl !== "YES") {
+        steps.push({ step:1, label:"HCl Presence", pass:false,
+            detail:"ไม่มี HCl ในระบบ → ไม่เกิด HCl Corrosion" });
+        return { steps, susceptibility:"Not Susceptible", reason:"No HCl present during operation" };
+    }
+    steps.push({ step:1, label:"HCl Presence", pass:true,
+        detail:"HCl มีอยู่ในระบบขณะ Operating → ดำเนินการตรวจสอบต่อ" });
+
+    // STEP 2: Water / condensate?
+    if (p.water !== "YES") {
+        steps.push({ step:2, label:"Water / Condensate", pass:false,
+            detail:"ไม่มีน้ำหรือ Condensate → HCl ไม่ละลายน้ำ ไม่เกิด Acid Corrosion" });
+        return { steps, susceptibility:"Not Susceptible", reason:"No water droplets or condensed water present" };
+    }
+    steps.push({ step:2, label:"Water / Condensate", pass:true,
+        detail:"มีน้ำ / Condensate → HCl สามารถละลายและกัดกร่อนได้" });
+
+    // STEP 3: Material in scope?
+    const inScopeMats = ["Carbon Steel", "Low Alloy Steel",
+        "Type 304 SS","Type 316 SS","Type 321 SS","Type 347 SS",
+        "Alloy 825","Alloy 20","Alloy 625","Alloy C-276","Alloy B-2","Alloy 400"];
+    if (!inScopeMats.includes(p.material)) {
+        steps.push({ step:3, label:"Material Check", pass:false,
+            detail:`${p.material} ไม่อยู่ในขอบเขตการวิเคราะห์` });
+        return { steps, susceptibility:"Not Susceptible", reason:`Material ${p.material} is not in scope` };
+    }
+    steps.push({ step:3, label:"Material Check", pass:true,
+        detail:`${p.material} — อยู่ในขอบเขต (Susceptible material group)` });
+
+    // Oxygen note for Alloy B-2/400
+    if (p.grp === "alloyb2") {
+        steps.push({ step:"3b", label:"Oxygen / Oxidants", pass:true,
+            detail:`Oxygen/Oxidants Present: ${p.oxygenPresent} → ใช้คอลัมน์ ${p.oxygenPresent} จากตาราง` });
+    }
+
+    // STEP 4: Determine CR
+    let finalCR, crSource;
+    if (p.useActual) {
+        finalCR  = p.actualCR;
+        crSource = `ใช้ Actual CR ที่วัดได้: ${finalCR} mm/y`;
+    } else {
+        // Lookup
+        let row = null;
+        if (p.grp === "cs" || p.grp === "ss300") {
+            const tbl = p.grp === "cs" ? CS_TABLE : SS300_TABLE;
+            row = phToRow(p.opPH, tbl);
+            if (!row) {
+                steps.push({ step:4, label:"CR Lookup", pass:false,
+                    detail:`pH ${p.opPH} อยู่นอกช่วงตาราง (0 – 6.80)` });
+                return { steps, susceptibility:"Error", reason:"pH out of table range" };
+            }
+            finalCR  = row[p.tempIdx];
+            crSource = `Lookup (pH ${p.opPH}, ${TEMP_LABELS[p.tempIdx]}): CR = ${finalCR} mm/y`;
+        } else if (p.grp === "alloy825") {
+            const alloyTbl = ALLOY_825_TABLE[p.material];
+            row = alloyTbl ? clToRow(p.clConc, alloyTbl) : null;
+            if (!row) {
+                steps.push({ step:4, label:"CR Lookup", pass:false,
+                    detail:`Cl⁻ ${p.clConc} wt% อยู่นอกช่วงตาราง (0.5 – >0.99)` });
+                return { steps, susceptibility:"Error", reason:"Cl⁻ concentration out of table range" };
+            }
+            finalCR  = row[p.tempIdx];
+            crSource = `Lookup (Cl⁻ ${p.clConc} wt%, ${TEMP_LABELS[p.tempIdx]}): CR = ${finalCR} mm/y`;
+        } else if (p.grp === "alloyb2") {
+            const alloyTbl = ALLOY_B2_TABLE[p.material];
+            const rowObj   = alloyTbl ? clToRow(p.clConc, alloyTbl) : null;
+            if (!rowObj) {
+                steps.push({ step:4, label:"CR Lookup", pass:false,
+                    detail:`Cl⁻ ${p.clConc} wt% อยู่นอกช่วงตาราง` });
+                return { steps, susceptibility:"Error", reason:"Cl⁻ concentration out of table range" };
+            }
+            const oxyKey = p.oxygenPresent === "YES" ? "Yes" : "No";
+            row     = rowObj[oxyKey];
+            finalCR = row[p.tempIdx];
+            crSource = `Lookup (Cl⁻ ${p.clConc} wt%, ${TEMP_LABELS[p.tempIdx]}, O₂: ${p.oxygenPresent}): CR = ${finalCR} mm/y`;
+        }
+    }
+
+    steps.push({ step:4, label:"Corrosion Rate Determination", pass:true, detail: crSource });
+
+    // STEP 5: pH info (for reference)
+    if (!p.useActual && (p.grp === "cs" || p.grp === "ss300")) {
+        steps.push({ step:5, label:"Operating pH", pass:true,
+            detail:`pH = ${p.opPH} | Temperature = ${TEMP_LABELS[p.tempIdx]}` });
+    }
+
+    // STEP 6: Ratio & Susceptibility
+    const ratio = finalCR / p.designCR;
+    let level;
+    if      (ratio > 4)   level = "High";
+    else if (ratio >= 1)  level = "Medium";
+    else if (ratio >= 0.5)level = "Low";
+    else                  level = "Negligible";
+
+    steps.push({ step: (p.grp === "cs" || p.grp === "ss300") ? 6 : 5,
+        label:"Susceptibility Assessment",
+        pass: true,
+        detail:`CR = ${finalCR} mm/y ÷ Design CR = ${p.designCR} mm/y → Ratio = ${ratio.toFixed(2)} → ${level.toUpperCase()}`
+    });
+
+    return { steps, susceptibility: level, corrosion_rate: finalCR, design_cr: p.designCR, ratio: ratio.toFixed(2) };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RUN & RENDER
+// ═══════════════════════════════════════════════════════════════
+function runAnalysis() {
+    const payload = validate();
+    if (!payload) return;
+    const result = analyze(payload);
+    renderResults(result);
+}
+
+function renderResults(data) {
+    const stepsList = document.getElementById("stepsList");
+    stepsList.innerHTML = "";
+    for (const s of data.steps) {
+        const cls  = s.pass ? "pass" : "fail";
+        const icon = s.pass ? "fa-circle-check" : "fa-circle-xmark";
+        const div  = document.createElement("div");
+        div.className = `step-item ${cls}`;
+        div.innerHTML = `
+            <div class="step-icon"><i class="fa-solid ${icon}"></i></div>
+            <div class="step-body">
+                <div class="step-label">Step ${s.step} — ${s.label}</div>
+                <div class="step-detail">${s.detail}</div>
+            </div>`;
+        stepsList.appendChild(div);
+    }
+
+    const level   = data.susceptibility;
+    const bgClass = { High:"bg-high", Medium:"bg-medium", Low:"bg-low",
+        Negligible:"bg-negligible", "Not Susceptible":"bg-not-susceptible", Error:"bg-error" }[level] || "bg-not-susceptible";
+    const cardEl  = document.getElementById("resultCard");
+
+    let inner = "";
+    if (data.corrosion_rate !== undefined) {
+        inner = `
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value">${data.corrosion_rate}</div>
+                    <div class="metric-label">CR (mm/y)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${data.design_cr}</div>
+                    <div class="metric-label">Design CR (mm/y)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${data.ratio}</div>
+                    <div class="metric-label">Ratio (CR / Design)</div>
+                </div>
+            </div>
+            <div class="result-level">
+                <div class="level-tag">Susceptibility</div>
+                <div class="level-value">${level.toUpperCase()}</div>
+            </div>`;
+    } else {
+        inner = `
+            <div>
+                <div class="level-tag">Result</div>
+                <div class="level-value" style="font-size:22px;">${level.toUpperCase()}</div>
+                <div class="reason-text" style="margin-top:6px;">${data.reason || ""}</div>
+            </div>`;
+    }
+    cardEl.innerHTML = `<div class="result-card ${bgClass}">${inner}</div>`;
+
+    const section = document.getElementById("resultsSection");
+    section.style.display = "block";
+    section.scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+(function init() {
+    selectMat("cs");
+    document.addEventListener("keydown", e => {
+        if (e.key === "Enter" && e.target.tagName !== "BUTTON") runAnalysis();
+    });
+})();
+</script>
+
+</body>
+</html>
