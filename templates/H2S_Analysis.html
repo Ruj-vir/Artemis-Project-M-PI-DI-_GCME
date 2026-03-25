@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H2S / H2 Corrosion Analysis — Artemis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ─── Base ─────────────────────────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #000 0%, #111 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ─── Header ───────────────────────────────────────────────────────── */
+        header {
+            background-color: #2b5797;
+            color: white;
+            padding: 0 24px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .brand { font-size: 26px; font-weight: 700; letter-spacing: 1px; }
+        .header-nav { display: flex; gap: 20px; }
+        .header-nav a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .header-nav a:hover { background: rgba(255,255,255,0.15); color: white; }
+
+        /* ─── Main layout ───────────────────────────────────────────────────── */
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 30px 20px 50px;
+        }
+
+        .card {
+            background: #f0f2f5;
+            width: 100%;
+            max-width: 960px;
+            border-radius: 28px;
+            padding: 32px 40px;
+            box-shadow: 0 0 40px rgba(255,255,255,0.08);
+        }
+
+        /* ─── Page title ────────────────────────────────────────────────────── */
+        .page-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a2f5a;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .page-title i { color: #2b5797; font-size: 22px; }
+
+        /* ─── Section label ─────────────────────────────────────────────────── */
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #2b5797;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #2b5797;
+            padding-bottom: 5px;
+            margin-bottom: 16px;
+        }
+
+        /* ─── Form grid ─────────────────────────────────────────────────────── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .form-panel {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 20px 22px;
+        }
+
+        /* ─── Form fields ───────────────────────────────────────────────────── */
+        .field { margin-bottom: 14px; }
+        .field:last-child { margin-bottom: 0; }
+
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid #c0d0e8;
+            border-radius: 7px;
+            font-size: 14px;
+            color: #222;
+            background: #fafcff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .field input:focus,
+        .field select:focus {
+            border-color: #2b5797;
+            box-shadow: 0 0 0 3px rgba(43,87,151,0.12);
+            background: white;
+        }
+        .field input::placeholder { color: #bbb; }
+
+        /* input + unit suffix */
+        .input-row { display: flex; }
+        .input-row input { flex: 1; border-radius: 7px 0 0 7px; }
+        .unit {
+            background: #2b5797;
+            color: white;
+            padding: 9px 11px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 0 7px 7px 0;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ─── Yes / No toggle ───────────────────────────────────────────────── */
+        .toggle-row { display: flex; gap: 10px; }
+        .toggle-btn {
+            flex: 1;
+            padding: 9px 0;
+            border: 2px solid #c0d0e8;
+            border-radius: 7px;
+            background: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.18s;
+            color: #666;
+        }
+        .toggle-btn:hover { border-color: #2b5797; color: #2b5797; }
+        .toggle-btn.active-yes { background: #27ae60; border-color: #27ae60; color: white; }
+        .toggle-btn.active-no  { background: #e74c3c; border-color: #e74c3c; color: white; }
+
+        /* ─── Optional actual CR toggle ─────────────────────────────────────── */
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 8px;
+            user-select: none;
+        }
+        .checkbox-label input[type="checkbox"] {
+            width: 15px; height: 15px;
+            accent-color: #2b5797;
+            cursor: pointer;
+        }
+        .hidden { display: none !important; }
+
+        /* hint text */
+        .hint { font-size: 11px; color: #aaa; margin-top: 4px; }
+
+        /* ─── Analyze button ────────────────────────────────────────────────── */
+        .btn-analyze {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #2b5797 0%, #3b6ba5 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 12px rgba(43,87,151,0.35);
+            transition: all 0.2s;
+            margin-bottom: 28px;
+        }
+        .btn-analyze:hover {
+            background: linear-gradient(135deg, #1e3f72 0%, #2b5797 100%);
+            box-shadow: 0 6px 16px rgba(43,87,151,0.45);
+            transform: translateY(-1px);
+        }
+        .btn-analyze:active { transform: translateY(0); }
+        .btn-analyze i { margin-right: 8px; }
+
+        /* ─── Results section ───────────────────────────────────────────────── */
+        #resultsSection { display: none; }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #d5dff0;
+            margin: 0 0 24px 0;
+        }
+
+        /* Steps */
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: white;
+            border-radius: 10px;
+            padding: 11px 16px;
+            border-left: 4px solid #ddd;
+        }
+        .step-item.pass { border-left-color: #27ae60; }
+        .step-item.fail { border-left-color: #e74c3c; }
+
+        .step-icon { font-size: 18px; width: 22px; flex-shrink: 0; text-align: center; }
+        .step-item.pass .step-icon { color: #27ae60; }
+        .step-item.fail .step-icon { color: #e74c3c; }
+
+        .step-body { flex: 1; }
+        .step-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.3px; }
+        .step-detail { font-size: 13px; color: #333; margin-top: 2px; }
+
+        /* Result summary card */
+        .result-card {
+            border-radius: 14px;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        /* Susceptibility color themes */
+        .bg-high        { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+        .bg-medium      { background: linear-gradient(135deg, #ca6f1e, #e67e22); }
+        .bg-low         { background: linear-gradient(135deg, #9a7d0a, #d4ac0d); }
+        .bg-negligible  { background: linear-gradient(135deg, #1a7a42, #27ae60); }
+        .bg-not-susceptible { background: linear-gradient(135deg, #5d6d7e, #7f8c8d); }
+        .bg-error       { background: linear-gradient(135deg, #7d3c98, #9b59b6); }
+
+        .metrics { display: flex; gap: 28px; flex-wrap: wrap; }
+        .metric { text-align: center; }
+        .metric-value { font-size: 26px; font-weight: 700; line-height: 1; }
+        .metric-label { font-size: 10px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+        .result-level { text-align: right; }
+        .level-tag { font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+        .level-value { font-size: 30px; font-weight: 700; line-height: 1.1; }
+
+        .reason-text { font-size: 14px; opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+<!-- ─── Header ───────────────────────────────────────────────────────────── -->
+<header>
+    <div class="brand">Artemis</div>
+    <nav class="header-nav">
+        <a href="javascript:history.back()"><i class="fa-solid fa-circle-arrow-left"></i> Back</a>
+        <a href="/projects"><i class="fa-solid fa-folder-open"></i> Projects</a>
+        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+    </nav>
+</header>
+
+<!-- ─── Main ─────────────────────────────────────────────────────────────── -->
+<div class="page-wrapper">
+    <div class="card">
+
+        <div class="page-title">
+            <i class="fa-solid fa-flask-vial"></i>
+            H2S / H2 Corrosion Analysis
+        </div>
+
+        <!-- ─── Form grid ─────────────────────────────────────────────────── -->
+        <div class="form-grid">
+
+            <!-- Left panel: Equipment -->
+            <div class="form-panel">
+                <div class="section-label">Equipment Parameters</div>
+
+                <div class="field">
+                    <label>Has H2S in Stream?</label>
+                    <div class="toggle-row">
+                        <button class="toggle-btn active-yes" id="btnYes" onclick="setH2S('YES')">
+                            <i class="fa-solid fa-check"></i> YES
+                        </button>
+                        <button class="toggle-btn" id="btnNo" onclick="setH2S('NO')">
+                            <i class="fa-solid fa-xmark"></i> NO
+                        </button>
+                    </div>
+                    <input type="hidden" id="hasH2S" value="YES">
+                </div>
+
+                <div class="field">
+                    <label>Operating Temperature</label>
+                    <div class="input-row">
+                        <input type="number" id="temperature" placeholder="e.g. 350" min="0" step="1">
+                        <span class="unit">°C</span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Material of Construction</label>
+                    <select id="material">
+                        <option value="">— Select Material —</option>
+                        <option value="Carbon Steel">Carbon Steel</option>
+                        <option value="Low Alloy">Low Alloy Steel</option>
+                        <option value="300 series SS">300 Series Stainless Steel</option>
+                        <option value="400 series SS">400 Series Stainless Steel</option>
+                        <option value="Duplex SS">Duplex SS (not in scope)</option>
+                        <option value="Titanium">Titanium (not in scope)</option>
+                        <option value="Nickel Alloy">Nickel Alloy (not in scope)</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Design Corrosion Rate (Allowable)</label>
+                    <div class="input-row">
+                        <input type="number" id="designCR" placeholder="e.g. 1.0" min="0.001" step="0.01">
+                        <span class="unit">mm/y</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right panel: H2S Parameters -->
+            <div class="form-panel" id="h2sPanel">
+                <div class="section-label">H2S Parameters</div>
+
+                <div class="field">
+                    <label>H2S Content</label>
+                    <div class="input-row">
+                        <input type="number" id="h2sMole" placeholder="e.g. 0.05" min="0" max="1" step="0.0001">
+                        <span class="unit">mol%</span>
+                    </div>
+                    <div class="hint">Valid range: 0.0 — 1.0 mol%</div>
+                </div>
+
+                <div class="field">
+                    <label>Hydrocarbon Type</label>
+                    <select id="hcType">
+                        <option value="">— Select Type —</option>
+                        <option value="Naphtha">Naphtha</option>
+                        <option value="Gas Oil">Gas Oil</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="useActualCR" onchange="toggleActualCR()">
+                        Use Actual (Measured) Corrosion Rate
+                    </label>
+                    <div id="actualCRWrapper" class="hidden">
+                        <div class="input-row">
+                            <input type="number" id="actualCR" placeholder="e.g. 2.5" min="0" step="0.01">
+                            <span class="unit">mm/y</span>
+                        </div>
+                        <div class="hint">Overrides table lookup value</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analyze button -->
+        <button class="btn-analyze" onclick="runAnalysis()">
+            <i class="fa-solid fa-magnifying-glass-chart"></i>
+            Analyze Corrosion Susceptibility
+        </button>
+
+        <!-- ─── Results ──────────────────────────────────────────────────── -->
+        <div id="resultsSection">
+            <hr class="divider">
+            <div class="section-label" style="margin-bottom: 14px;">Analysis Flowchart</div>
+
+            <div class="steps-list" id="stepsList"></div>
+
+            <div id="resultCard"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ─── Scripts ───────────────────────────────────────────────────────────── -->
+<script>
+    // ── State ──────────────────────────────────────────────────────────────
+    let h2sState = "YES";
+
+    function setH2S(val) {
+        h2sState = val;
+        document.getElementById("hasH2S").value = val;
+        document.getElementById("btnYes").className = "toggle-btn" + (val === "YES" ? " active-yes" : "");
+        document.getElementById("btnNo").className  = "toggle-btn" + (val === "NO"  ? " active-no"  : "");
+
+        const panel = document.getElementById("h2sPanel");
+        panel.style.opacity        = val === "YES" ? "1"    : "0.45";
+        panel.style.pointerEvents  = val === "YES" ? ""     : "none";
+    }
+
+    function toggleActualCR() {
+        const show = document.getElementById("useActualCR").checked;
+        document.getElementById("actualCRWrapper").classList.toggle("hidden", !show);
+    }
+
+    // ── Validation ─────────────────────────────────────────────────────────
+    function validate() {
+        const temp      = parseFloat(document.getElementById("temperature").value);
+        const material  = document.getElementById("material").value;
+        const designCR  = parseFloat(document.getElementById("designCR").value);
+        const h2sMole   = parseFloat(document.getElementById("h2sMole").value);
+        const hcType    = document.getElementById("hcType").value;
+        const useActual = document.getElementById("useActualCR").checked;
+        const actualCR  = parseFloat(document.getElementById("actualCR").value);
+
+        if (isNaN(temp) || temp <= 0)        { alert("กรุณาระบุ Temperature ที่ถูกต้อง"); return null; }
+        if (!material)                        { alert("กรุณาเลือก Material"); return null; }
+        if (isNaN(designCR) || designCR <= 0) { alert("กรุณาระบุ Design CR ที่ถูกต้อง (> 0)"); return null; }
+
+        if (h2sState === "YES") {
+            if (isNaN(h2sMole) || h2sMole < 0 || h2sMole > 1) {
+                alert("H2S Content ต้องอยู่ในช่วง 0.0 – 1.0 mol%");
+                return null;
+            }
+            if (!hcType) { alert("กรุณาเลือก Hydrocarbon Type"); return null; }
+            if (useActual && (isNaN(actualCR) || actualCR <= 0)) {
+                alert("กรุณาระบุ Actual CR ที่ถูกต้อง (> 0)");
+                return null;
+            }
+        }
+
+        return {
+            has_h2s:   h2sState,
+            temp,
+            material,
+            h2s_mole:  isNaN(h2sMole) ? 0 : h2sMole,
+            hc_type:   hcType || "Naphtha",
+            design_cr: designCR,
+            actual_cr: (useActual && !isNaN(actualCR)) ? actualCR : null,
+        };
+    }
+
+    // ── Run analysis ────────────────────────────────────────────────────────
+    async function runAnalysis() {
+        const payload = validate();
+        if (!payload) return;
+
+        const btn = document.querySelector(".btn-analyze");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing…';
+
+        try {
+            const res = await fetch("/h2s/calculate", {
+                method:  "POST",
+                headers: { "Content-Type": "application/json" },
+                body:    JSON.stringify(payload),
+            });
+
+            if (!res.ok) throw new Error(`Server error ${res.status}`);
+
+            const data = await res.json();
+            renderResults(data);
+        } catch (err) {
+            alert("เกิดข้อผิดพลาด: " + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-magnifying-glass-chart"></i> Analyze Corrosion Susceptibility';
+        }
+    }
+
+    // ── Render results ──────────────────────────────────────────────────────
+    function renderResults(data) {
+        // Steps
+        const stepsList = document.getElementById("stepsList");
+        stepsList.innerHTML = "";
+        for (const s of data.steps) {
+            const div = document.createElement("div");
+            div.className = `step-item ${s.pass ? "pass" : "fail"}`;
+            div.innerHTML = `
+                <div class="step-icon">
+                    <i class="fa-solid ${s.pass ? "fa-circle-check" : "fa-circle-xmark"}"></i>
+                </div>
+                <div class="step-body">
+                    <div class="step-label">Step ${s.step} — ${s.label}</div>
+                    <div class="step-detail">${s.detail}</div>
+                </div>`;
+            stepsList.appendChild(div);
+        }
+
+        // Result card
+        const level    = data.susceptibility;                          // e.g. "High"
+        const bgClass  = levelToClass(level);
+        const cardEl   = document.getElementById("resultCard");
+
+        let inner = "";
+        if (data.corrosion_rate !== undefined) {
+            inner = `
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value">${data.corrosion_rate}</div>
+                        <div class="metric-label">CR (mm/y)</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${data.design_cr}</div>
+                        <div class="metric-label">Design CR (mm/y)</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${data.ratio}</div>
+                        <div class="metric-label">Ratio (CR / Design)</div>
+                    </div>
+                </div>
+                <div class="result-level">
+                    <div class="level-tag">Susceptibility</div>
+                    <div class="level-value">${level.toUpperCase()}</div>
+                </div>`;
+        } else {
+            inner = `
+                <div>
+                    <div class="level-tag">Result</div>
+                    <div class="level-value" style="font-size:22px;">${level.toUpperCase()}</div>
+                    <div class="reason-text" style="margin-top:6px;">${data.reason || ""}</div>
+                </div>`;
+        }
+
+        cardEl.innerHTML = `<div class="result-card ${bgClass}" style="margin-top:16px;">${inner}</div>`;
+
+        // Reveal & scroll
+        const section = document.getElementById("resultsSection");
+        section.style.display = "block";
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function levelToClass(level) {
+        const map = {
+            "High":            "bg-high",
+            "Medium":          "bg-medium",
+            "Low":             "bg-low",
+            "Negligible":      "bg-negligible",
+            "Not Susceptible": "bg-not-susceptible",
+            "Error":           "bg-error",
+        };
+        return map[level] || "bg-not-susceptible";
+    }
+
+    // ── Keyboard shortcut: Enter → Analyze ─────────────────────────────────
+    document.addEventListener("keydown", e => {
+        if (e.key === "Enter" && e.target.tagName !== "BUTTON") runAnalysis();
+    });
+</script>
+
+</body>
+</html>

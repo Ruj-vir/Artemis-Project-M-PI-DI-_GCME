@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flue Gas Dew Point Corrosion — Artemis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #000 0%, #111 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ─── Header ─── */
+        header {
+            background-color: #2b5797;
+            color: white;
+            padding: 0 24px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .brand { font-size: 26px; font-weight: 700; letter-spacing: 1px; }
+        .header-nav { display: flex; gap: 20px; }
+        .header-nav a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .header-nav a:hover { background: rgba(255,255,255,0.15); color: white; }
+
+        /* ─── Layout ─── */
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 30px 20px 50px;
+        }
+
+        .card {
+            background: #f0f2f5;
+            width: 100%;
+            max-width: 960px;
+            border-radius: 28px;
+            padding: 32px 40px;
+            box-shadow: 0 0 40px rgba(255,255,255,0.08);
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a2f5a;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .page-title i { color: #2b5797; font-size: 22px; }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #2b5797;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #2b5797;
+            padding-bottom: 5px;
+            margin-bottom: 16px;
+        }
+
+        /* ─── Form grid ─── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .form-panel {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 20px 22px;
+        }
+
+        /* Full-width panel */
+        .form-panel-full {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 20px 22px;
+            margin-bottom: 18px;
+        }
+
+        /* ─── Fields ─── */
+        .field { margin-bottom: 14px; }
+        .field:last-child { margin-bottom: 0; }
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+        .field input, .field select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid #c0d0e8;
+            border-radius: 7px;
+            font-size: 14px;
+            color: #222;
+            background: #fafcff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .field input:focus, .field select:focus {
+            border-color: #2b5797;
+            box-shadow: 0 0 0 3px rgba(43,87,151,0.12);
+            background: white;
+        }
+        .field input::placeholder { color: #bbb; }
+
+        .input-row { display: flex; }
+        .input-row input { flex: 1; border-radius: 7px 0 0 7px; }
+        .unit {
+            background: #2b5797;
+            color: white;
+            padding: 9px 11px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 0 7px 7px 0;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ─── Checkbox group (S / N / Cl) ─── */
+        .checkbox-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .check-chip {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 14px;
+            border: 2px solid #c0d0e8;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            background: white;
+            transition: all 0.18s;
+            user-select: none;
+        }
+        .check-chip input[type="checkbox"] {
+            width: 15px; height: 15px;
+            accent-color: #2b5797;
+            cursor: pointer;
+        }
+        .check-chip:has(input:checked) {
+            border-color: #2b5797;
+            background: #eef3fb;
+            color: #2b5797;
+        }
+
+        /* hint */
+        .hint { font-size: 11px; color: #aaa; margin-top: 4px; }
+
+        /* ─── Yes/No toggle ─── */
+        .toggle-row { display: flex; gap: 10px; }
+        .toggle-btn {
+            flex: 1;
+            padding: 9px 0;
+            border: 2px solid #c0d0e8;
+            border-radius: 7px;
+            background: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.18s;
+            color: #666;
+        }
+        .toggle-btn:hover { border-color: #2b5797; color: #2b5797; }
+        .toggle-btn.active-yes { background: #27ae60; border-color: #27ae60; color: white; }
+        .toggle-btn.active-no  { background: #e74c3c; border-color: #e74c3c; color: white; }
+
+        /* ─── Actual CR checkbox ─── */
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 8px;
+            user-select: none;
+        }
+        .checkbox-label input[type="checkbox"] {
+            width: 15px; height: 15px;
+            accent-color: #2b5797;
+            cursor: pointer;
+        }
+        .hidden { display: none !important; }
+
+        /* ─── Button ─── */
+        .btn-analyze {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #2b5797 0%, #3b6ba5 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 12px rgba(43,87,151,0.35);
+            transition: all 0.2s;
+            margin-bottom: 28px;
+        }
+        .btn-analyze:hover {
+            background: linear-gradient(135deg, #1e3f72 0%, #2b5797 100%);
+            box-shadow: 0 6px 16px rgba(43,87,151,0.45);
+            transform: translateY(-1px);
+        }
+        .btn-analyze:active { transform: translateY(0); }
+        .btn-analyze i { margin-right: 8px; }
+
+        /* ─── Results ─── */
+        #resultsSection { display: none; }
+        .divider { border: none; border-top: 1px solid #d5dff0; margin: 0 0 24px 0; }
+
+        .steps-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: white;
+            border-radius: 10px;
+            padding: 11px 16px;
+            border-left: 4px solid #ddd;
+        }
+        .step-item.pass { border-left-color: #27ae60; }
+        .step-item.fail { border-left-color: #e74c3c; }
+        .step-item.info { border-left-color: #2b5797; }
+        .step-icon { font-size: 18px; width: 22px; flex-shrink: 0; text-align: center; }
+        .step-item.pass .step-icon { color: #27ae60; }
+        .step-item.fail .step-icon { color: #e74c3c; }
+        .step-item.info .step-icon { color: #2b5797; }
+        .step-body { flex: 1; }
+        .step-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.3px; }
+        .step-detail { font-size: 13px; color: #333; margin-top: 2px; }
+
+        /* ─── Result card colors ─── */
+        .result-card {
+            border-radius: 14px;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        .bg-high           { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+        .bg-medium         { background: linear-gradient(135deg, #ca6f1e, #e67e22); }
+        .bg-low            { background: linear-gradient(135deg, #9a7d0a, #d4ac0d); }
+        .bg-negligible     { background: linear-gradient(135deg, #1a7a42, #27ae60); }
+        .bg-not-susceptible{ background: linear-gradient(135deg, #5d6d7e, #7f8c8d); }
+        .bg-error          { background: linear-gradient(135deg, #7d3c98, #9b59b6); }
+
+        .metrics { display: flex; gap: 28px; flex-wrap: wrap; }
+        .metric { text-align: center; }
+        .metric-value { font-size: 26px; font-weight: 700; line-height: 1; }
+        .metric-label { font-size: 10px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+        .result-level { text-align: right; }
+        .level-tag { font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+        .level-value { font-size: 30px; font-weight: 700; line-height: 1.1; }
+        .reason-text { font-size: 14px; opacity: 0.9; }
+
+        /* ─── Dew point reference table ─── */
+        .ref-table-wrapper {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 18px 22px;
+            margin-bottom: 18px;
+        }
+        .ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .ref-table th {
+            background: #2b5797;
+            color: white;
+            padding: 7px 10px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .ref-table th:first-child { border-radius: 6px 0 0 6px; }
+        .ref-table th:last-child  { border-radius: 0 6px 6px 0; }
+        .ref-table td {
+            padding: 7px 10px;
+            border-bottom: 1px solid #eef0f5;
+            color: #333;
+        }
+        .ref-table tr:last-child td { border-bottom: none; }
+        .ref-table tr:nth-child(even) td { background: #f7f9fd; }
+        .ref-table .highlight-row td { font-weight: 700; color: #2b5797; }
+    </style>
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header>
+    <div class="brand">Artemis</div>
+    <nav class="header-nav">
+        <a href="javascript:history.back()"><i class="fa-solid fa-circle-arrow-left"></i> Back</a>
+        <a href="/projects"><i class="fa-solid fa-folder-open"></i> Projects</a>
+        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+    </nav>
+</header>
+
+<!-- ─── Main ─── -->
+<div class="page-wrapper">
+<div class="card">
+
+    <div class="page-title">
+        <i class="fa-solid fa-temperature-high"></i>
+        Flue Gas Dew Point Corrosion Analysis
+    </div>
+
+    <!-- ── Step 1: Fuel Composition ── -->
+    <div class="form-panel-full">
+        <div class="section-label">Step 1 — Fuel Composition (Contaminants)</div>
+        <div class="field">
+            <label>Contains Sulfur, Nitrogen, or Chlorides in Fuel?</label>
+            <div class="checkbox-group" id="contaminantGroup">
+                <label class="check-chip">
+                    <input type="checkbox" value="Sulfur" onchange="updateContaminants()"> Sulfur (S)
+                </label>
+                <label class="check-chip">
+                    <input type="checkbox" value="Nitrogen" onchange="updateContaminants()"> Nitrogen (N)
+                </label>
+                <label class="check-chip">
+                    <input type="checkbox" value="Chlorides" onchange="updateContaminants()"> Chlorides (Cl)
+                </label>
+            </div>
+            <div class="hint" style="margin-top: 8px;">เลือกสารปนเปื้อนที่มีอยู่ในเชื้อเพลิง (เลือกได้มากกว่า 1)</div>
+        </div>
+    </div>
+
+    <!-- ── Step 2 & 3 in grid ── -->
+    <div class="form-grid">
+
+        <!-- Left: Equipment & Material -->
+        <div class="form-panel">
+            <div class="section-label">Step 2 — Material of Construction</div>
+
+            <div class="field">
+                <label>Material</label>
+                <select id="material">
+                    <option value="">— Select Material —</option>
+                    <option value="Carbon Steel">Carbon Steel</option>
+                    <option value="Low Alloy">Low Alloy Steel</option>
+                    <option value="300 series SS">300 Series Stainless Steel</option>
+                    <option value="Duplex SS">Duplex SS (not in scope)</option>
+                    <option value="Titanium">Titanium (not in scope)</option>
+                    <option value="Nickel Alloy">Nickel Alloy (not in scope)</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Design Corrosion Rate (Allowable)</label>
+                <div class="input-row">
+                    <input type="number" id="designCR" placeholder="e.g. 1.0" min="0.001" step="0.01">
+                    <span class="unit">mm/y</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Temperature -->
+        <div class="form-panel">
+            <div class="section-label">Step 3 — Operating Temperature</div>
+
+            <div class="field">
+                <label>Flue Gas Operating Temperature</label>
+                <div class="input-row">
+                    <input type="number" id="operatingTemp" placeholder="e.g. 180" min="0" step="1">
+                    <span class="unit">°C</span>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Estimated Dew Point Temperature</label>
+                <div class="input-row">
+                    <input type="number" id="dewPointTemp" placeholder="e.g. 150" min="0" step="1">
+                    <span class="unit">°C</span>
+                </div>
+                <div class="hint">อ้างอิง Dew Point จากตารางด้านล่าง หรือใส่ค่าที่วัดได้จริง</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Dew Point Reference Table ── -->
+    <div class="ref-table-wrapper">
+        <div class="section-label" style="margin-bottom: 12px;">Reference — Typical Dew Point Temperatures</div>
+        <table class="ref-table">
+            <thead>
+                <tr>
+                    <th>Acid Type</th>
+                    <th>Source Contaminant</th>
+                    <th>Typical Dew Point (°C)</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Sulfuric Acid (H₂SO₄)</td>
+                    <td>Sulfur (S) → SO₃</td>
+                    <td>120 – 160 °C</td>
+                    <td>ขึ้นอยู่กับ %SO₃ ในก๊าซ</td>
+                </tr>
+                <tr>
+                    <td>Sulfurous Acid (H₂SO₃)</td>
+                    <td>Sulfur (S) → SO₂</td>
+                    <td>60 – 100 °C</td>
+                    <td>ต่ำกว่า H₂SO₄ dew point</td>
+                </tr>
+                <tr class="highlight-row">
+                    <td>Hydrochloric Acid (HCl)</td>
+                    <td>Chlorides (Cl)</td>
+                    <td>50 – 80 °C</td>
+                    <td>เกิด SCC ใน SS ได้รุนแรง</td>
+                </tr>
+                <tr>
+                    <td>Nitric Acid (HNO₃)</td>
+                    <td>Nitrogen (N) → NOₓ</td>
+                    <td>30 – 60 °C</td>
+                    <td>มักต่ำกว่า Sulfuric dew point</td>
+                </tr>
+                <tr>
+                    <td>Water (H₂O)</td>
+                    <td>Combustion products</td>
+                    <td>40 – 60 °C</td>
+                    <td>Moisture condensation point</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ── Step 4: Actual CR ── -->
+    <div class="form-panel-full">
+        <div class="section-label">Step 4 — Actual Corrosion Rate</div>
+        <div class="field">
+            <label class="checkbox-label">
+                <input type="checkbox" id="useActualCR" onchange="toggleActualCR()">
+                Is the Actual (Measured) Corrosion Rate Available?
+            </label>
+            <div id="actualCRWrapper" class="hidden">
+                <div class="input-row" style="max-width: 280px;">
+                    <input type="number" id="actualCR" placeholder="e.g. 2.5" min="0" step="0.01">
+                    <span class="unit">mm/y</span>
+                </div>
+                <div class="hint">ใส่ค่าที่วัดได้จริงจากการตรวจสอบ</div>
+            </div>
+            <div id="noCRNote" class="hint" style="margin-top: 6px;">
+                หากไม่มีค่า Actual CR ระบบจะใช้ Estimated CR = 1.0 mm/y (Conservative estimate for dew point corrosion)
+            </div>
+        </div>
+    </div>
+
+    <!-- Analyze Button -->
+    <button class="btn-analyze" onclick="runAnalysis()">
+        <i class="fa-solid fa-magnifying-glass-chart"></i>
+        Analyze Corrosion Susceptibility
+    </button>
+
+    <!-- ─── Results ─── -->
+    <div id="resultsSection">
+        <hr class="divider">
+        <div class="section-label" style="margin-bottom: 14px;">Analysis Flowchart</div>
+        <div class="steps-list" id="stepsList"></div>
+        <div id="resultCard"></div>
+    </div>
+
+</div>
+</div>
+
+<script>
+// ── State ──
+let selectedContaminants = [];
+
+function updateContaminants() {
+    selectedContaminants = Array.from(
+        document.querySelectorAll('#contaminantGroup input:checked')
+    ).map(cb => cb.value);
+}
+
+function toggleActualCR() {
+    const show = document.getElementById("useActualCR").checked;
+    document.getElementById("actualCRWrapper").classList.toggle("hidden", !show);
+    document.getElementById("noCRNote").classList.toggle("hidden", show);
+}
+
+// ── Validation ──
+function validate() {
+    const material    = document.getElementById("material").value;
+    const designCR    = parseFloat(document.getElementById("designCR").value);
+    const operatingT  = parseFloat(document.getElementById("operatingTemp").value);
+    const dewPointT   = parseFloat(document.getElementById("dewPointTemp").value);
+    const useActual   = document.getElementById("useActualCR").checked;
+    const actualCR    = parseFloat(document.getElementById("actualCR").value);
+
+    if (!material)                          { alert("กรุณาเลือก Material"); return null; }
+    if (isNaN(designCR) || designCR <= 0)   { alert("กรุณาระบุ Design CR ที่ถูกต้อง (> 0)"); return null; }
+    if (isNaN(operatingT) || operatingT <= 0){ alert("กรุณาระบุ Operating Temperature ที่ถูกต้อง"); return null; }
+    if (isNaN(dewPointT) || dewPointT <= 0)  { alert("กรุณาระบุ Dew Point Temperature ที่ถูกต้อง"); return null; }
+    if (useActual && (isNaN(actualCR) || actualCR <= 0)) {
+        alert("กรุณาระบุ Actual CR ที่ถูกต้อง (> 0)");
+        return null;
+    }
+
+    return {
+        contaminants: selectedContaminants,
+        material,
+        design_cr:   designCR,
+        operating_t: operatingT,
+        dew_point_t: dewPointT,
+        actual_cr:   useActual ? actualCR : null,
+    };
+}
+
+// ── Core Analysis Logic ──
+function analyze(payload) {
+    const steps = [];
+    const { contaminants, material, design_cr, operating_t, dew_point_t, actual_cr } = payload;
+
+    // STEP 1: Contaminants present?
+    if (contaminants.length === 0) {
+        steps.push({
+            step: 1, label: "Fuel Contaminants (S / N / Cl)",
+            pass: false,
+            detail: "ไม่พบ Sulfur, Nitrogen หรือ Chlorides ในเชื้อเพลิง → ไม่เกิด Acid Dew Point Corrosion"
+        });
+        return { steps, susceptibility: "Not Susceptible", reason: "No corrosive contaminants in fuel (S/N/Cl not present)" };
+    }
+    steps.push({
+        step: 1, label: "Fuel Contaminants (S / N / Cl)",
+        pass: true,
+        detail: `พบสารปนเปื้อน: ${contaminants.join(", ")} → ดำเนินการตรวจสอบต่อ`
+    });
+
+    // STEP 2: Material in scope?
+    const inScopeMaterials = ["Carbon Steel", "Low Alloy", "300 series SS"];
+    const isInScope = inScopeMaterials.some(m => material.includes(m.split(" ")[0]) || material === m);
+    // More robust check
+    const scopeMatch = material === "Carbon Steel" || material === "Low Alloy" || material === "300 series SS";
+
+    if (!scopeMatch) {
+        steps.push({
+            step: 2, label: "Material of Construction",
+            pass: false,
+            detail: `${material} — ไม่อยู่ในขอบเขตการวิเคราะห์ (Not in scope for this mechanism)`
+        });
+        return { steps, susceptibility: "Not Susceptible", reason: `Material ${material} is not in scope for Flue Gas Dew Point Corrosion` };
+    }
+    steps.push({
+        step: 2, label: "Material of Construction",
+        pass: true,
+        detail: `${material} — อยู่ในขอบเขตการวิเคราะห์ (Susceptible material)`
+    });
+
+    // STEP 3: Operating temp vs Dew point
+    const aboveDewPoint = operating_t > dew_point_t;
+    if (aboveDewPoint) {
+        steps.push({
+            step: 3, label: "Operating Temp vs Dew Point",
+            pass: false,
+            detail: `Operating Temp (${operating_t}°C) > Dew Point (${dew_point_t}°C) → ไม่มีการควบแน่น ไม่เกิด Dew Point Corrosion`
+        });
+        return { steps, susceptibility: "Not Susceptible", reason: `Operating temperature ${operating_t}°C is above the dew point ${dew_point_t}°C` };
+    }
+    steps.push({
+        step: 3, label: "Operating Temp vs Dew Point",
+        pass: true,
+        detail: `Operating Temp (${operating_t}°C) ≤ Dew Point (${dew_point_t}°C) → มีการควบแน่นของกรด เกิด Corrosion ได้`
+    });
+
+    // STEP 4: Determine Corrosion Rate
+    let finalCR;
+    let crSource;
+    if (actual_cr !== null) {
+        finalCR = actual_cr;
+        crSource = `ใช้ Actual CR ที่วัดได้: ${actual_cr} mm/y`;
+    } else {
+        // Conservative estimate for dew point corrosion when no actual data
+        // Based on severity: Chlorides > Sulfuric > others
+        let baseCR = 1.0;
+        if (contaminants.includes("Chlorides")) baseCR = 2.0;
+        else if (contaminants.includes("Sulfur") && contaminants.includes("Nitrogen")) baseCR = 1.5;
+        finalCR = baseCR;
+        crSource = `ใช้ Estimated CR (Conservative): ${finalCR} mm/y (ขึ้นอยู่กับ contaminants ที่มี)`;
+    }
+
+    steps.push({
+        step: 4, label: "Corrosion Rate Determination",
+        pass: true,
+        detail: crSource
+    });
+
+    // STEP 5: Ratio & Susceptibility
+    const ratio = finalCR / design_cr;
+    let level;
+    if (ratio > 4)          level = "High";
+    else if (ratio >= 1)    level = "Medium";
+    else if (ratio >= 0.5)  level = "Low";
+    else                    level = "Negligible";
+
+    steps.push({
+        step: 5, label: "Susceptibility Assessment (CR / Design CR)",
+        pass: true,
+        detail: `CR = ${finalCR} mm/y ÷ Design CR = ${design_cr} mm/y → Ratio = ${ratio.toFixed(2)} → Susceptibility: ${level.toUpperCase()}`
+    });
+
+    return {
+        steps,
+        susceptibility: level,
+        corrosion_rate: finalCR,
+        design_cr,
+        ratio: ratio.toFixed(2),
+    };
+}
+
+// ── Run ──
+function runAnalysis() {
+    const payload = validate();
+    if (!payload) return;
+
+    const result = analyze(payload);
+    renderResults(result);
+}
+
+// ── Render ──
+function renderResults(data) {
+    const stepsList = document.getElementById("stepsList");
+    stepsList.innerHTML = "";
+
+    for (const s of data.steps) {
+        const cls = s.pass ? "pass" : "fail";
+        const icon = s.pass ? "fa-circle-check" : "fa-circle-xmark";
+        const div = document.createElement("div");
+        div.className = `step-item ${cls}`;
+        div.innerHTML = `
+            <div class="step-icon"><i class="fa-solid ${icon}"></i></div>
+            <div class="step-body">
+                <div class="step-label">Step ${s.step} — ${s.label}</div>
+                <div class="step-detail">${s.detail}</div>
+            </div>`;
+        stepsList.appendChild(div);
+    }
+
+    const level   = data.susceptibility;
+    const bgClass = levelToClass(level);
+    const cardEl  = document.getElementById("resultCard");
+
+    let inner = "";
+    if (data.corrosion_rate !== undefined) {
+        inner = `
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value">${data.corrosion_rate}</div>
+                    <div class="metric-label">CR (mm/y)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${data.design_cr}</div>
+                    <div class="metric-label">Design CR (mm/y)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${data.ratio}</div>
+                    <div class="metric-label">Ratio (CR / Design)</div>
+                </div>
+            </div>
+            <div class="result-level">
+                <div class="level-tag">Susceptibility</div>
+                <div class="level-value">${level.toUpperCase()}</div>
+            </div>`;
+    } else {
+        inner = `
+            <div>
+                <div class="level-tag">Result</div>
+                <div class="level-value" style="font-size:22px;">${level.toUpperCase()}</div>
+                <div class="reason-text" style="margin-top:6px;">${data.reason || ""}</div>
+            </div>`;
+    }
+
+    cardEl.innerHTML = `<div class="result-card ${bgClass}" style="margin-top:16px;">${inner}</div>`;
+
+    const section = document.getElementById("resultsSection");
+    section.style.display = "block";
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function levelToClass(level) {
+    const map = {
+        "High": "bg-high",
+        "Medium": "bg-medium",
+        "Low": "bg-low",
+        "Negligible": "bg-negligible",
+        "Not Susceptible": "bg-not-susceptible",
+        "Error": "bg-error",
+    };
+    return map[level] || "bg-not-susceptible";
+}
+
+// Enter key shortcut
+document.addEventListener("keydown", e => {
+    if (e.key === "Enter" && e.target.tagName !== "BUTTON") runAnalysis();
+});
+</script>
+
+</body>
+</html>

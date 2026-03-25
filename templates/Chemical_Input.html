@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemical Input - Artemis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #2b5797;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 50px;
+        }
+
+        .brand {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(to bottom, #000 0%, #111 100%);
+        }
+
+        .card {
+            background-color: #f0f2f5;
+            width: 100%;
+            max-width: 950px;
+            border-radius: 40px;
+            padding: 25px 40px;
+            box-sizing: border-box;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .top-nav div {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .top-nav div:hover {
+            color: #2b5797;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: normal;
+            margin: 0;
+            font-size: 28px;
+        }
+
+        /* ส่วน Form */
+        .form-section {
+            background-color: white;
+            border: 1px solid #6d9eeb;
+            border-radius: 10px;
+            padding: 20px 25px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 9px 12px;
+            border: 1px solid #6d9eeb;
+            border-radius: 5px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #2b5797;
+            box-shadow: 0 0 0 2px rgba(43, 87, 151, 0.15);
+        }
+
+        .btn-add {
+            background-color: #3b6ba5;
+            color: white;
+            border: none;
+            padding: 9px 25px;
+            font-size: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+
+        .btn-add:hover {
+            background-color: #2a4e7a;
+        }
+
+        /* ส่วนตาราง */
+        .table-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .table-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header-row span {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .btn-clear {
+            background-color: #c0392b;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            font-size: 13px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-clear:hover {
+            background-color: #a93226;
+        }
+
+        .table-wrapper {
+            border: 1px solid #6d9eeb;
+            max-height: 250px;
+            overflow-y: auto;
+            background-color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #2b5797;
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: normal;
+            z-index: 5;
+            white-space: nowrap;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fff;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #dbe9f5;
+        }
+
+        tbody tr:hover {
+            background-color: #b8d2ea;
+        }
+
+        td {
+            padding: 8px 12px;
+            color: #444;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .td-no {
+            text-align: center;
+            width: 50px;
+            color: #888;
+        }
+
+        .td-delete {
+            text-align: center;
+            width: 50px;
+        }
+
+        .td-delete i {
+            color: #c0392b;
+            cursor: pointer;
+        }
+
+        .td-delete i:hover {
+            color: #922b21;
+        }
+
+        .empty-row td {
+            text-align: center;
+            color: #aaa;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        /* Scrollbar */
+        .table-wrapper::-webkit-scrollbar { width: 12px; }
+        .table-wrapper::-webkit-scrollbar-track { background: #f1f1f1; }
+        .table-wrapper::-webkit-scrollbar-thumb { background: #c1c1c1; border: 2px solid #f1f1f1; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">Artemis</div>
+</header>
+
+<div class="main-container">
+    <div class="card">
+
+        <div class="top-nav">
+            <div onclick="history.back()"><i class="fa-solid fa-circle-arrow-left"></i> Back</div>
+            <div onclick="window.location.href='/'"><i class="fa-solid fa-house"></i> Home</div>
+        </div>
+
+        <h1>Chemical / Substance Input</h1>
+
+        <!-- Form -->
+        <div class="form-section">
+            <div class="form-group">
+                <label><i class="fa-solid fa-flask"></i> Chemical / Substance</label>
+                <input type="text" id="inputChemical" placeholder="e.g., Benzene, NaOH, H2SO4">
+            </div>
+            <div class="form-group" style="max-width: 160px;">
+                <label><i class="fa-solid fa-weight-scale"></i> Quantity (Amount)</label>
+                <input type="number" id="inputQuantity" placeholder="e.g., 100" min="0" step="any">
+            </div>
+            <div class="form-group" style="max-width: 160px;">
+                <label><i class="fa-solid fa-ruler"></i> Unit</label>
+                <select id="inputUnit">
+                    <option value="">-- Select Unit --</option>
+                    <option value="%">% (Percent)</option>
+                    <option value="ppm">ppm</option>
+                    <option value="ppb">ppb</option>
+                    <option value="mg/L">mg/L</option>
+                    <option value="g/L">g/L</option>
+                    <option value="mg/kg">mg/kg</option>
+                    <option value="kg">kg</option>
+                    <option value="g">g</option>
+                    <option value="mL">mL</option>
+                    <option value="L">L</option>
+                    <option value="mol/L">mol/L</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <button class="btn-add" onclick="addRow()">
+                <i class="fa-solid fa-plus"></i> Add
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-section">
+            <div class="table-header-row">
+                <span>รายการ Chemical (<span id="rowCount">0</span> รายการ)</span>
+                <button class="btn-clear" onclick="clearAll()">
+                    <i class="fa-solid fa-trash"></i> Clear All
+                </button>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="td-no">#</th>
+                            <th>Chemical / Substance</th>
+                            <th>Quantity (Amount)</th>
+                            <th>Unit</th>
+                            <th class="td-delete"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr class="empty-row" id="emptyRow">
+                            <td colspan="5">ยังไม่มีข้อมูล — กรอกข้อมูลด้านบนแล้วกด Add</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let rowIndex = 0;
+
+    function addRow() {
+        const chemical = document.getElementById('inputChemical').value.trim();
+        const quantity = document.getElementById('inputQuantity').value.trim();
+        const unit     = document.getElementById('inputUnit').value;
+
+        if (!chemical) {
+            Swal.fire('ข้อผิดพลาด', 'กรุณาระบุ Chemical / Substance', 'error');
+            return;
+        }
+        if (!quantity || isNaN(quantity)) {
+            Swal.fire('ข้อผิดพลาด', 'กรุณาระบุ Quantity ให้ถูกต้อง', 'error');
+            return;
+        }
+        if (!unit) {
+            Swal.fire('ข้อผิดพลาด', 'กรุณาเลือก Unit', 'error');
+            return;
+        }
+
+        // ซ่อนแถว empty
+        document.getElementById('emptyRow').style.display = 'none';
+
+        rowIndex++;
+        const tbody = document.getElementById('tableBody');
+        const newRow = tbody.insertRow(tbody.rows.length - 1 < 0 ? 0 : tbody.rows.length);
+
+        newRow.setAttribute('data-id', rowIndex);
+        newRow.innerHTML = `
+            <td class="td-no">${rowIndex}</td>
+            <td>${escapeHtml(chemical)}</td>
+            <td>${escapeHtml(quantity)}</td>
+            <td>${escapeHtml(unit)}</td>
+            <td class="td-delete">
+                <i class="fa-solid fa-trash-can" onclick="deleteRow(this, ${rowIndex})" title="Delete"></i>
+            </td>
+        `;
+
+        updateCount();
+        clearInputs();
+    }
+
+    function deleteRow(btn, id) {
+        Swal.fire({
+            title: 'ลบรายการนี้?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'ลบ',
+            cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                btn.closest('tr').remove();
+                updateCount();
+                renumberRows();
+                checkEmpty();
+            }
+        });
+    }
+
+    function clearAll() {
+        if (rowIndex === 0) return;
+        Swal.fire({
+            title: 'ล้างทั้งหมด?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'ล้าง',
+            cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const tbody = document.getElementById('tableBody');
+                // ลบทุก row ยกเว้น emptyRow
+                const rows = tbody.querySelectorAll('tr:not(#emptyRow)');
+                rows.forEach(r => r.remove());
+                rowIndex = 0;
+                updateCount();
+                checkEmpty();
+            }
+        });
+    }
+
+    function renumberRows() {
+        const rows = document.querySelectorAll('#tableBody tr:not(#emptyRow)');
+        rows.forEach((row, i) => {
+            row.querySelector('.td-no').textContent = i + 1;
+        });
+    }
+
+    function updateCount() {
+        const count = document.querySelectorAll('#tableBody tr:not(#emptyRow)').length;
+        document.getElementById('rowCount').textContent = count;
+    }
+
+    function checkEmpty() {
+        const count = document.querySelectorAll('#tableBody tr:not(#emptyRow)').length;
+        document.getElementById('emptyRow').style.display = count === 0 ? '' : 'none';
+    }
+
+    function clearInputs() {
+        document.getElementById('inputChemical').value = '';
+        document.getElementById('inputQuantity').value = '';
+        document.getElementById('inputUnit').value = '';
+        document.getElementById('inputChemical').focus();
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // กด Enter เพื่อ Add
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') addRow();
+    });
+</script>
+
+</body>
+</html>

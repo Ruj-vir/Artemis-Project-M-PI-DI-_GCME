@@ -238,8 +238,8 @@
     <div class="main-container">
         <div class="card">
             <div class="top-nav">
-                <div><i class="fa-solid fa-circle-arrow-left"></i> Back</div>
-                <div><i class="fa-solid fa-house"></i> Home</div>
+                <div onclick="history.back()" style="cursor:pointer;"><i class="fa-solid fa-circle-arrow-left"></i> Back</div>
+                <div onclick="window.location.href='/'" style="cursor:pointer;"><i class="fa-solid fa-house"></i> Home</div>
             </div>
 
             <h1>Project Name</h1>
@@ -248,7 +248,7 @@
 
             <div class="table-wrapper">
                 <table>
-                    <tr class="selected" onclick="window.location.href='http://127.0.0.1:8000'" style="cursor: pointer;">
+                    <tr class="selected" onclick="selectRow(this)" style="cursor: pointer;">
                         <td width="5%" onclick="event.stopPropagation();">
                             <span class="link-text" onclick="this.nextElementSibling.click()">Upload file</span>
                             <input type="file" style="display: none;" onchange="alert('คุณเลือกไฟล์: ' + this.files[0].name)">
@@ -264,10 +264,9 @@
                         <td>Modified date: 25/02/2024</td>
                         <td>Modified by: 26009649</td>
                     </tr>
-                    <tr>
+                    <tr onclick="selectRow(this)" style="cursor: pointer;">
                         <td width="5%">
-    <span class="link-text" onclick="this.nextElementSibling.click()">Upload file</span>
-    
+    <span class="link-text" onclick="event.stopPropagation(); this.nextElementSibling.click()">Upload file</span>
     <input type="file" style="display: none;" onchange="alert('คุณเลือกไฟล์: ' + this.files[0].name)">
 </td>
                         <td width="25%">
@@ -385,7 +384,7 @@
                     
                 </div>
                 <div class="action-buttons">
-                    <button class="btn">View</button>
+                    <button class="btn" onclick="viewSelected()">View</button>
                     <button class="btn" onclick="openNewProjectModal()">New Project</button>
                 </div>
             </div>
@@ -525,6 +524,22 @@
     }
 </script>
 <script>
+    // ── Row selection ──────────────────────────────────────────────────────
+    var selectedRow = document.querySelector("tr.selected") || null;
+
+    function selectRow(row) {
+        document.querySelectorAll(".table-wrapper table tr").forEach(function(r) {
+            r.classList.remove("selected");
+        });
+        row.classList.add("selected");
+        selectedRow = row;
+    }
+
+    function viewSelected() {
+        // นำทางไปหน้า H2S Analysis ของ project ที่เลือก
+        window.location.href = "/h2s";
+    }
+
     function filterTable() {
         // 1. รับค่าที่พิมพ์เข้ามา และแปลงเป็นตัวพิมพ์เล็ก (เพื่อให้ค้นหาเจอไม่ว่าจะพิมพ์เล็กหรือใหญ่)
         var input = document.getElementById("searchInput");
