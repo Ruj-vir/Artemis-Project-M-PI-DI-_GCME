@@ -176,6 +176,21 @@ async def hcl_corrosion_page(request: Request):
     return templates.TemplateResponse("Hydrochloric_Acid_Corrosion\u200b.html", {"request": request})
 
 
+@app.get("/htha", response_class=HTMLResponse)
+async def htha_page(request: Request):
+    return templates.TemplateResponse("High temperature hydrogen attack.html", {"request": request})
+
+
+@app.get("/sulfidation", response_class=HTMLResponse)
+async def sulfidation_page(request: Request):
+    return templates.TemplateResponse("Sulfidation.html", {"request": request})
+
+
+@app.get("/thermal_shock", response_class=HTMLResponse)
+async def thermal_shock_page(request: Request):
+    return templates.TemplateResponse("Thermal shock.html", {"request": request})
+
+
 @app.post("/h2s/calculate")
 async def h2s_calculate(data: H2SInput):
     result = calculate_h2s_susceptibility(

@@ -1,0 +1,11 @@
+# Force LF for Docker and config files
+Dockerfile text eol=lf
+docker-compose.yml text eol=lf
+.dockerignore text eol=lf
+requirements.txt text eol=lf
+*.py text eol=lf
+*.sh text eol=lf
+
+# Windows files keep CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf

@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTHA Analysis — Artemis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #000 0%, #111 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background-color: #2b5797;
+            color: white;
+            padding: 0 24px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .brand { font-size: 26px; font-weight: 700; letter-spacing: 1px; }
+        .header-nav { display: flex; gap: 20px; }
+        .header-nav a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 13px;
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .header-nav a:hover { background: rgba(255,255,255,0.15); color: white; }
+
+        /* Layout */
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 30px 20px 50px;
+        }
+        .card {
+            background: #f0f2f5;
+            width: 100%;
+            max-width: 1020px;
+            border-radius: 28px;
+            padding: 32px 40px;
+            box-shadow: 0 0 40px rgba(255,255,255,0.08);
+        }
+        .page-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a2f5a;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .page-title i { color: #2b5797; font-size: 22px; }
+        .page-subtitle {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 28px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #2b5797;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #2b5797;
+            padding-bottom: 5px;
+            margin-bottom: 16px;
+        }
+
+        /* Panels */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+        .form-panel {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 20px 22px;
+        }
+        .form-panel-full {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 20px 22px;
+            margin-bottom: 18px;
+        }
+
+        /* Fields */
+        .field { margin-bottom: 14px; }
+        .field:last-child { margin-bottom: 0; }
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+        .field input, .field select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid #c0d0e8;
+            border-radius: 7px;
+            font-size: 14px;
+            color: #222;
+            background: #fafcff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .field input:focus, .field select:focus {
+            border-color: #2b5797;
+            box-shadow: 0 0 0 3px rgba(43,87,151,0.12);
+            background: white;
+        }
+        .field input::placeholder { color: #bbb; }
+        .input-row { display: flex; }
+        .input-row input { flex: 1; border-radius: 7px 0 0 7px; }
+        .unit {
+            background: #2b5797;
+            color: white;
+            padding: 9px 11px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 0 7px 7px 0;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Toggle */
+        .toggle-row { display: flex; gap: 10px; }
+        .toggle-btn {
+            flex: 1;
+            padding: 9px 0;
+            border: 2px solid #c0d0e8;
+            border-radius: 7px;
+            background: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.18s;
+            color: #666;
+        }
+        .toggle-btn:hover { border-color: #2b5797; color: #2b5797; }
+        .toggle-btn.active-yes { background: #27ae60; border-color: #27ae60; color: white; }
+        .toggle-btn.active-no  { background: #e74c3c; border-color: #e74c3c; color: white; }
+
+        .hint { font-size: 11px; color: #aaa; margin-top: 4px; }
+        .hidden { display: none !important; }
+
+        /* Nelson Curve Chart */
+        .chart-wrapper {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 20px 22px;
+            margin-bottom: 18px;
+        }
+        #nelsonCanvas {
+            width: 100%;
+            border-radius: 8px;
+            display: block;
+        }
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #555;
+            font-weight: 600;
+        }
+        .legend-dot {
+            width: 28px;
+            height: 3px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        /* Susceptibility zones info */
+        .zone-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+        .zone-chip {
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .zone-chip i { font-size: 14px; }
+        .zone-high        { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+        .zone-medium      { background: linear-gradient(135deg, #ca6f1e, #e67e22); }
+        .zone-low         { background: linear-gradient(135deg, #9a7d0a, #d4ac0d); }
+        .zone-negligible  { background: linear-gradient(135deg, #1a7a42, #27ae60); }
+
+        /* Button */
+        .btn-analyze {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #2b5797 0%, #3b6ba5 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(43,87,151,0.35);
+            transition: all 0.2s;
+            margin-bottom: 28px;
+        }
+        .btn-analyze:hover {
+            background: linear-gradient(135deg, #1e3f72, #2b5797);
+            transform: translateY(-1px);
+        }
+        .btn-analyze i { margin-right: 8px; }
+
+        /* Results */
+        #resultsSection { display: none; }
+        .divider { border: none; border-top: 1px solid #d5dff0; margin: 0 0 24px 0; }
+
+        .steps-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: white;
+            border-radius: 10px;
+            padding: 11px 16px;
+            border-left: 4px solid #ddd;
+        }
+        .step-item.pass { border-left-color: #27ae60; }
+        .step-item.fail { border-left-color: #e74c3c; }
+        .step-item.info { border-left-color: #2b5797; }
+        .step-icon { font-size: 18px; width: 22px; flex-shrink: 0; margin-top: 1px; text-align: center; }
+        .step-item.pass .step-icon { color: #27ae60; }
+        .step-item.fail .step-icon { color: #e74c3c; }
+        .step-item.info .step-icon { color: #2b5797; }
+        .step-body { flex: 1; }
+        .step-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; }
+        .step-detail { font-size: 13px; color: #333; margin-top: 2px; line-height: 1.55; }
+
+        /* Result card */
+        .result-card {
+            border-radius: 14px;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            margin-top: 16px;
+        }
+        .bg-high            { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+        .bg-medium          { background: linear-gradient(135deg, #ca6f1e, #e67e22); }
+        .bg-low             { background: linear-gradient(135deg, #9a7d0a, #d4ac0d); }
+        .bg-negligible      { background: linear-gradient(135deg, #1a7a42, #27ae60); }
+        .bg-not-susceptible { background: linear-gradient(135deg, #5d6d7e, #7f8c8d); }
+        .bg-error           { background: linear-gradient(135deg, #7d3c98, #9b59b6); }
+
+        .metrics { display: flex; gap: 24px; flex-wrap: wrap; }
+        .metric { text-align: center; }
+        .metric-value { font-size: 24px; font-weight: 700; line-height: 1; }
+        .metric-label { font-size: 10px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+        .result-level { text-align: right; }
+        .level-tag { font-size: 11px; opacity: 0.8; text-transform: uppercase; margin-bottom: 2px; }
+        .level-value { font-size: 28px; font-weight: 700; line-height: 1.1; }
+        .reason-text { font-size: 14px; opacity: 0.9; }
+
+        /* C-½Mo warning */
+        .warning-box {
+            background: #fff8e1;
+            border: 1.5px solid #f0b429;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 12px;
+            color: #7a5c00;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            margin-top: 10px;
+        }
+        .warning-box i { color: #f0b429; margin-top: 1px; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">Artemis</div>
+    <nav class="header-nav">
+        <a href="javascript:history.back()"><i class="fa-solid fa-circle-arrow-left"></i> Back</a>
+        <a href="/projects"><i class="fa-solid fa-folder-open"></i> Projects</a>
+        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+    </nav>
+</header>
+
+<div class="page-wrapper">
+<div class="card">
+
+    <div class="page-title">
+        <i class="fa-solid fa-atom"></i>
+        High-Temperature Hydrogen Attack (HTHA)
+    </div>
+    <div class="page-subtitle">API 571 | Nelson Curve Screening Method</div>
+
+    <!-- Step 1: H2 Partial Pressure -->
+    <div class="form-panel-full">
+        <div class="section-label">Step 1 — Hydrogen Partial Pressure</div>
+        <div class="form-grid" style="margin-bottom:0;">
+            <div class="field">
+                <label>Is Hydrogen Partial Pressure Present?</label>
+                <div class="toggle-row">
+                    <button class="toggle-btn active-yes" id="btnH2Yes" onclick="setToggle('h2','YES')">
+                        <i class="fa-solid fa-check"></i> YES
+                    </button>
+                    <button class="toggle-btn" id="btnH2No" onclick="setToggle('h2','NO')">
+                        <i class="fa-solid fa-xmark"></i> NO
+                    </button>
+                </div>
+                <input type="hidden" id="h2Present" value="YES">
+            </div>
+            <div class="field">
+                <label>H₂ Partial Pressure</label>
+                <div class="input-row">
+                    <input type="number" id="h2pp" placeholder="e.g. 50" min="0" step="0.1">
+                    <span class="unit">psia</span>
+                </div>
+                <div class="hint">Hydrogen partial pressure in the system</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 2 & 3: Temp + Material -->
+    <div class="form-grid">
+        <div class="form-panel">
+            <div class="section-label">Step 2 — Operating Temperature</div>
+            <div class="field">
+                <label>Operating Temperature</label>
+                <div class="input-row">
+                    <input type="number" id="opTemp" placeholder="e.g. 300" min="0" step="1">
+                    <span class="unit">°C</span>
+                </div>
+                <div class="hint">Must be above 177°C to be susceptible</div>
+            </div>
+        </div>
+
+        <div class="form-panel">
+            <div class="section-label">Step 3 — Material of Construction</div>
+            <div class="field">
+                <label>Material</label>
+                <select id="material" onchange="onMaterialChange()">
+                    <option value="">— Select Material —</option>
+                    <option value="Carbon Steel">Carbon Steel</option>
+                    <option value="C-0.5Mo">C-½Mo Steel</option>
+                    <option value="1Cr-0.5Mo">1Cr-½Mo Steel</option>
+                    <option value="1.25Cr-0.5Mo">1¼Cr-½Mo Steel</option>
+                    <option value="2.25Cr-1Mo">2¼Cr-1Mo Steel</option>
+                    <option value="3Cr-1Mo">3Cr-1Mo Steel</option>
+                    <option value="5Cr-0.5Mo">5Cr-½Mo Steel</option>
+                    <option value="7Cr-0.5Mo">7Cr-½Mo Steel</option>
+                    <option value="9Cr-1Mo">9Cr-1Mo Steel</option>
+                    <option value="SS304">Type 304/316 SS (not susceptible)</option>
+                </select>
+            </div>
+            <div id="cMoWarning" class="warning-box hidden">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>C-½Mo: Susceptibility based on literature data for both <strong>annealed</strong> and <strong>normalised</strong> conditions. Use with caution — some sources recommend avoiding this alloy in HTHA service.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nelson Curve Reference Chart -->
+    <div class="chart-wrapper">
+        <div class="section-label" style="margin-bottom: 12px;">Nelson Curve Reference — API 941</div>
+        <canvas id="nelsonCanvas" height="360"></canvas>
+        <div class="chart-legend" id="chartLegend"></div>
+        <div class="hint" style="margin-top: 8px;">
+            <i class="fa-solid fa-circle-info"></i>
+            จุดสีแดง (<span style="color:#e74c3c; font-weight:700;">●</span>) = Operating point ที่กรอกข้อมูล &nbsp;|&nbsp; เส้นแต่ละเส้น = Nelson Curve limit สำหรับแต่ละวัสดุ
+        </div>
+    </div>
+
+    <!-- Susceptibility zones -->
+    <div class="zone-info">
+        <div class="zone-chip zone-high">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <div><div style="font-size:10px;opacity:0.85;margin-bottom:2px;">HIGH SUSCEPTIBILITY</div>At or above Nelson curve limit</div>
+        </div>
+        <div class="zone-chip zone-medium">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <div><div style="font-size:10px;opacity:0.85;margin-bottom:2px;">MEDIUM SUSCEPTIBILITY</div>&lt; 15°C below Nelson curve limit</div>
+        </div>
+        <div class="zone-chip zone-low">
+            <i class="fa-solid fa-circle-minus"></i>
+            <div><div style="font-size:10px;opacity:0.85;margin-bottom:2px;">LOW SUSCEPTIBILITY</div>15–30°C below Nelson curve limit</div>
+        </div>
+        <div class="zone-chip zone-negligible">
+            <i class="fa-solid fa-circle-check"></i>
+            <div><div style="font-size:10px;opacity:0.85;margin-bottom:2px;">NOT SUSCEPTIBLE</div>&gt; 30°C below Nelson curve limit</div>
+        </div>
+    </div>
+
+    <!-- Analyze -->
+    <button class="btn-analyze" onclick="runAnalysis()">
+        <i class="fa-solid fa-magnifying-glass-chart"></i>
+        Analyze HTHA Susceptibility
+    </button>
+
+    <!-- Results -->
+    <div id="resultsSection">
+        <hr class="divider">
+        <div class="section-label" style="margin-bottom:14px;">Analysis Flowchart</div>
+        <div class="steps-list" id="stepsList"></div>
+        <div id="resultCard"></div>
+    </div>
+
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// NELSON CURVE DATA
+// Each curve: array of [H2_partial_pressure_psia, max_temp_°C]
+// Interpolated from API 941 / Nelson Curves (standard reference)
+// ═══════════════════════════════════════════════════════════════
+const NELSON_CURVES = {
+    "Carbon Steel": {
+        color: "#e74c3c",
+        points: [
+            [25, 222], [50, 238], [75, 249], [100, 258],
+            [150, 271], [200, 282], [300, 296], [400, 307],
+            [500, 316], [750, 332], [1000, 343], [1500, 360], [2000, 371]
+        ]
+    },
+    "C-0.5Mo": {
+        color: "#e67e22",
+        points: [
+            [25, 249], [50, 260], [75, 271], [100, 279],
+            [150, 293], [200, 304], [300, 318], [400, 329],
+            [500, 338], [750, 354], [1000, 366], [1500, 382], [2000, 393]
+        ]
+    },
+    "1Cr-0.5Mo": {
+        color: "#f1c40f",
+        points: [
+            [25, 293], [50, 307], [75, 316], [100, 324],
+            [150, 338], [200, 349], [300, 363], [400, 374],
+            [500, 382], [750, 399], [1000, 410], [1500, 427], [2000, 438]
+        ]
+    },
+    "1.25Cr-0.5Mo": {
+        color: "#2ecc71",
+        points: [
+            [25, 316], [50, 329], [75, 338], [100, 346],
+            [150, 360], [200, 371], [300, 385], [400, 396],
+            [500, 404], [750, 421], [1000, 432], [1500, 449], [2000, 460]
+        ]
+    },
+    "2.25Cr-1Mo": {
+        color: "#3498db",
+        points: [
+            [25, 360], [50, 374], [75, 382], [100, 391],
+            [150, 404], [200, 416], [300, 429], [400, 441],
+            [500, 449], [750, 466], [1000, 477], [1500, 493], [2000, 504]
+        ]
+    },
+    "3Cr-1Mo": {
+        color: "#9b59b6",
+        points: [
+            [25, 374], [50, 388], [75, 396], [100, 404],
+            [150, 418], [200, 429], [300, 443], [400, 454],
+            [500, 463], [750, 479], [1000, 491], [1500, 507], [2000, 516]
+        ]
+    },
+    "5Cr-0.5Mo": {
+        color: "#1abc9c",
+        points: [
+            [25, 407], [50, 421], [75, 429], [100, 438],
+            [150, 452], [200, 463], [300, 477], [400, 488],
+            [500, 496], [750, 513], [1000, 524], [1500, 541], [2000, 552]
+        ]
+    },
+    "7Cr-0.5Mo": {
+        color: "#e91e63",
+        points: [
+            [25, 427], [50, 441], [75, 449], [100, 457],
+            [150, 471], [200, 482], [300, 496], [400, 507],
+            [500, 516], [750, 532], [1000, 543], [1500, 560], [2000, 571]
+        ]
+    },
+    "9Cr-1Mo": {
+        color: "#00bcd4",
+        points: [
+            [25, 454], [50, 468], [75, 477], [100, 485],
+            [150, 499], [200, 510], [300, 524], [400, 535],
+            [500, 543], [750, 560], [1000, 571], [1500, 588], [2000, 599]
+        ]
+    },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// INTERPOLATE: get max temp at given H2PP for a material curve
+// ═══════════════════════════════════════════════════════════════
+function interpolateCurve(points, h2pp) {
+    if (h2pp <= points[0][0]) return points[0][1];
+    if (h2pp >= points[points.length-1][0]) return points[points.length-1][1];
+    for (let i = 0; i < points.length - 1; i++) {
+        const [x1, y1] = points[i];
+        const [x2, y2] = points[i+1];
+        if (h2pp >= x1 && h2pp <= x2) {
+            const t = (h2pp - x1) / (x2 - x1);
+            return y1 + t * (y2 - y1);
+        }
+    }
+    return null;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DRAW NELSON CURVE CHART
+// ═══════════════════════════════════════════════════════════════
+const CHART_PP_MIN  = 10;
+const CHART_PP_MAX  = 2000;
+const CHART_TEMP_MIN = 150;
+const CHART_TEMP_MAX = 620;
+
+function toCanvasX(pp, w, pad) {
+    // log scale for pressure
+    const logMin = Math.log10(CHART_PP_MIN);
+    const logMax = Math.log10(CHART_PP_MAX);
+    const logVal = Math.log10(Math.max(pp, CHART_PP_MIN));
+    return pad.left + ((logVal - logMin) / (logMax - logMin)) * (w - pad.left - pad.right);
+}
+function toCanvasY(temp, h, pad) {
+    return h - pad.bottom - ((temp - CHART_TEMP_MIN) / (CHART_TEMP_MAX - CHART_TEMP_MIN)) * (h - pad.top - pad.bottom);
+}
+
+let operatingPoint = null; // {pp, temp}
+
+function drawChart() {
+    const canvas = document.getElementById("nelsonCanvas");
+    const dpr    = window.devicePixelRatio || 1;
+    const W      = canvas.parentElement.clientWidth - 44;
+    const H      = 360;
+    canvas.style.width  = W + "px";
+    canvas.style.height = H + "px";
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+
+    const pad = { top: 20, right: 20, bottom: 50, left: 60 };
+
+    // Background
+    ctx.fillStyle = "#fafcff";
+    ctx.fillRect(0, 0, W, H);
+
+    // Grid lines
+    ctx.strokeStyle = "#e8edf5";
+    ctx.lineWidth = 1;
+
+    // Vertical grid (log scale pressure ticks)
+    const ppTicks = [10,20,50,100,200,500,1000,2000];
+    for (const pp of ppTicks) {
+        const x = toCanvasX(pp, W, pad);
+        ctx.beginPath();
+        ctx.moveTo(x, pad.top);
+        ctx.lineTo(x, H - pad.bottom);
+        ctx.stroke();
+        ctx.fillStyle = "#999";
+        ctx.font = "10px Segoe UI";
+        ctx.textAlign = "center";
+        ctx.fillText(pp, x, H - pad.bottom + 14);
+    }
+
+    // Horizontal grid (temperature)
+    for (let t = 200; t <= 600; t += 50) {
+        const y = toCanvasY(t, H, pad);
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(W - pad.right, y);
+        ctx.stroke();
+        ctx.fillStyle = "#999";
+        ctx.font = "10px Segoe UI";
+        ctx.textAlign = "right";
+        ctx.fillText(t + "°C", pad.left - 6, y + 3);
+    }
+
+    // Axes
+    ctx.strokeStyle = "#aab";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top);
+    ctx.lineTo(pad.left, H - pad.bottom);
+    ctx.lineTo(W - pad.right, H - pad.bottom);
+    ctx.stroke();
+
+    // Axis labels
+    ctx.fillStyle = "#555";
+    ctx.font = "bold 11px Segoe UI";
+    ctx.textAlign = "center";
+    ctx.fillText("H₂ Partial Pressure (psia)", (pad.left + W - pad.right) / 2, H - 4);
+    ctx.save();
+    ctx.translate(14, (pad.top + H - pad.bottom) / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText("Temperature (°C)", 0, 0);
+    ctx.restore();
+
+    // Selected material
+    const selMat = document.getElementById("material").value;
+
+    // Draw all curves (dimmed if not selected)
+    for (const [matName, matData] of Object.entries(NELSON_CURVES)) {
+        const isSelected = (matName === selMat);
+        const pts = matData.points;
+
+        ctx.beginPath();
+        for (let i = 0; i < pts.length; i++) {
+            const x = toCanvasX(pts[i][0], W, pad);
+            const y = toCanvasY(pts[i][1], H, pad);
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = isSelected ? matData.color : matData.color + "44";
+        ctx.lineWidth   = isSelected ? 2.5 : 1;
+        ctx.stroke();
+
+        // Label at end of curve
+        const last = pts[pts.length - 1];
+        const lx   = toCanvasX(last[0], W, pad) - 4;
+        const ly   = toCanvasY(last[1], H, pad);
+        ctx.fillStyle = isSelected ? matData.color : matData.color + "66";
+        ctx.font      = isSelected ? "bold 9px Segoe UI" : "8px Segoe UI";
+        ctx.textAlign = "right";
+        const shortName = matName.replace("Carbon Steel","C-Steel").replace("-0.5","-½").replace("-1Mo","-1Mo");
+        if (isSelected) ctx.fillText(shortName, lx, ly - 4);
+    }
+
+    // Operating point
+    if (operatingPoint) {
+        const ox = toCanvasX(operatingPoint.pp, W, pad);
+        const oy = toCanvasY(operatingPoint.temp, H, pad);
+
+        // Cross-hairs
+        ctx.strokeStyle = "rgba(231,76,60,0.25)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 3]);
+        ctx.beginPath();
+        ctx.moveTo(ox, pad.top);
+        ctx.lineTo(ox, H - pad.bottom);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(pad.left, oy);
+        ctx.lineTo(W - pad.right, oy);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Dot
+        ctx.beginPath();
+        ctx.arc(ox, oy, 7, 0, Math.PI * 2);
+        ctx.fillStyle = "#e74c3c";
+        ctx.fill();
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Label
+        ctx.fillStyle = "#c0392b";
+        ctx.font = "bold 11px Segoe UI";
+        ctx.textAlign = "left";
+        ctx.fillText(`Operating Point (${operatingPoint.pp} psia, ${operatingPoint.temp}°C)`, ox + 10, oy - 6);
+    }
+
+    // Update legend
+    buildLegend();
+}
+
+function buildLegend() {
+    const sel = document.getElementById("material").value;
+    const lg  = document.getElementById("chartLegend");
+    lg.innerHTML = "";
+    for (const [name, data] of Object.entries(NELSON_CURVES)) {
+        const div = document.createElement("div");
+        div.className = "legend-item";
+        const shortLabel = name;
+        div.innerHTML = `<div class="legend-dot" style="background:${data.color};opacity:${name===sel?1:0.4}"></div><span style="opacity:${name===sel?1:0.5}">${shortLabel}</span>`;
+        lg.appendChild(div);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STATE / CONTROLS
+// ═══════════════════════════════════════════════════════════════
+const state = { h2: "YES" };
+
+function setToggle(key, val) {
+    state[key] = val;
+    const yId = `btn${key.charAt(0).toUpperCase()+key.slice(1)}Yes`;
+    const nId = `btn${key.charAt(0).toUpperCase()+key.slice(1)}No`;
+    document.getElementById(yId).className = "toggle-btn" + (val==="YES"?" active-yes":"");
+    document.getElementById(nId).className = "toggle-btn" + (val==="NO" ?" active-no" :"");
+    document.getElementById(key+"Present").value = val;
+}
+
+function onMaterialChange() {
+    const mat = document.getElementById("material").value;
+    document.getElementById("cMoWarning").classList.toggle("hidden", mat !== "C-0.5Mo");
+    drawChart();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VALIDATE
+// ═══════════════════════════════════════════════════════════════
+function validate() {
+    const h2  = document.getElementById("h2Present").value;
+    const h2pp= parseFloat(document.getElementById("h2pp").value);
+    const temp= parseFloat(document.getElementById("opTemp").value);
+    const mat = document.getElementById("material").value;
+
+    if (!mat)                          { alert("กรุณาเลือก Material"); return null; }
+    if (isNaN(temp) || temp <= 0)      { alert("กรุณาระบุ Operating Temperature"); return null; }
+    if (h2 === "YES") {
+        if (isNaN(h2pp) || h2pp <= 0) { alert("กรุณาระบุ H₂ Partial Pressure (> 0 psia)"); return null; }
+    }
+    return { h2, h2pp: isNaN(h2pp) ? 0 : h2pp, temp, mat };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ANALYSIS LOGIC
+// ═══════════════════════════════════════════════════════════════
+function analyze(p) {
+    const steps = [];
+
+    // Step 1: H2 present?
+    if (p.h2 !== "YES" || p.h2pp <= 0) {
+        steps.push({ step:1, label:"Hydrogen Partial Pressure", pass:false,
+            detail:"ไม่มี Hydrogen Partial Pressure → HTHA ไม่เกิด" });
+        return { steps, susceptibility:"Not Susceptible", reason:"No hydrogen partial pressure present" };
+    }
+    steps.push({ step:1, label:"Hydrogen Partial Pressure", pass:true,
+        detail:`H₂ Partial Pressure = ${p.h2pp} psia → ระบบมี Hydrogen → ดำเนินการตรวจสอบต่อ` });
+
+    // Step 2: Temp > 177°C?
+    if (p.temp <= 177) {
+        steps.push({ step:2, label:"Operating Temperature Check", pass:false,
+            detail:`Operating Temperature = ${p.temp}°C ≤ 177°C → ต่ำเกินไป ไม่เกิด HTHA` });
+        return { steps, susceptibility:"Not Susceptible", reason:`Temperature ${p.temp}°C is below 177°C threshold` };
+    }
+    steps.push({ step:2, label:"Operating Temperature Check", pass:true,
+        detail:`Operating Temperature = ${p.temp}°C > 177°C → อยู่ในช่วง HTHA Susceptible` });
+
+    // Step 3: Material in scope?
+    if (p.mat === "SS304") {
+        steps.push({ step:3, label:"Material Check", pass:false,
+            detail:"Austenitic Stainless Steel (304/316) — Not susceptible to HTHA under normal conditions" });
+        return { steps, susceptibility:"Not Susceptible", reason:"Austenitic SS is not susceptible to HTHA" };
+    }
+    if (!NELSON_CURVES[p.mat]) {
+        steps.push({ step:3, label:"Material Check", pass:false,
+            detail:`${p.mat} — ไม่อยู่ในขอบเขตของ Nelson Curve` });
+        return { steps, susceptibility:"Not Susceptible", reason:"Material not in Nelson Curve scope" };
+    }
+    steps.push({ step:3, label:"Material Check", pass:true,
+        detail:`${p.mat} — อยู่ใน Nelson Curve → ดำเนินการ Screening ต่อ` });
+
+    if (p.mat === "C-0.5Mo") {
+        steps.push({ step:"3b", label:"C-½Mo Note", pass:true,
+            detail:"C-½Mo: Susceptibility based on literature for annealed and normalised conditions — use with caution" });
+    }
+
+    // Step 4: Read Nelson Curve
+    const curveData  = NELSON_CURVES[p.mat];
+    const curveMaxT  = interpolateCurve(curveData.points, p.h2pp);
+    const margin     = curveMaxT - p.temp; // positive = below curve (safer)
+
+    steps.push({ step:4, label:"Nelson Curve Reading", pass:true,
+        detail:`Material: ${p.mat} | H₂ PP: ${p.h2pp} psia → Nelson Curve Limit = ${curveMaxT.toFixed(1)}°C | Operating Temp = ${p.temp}°C | Margin = ${margin.toFixed(1)}°C below curve` });
+
+    // Step 5: Susceptibility
+    let level, detail5;
+    if (margin <= 0) {
+        level   = "High";
+        detail5 = `Operating point อยู่ที่หรือเหนือ Nelson Curve Limit → HIGH Susceptibility`;
+    } else if (margin < 15) {
+        level   = "Medium";
+        detail5 = `Margin = ${margin.toFixed(1)}°C (< 15°C below curve) → MEDIUM Susceptibility`;
+    } else if (margin <= 30) {
+        level   = "Low";
+        detail5 = `Margin = ${margin.toFixed(1)}°C (15–30°C below curve) → LOW Susceptibility`;
+    } else {
+        level   = "Negligible";
+        detail5 = `Margin = ${margin.toFixed(1)}°C (> 30°C below curve) → NOT Susceptible`;
+    }
+    steps.push({ step:5, label:"Susceptibility Assessment", pass: level !== "High", detail: detail5 });
+
+    return { steps, susceptibility: level, h2pp: p.h2pp, temp: p.temp, curveLimit: curveMaxT.toFixed(1), margin: margin.toFixed(1) };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RUN & RENDER
+// ═══════════════════════════════════════════════════════════════
+function runAnalysis() {
+    const p = validate();
+    if (!p) return;
+
+    // Update operating point on chart
+    operatingPoint = { pp: p.h2pp, temp: p.temp };
+    drawChart();
+
+    const result = analyze(p);
+    renderResults(result);
+}
+
+function renderResults(data) {
+    const stepsList = document.getElementById("stepsList");
+    stepsList.innerHTML = "";
+    for (const s of data.steps) {
+        const cls  = s.pass ? "pass" : "fail";
+        const icon = s.pass ? "fa-circle-check" : "fa-circle-xmark";
+        const div  = document.createElement("div");
+        div.className = `step-item ${cls}`;
+        div.innerHTML = `
+            <div class="step-icon"><i class="fa-solid ${icon}"></i></div>
+            <div class="step-body">
+                <div class="step-label">Step ${s.step} — ${s.label}</div>
+                <div class="step-detail">${s.detail}</div>
+            </div>`;
+        stepsList.appendChild(div);
+    }
+
+    const level   = data.susceptibility;
+    const bgMap   = { High:"bg-high", Medium:"bg-medium", Low:"bg-low",
+                      Negligible:"bg-negligible", "Not Susceptible":"bg-not-susceptible", Error:"bg-error" };
+    const bgClass = bgMap[level] || "bg-not-susceptible";
+    const cardEl  = document.getElementById("resultCard");
+
+    let inner = "";
+    if (data.curveLimit !== undefined) {
+        inner = `
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value">${data.h2pp}</div>
+                    <div class="metric-label">H₂ PP (psia)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${data.temp}°C</div>
+                    <div class="metric-label">Operating Temp</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${data.curveLimit}°C</div>
+                    <div class="metric-label">Nelson Curve Limit</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${data.margin}°C</div>
+                    <div class="metric-label">Margin Below Curve</div>
+                </div>
+            </div>
+            <div class="result-level">
+                <div class="level-tag">Susceptibility</div>
+                <div class="level-value">${level.toUpperCase()}</div>
+            </div>`;
+    } else {
+        inner = `
+            <div>
+                <div class="level-tag">Result</div>
+                <div class="level-value" style="font-size:22px;">${level.toUpperCase()}</div>
+                <div class="reason-text" style="margin-top:6px;">${data.reason || ""}</div>
+            </div>`;
+    }
+    cardEl.innerHTML = `<div class="result-card ${bgClass}">${inner}</div>`;
+
+    const section = document.getElementById("resultsSection");
+    section.style.display = "block";
+    section.scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+window.addEventListener("load", () => {
+    drawChart();
+    window.addEventListener("resize", drawChart);
+});
+document.addEventListener("keydown", e => {
+    if (e.key === "Enter" && e.target.tagName !== "BUTTON") runAnalysis();
+});
+</script>
+
+</body>
+</html>

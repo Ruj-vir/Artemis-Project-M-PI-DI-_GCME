@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sulfidation Analysis — Artemis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #000 0%, #111 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ─── Header ─── */
+        header {
+            background-color: #2b5797;
+            color: white;
+            padding: 0 24px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .brand { font-size: 26px; font-weight: 700; letter-spacing: 1px; }
+        .header-nav { display: flex; gap: 20px; }
+        .header-nav a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 13px;
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .header-nav a:hover { background: rgba(255,255,255,0.15); color: white; }
+
+        /* ─── Layout ─── */
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 30px 20px 50px;
+        }
+        .card {
+            background: #f0f2f5;
+            width: 100%;
+            max-width: 1020px;
+            border-radius: 28px;
+            padding: 32px 40px;
+            box-shadow: 0 0 40px rgba(255,255,255,0.08);
+        }
+        .page-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a2f5a;
+            margin-bottom: 6px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .page-title i { color: #2b5797; font-size: 22px; }
+        .page-subtitle {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 28px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #2b5797;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #2b5797;
+            padding-bottom: 5px;
+            margin-bottom: 16px;
+        }
+
+        /* ─── Panels ─── */
+        .form-grid   { display: grid; grid-template-columns: 1fr 1fr;     gap: 16px; margin-bottom: 18px; }
+        .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+        .form-panel {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 20px 22px;
+        }
+        .form-panel-full {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 20px 22px;
+            margin-bottom: 18px;
+        }
+
+        /* ─── Fields ─── */
+        .field { margin-bottom: 14px; }
+        .field:last-child { margin-bottom: 0; }
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+        .field input, .field select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid #c0d0e8;
+            border-radius: 7px;
+            font-size: 14px;
+            color: #222;
+            background: #fafcff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .field input:focus, .field select:focus {
+            border-color: #2b5797;
+            box-shadow: 0 0 0 3px rgba(43,87,151,0.12);
+            background: white;
+        }
+        .field input::placeholder { color: #bbb; }
+
+        .input-row { display: flex; }
+        .input-row input { flex: 1; border-radius: 7px 0 0 7px; }
+        .unit {
+            background: #2b5797;
+            color: white;
+            padding: 9px 11px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 0 7px 7px 0;
+            white-space: nowrap;
+            display: flex; align-items: center;
+        }
+
+        /* ─── Toggle ─── */
+        .toggle-row { display: flex; gap: 10px; }
+        .toggle-btn {
+            flex: 1;
+            padding: 9px 0;
+            border: 2px solid #c0d0e8;
+            border-radius: 7px;
+            background: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.18s;
+            color: #666;
+        }
+        .toggle-btn:hover { border-color: #2b5797; color: #2b5797; }
+        .toggle-btn.active-yes { background: #27ae60; border-color: #27ae60; color: white; }
+        .toggle-btn.active-no  { background: #e74c3c; border-color: #e74c3c; color: white; }
+
+        /* ─── Checkbox ─── */
+        .checkbox-label {
+            display: flex; align-items: center; gap: 8px;
+            cursor: pointer; font-size: 13px; color: #555;
+            margin-bottom: 8px; user-select: none;
+        }
+        .checkbox-label input[type="checkbox"] {
+            width: 15px; height: 15px;
+            accent-color: #2b5797; cursor: pointer;
+        }
+        .hidden { display: none !important; }
+        .hint { font-size: 11px; color: #aaa; margin-top: 4px; }
+
+        /* ─── McConomy Chart ─── */
+        .chart-wrapper {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 20px 22px;
+            margin-bottom: 18px;
+        }
+        #mcconomyCanvas { width: 100%; display: block; border-radius: 8px; }
+
+        .chart-legend {
+            display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px;
+        }
+        .legend-item {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 11px; color: #555; font-weight: 600;
+        }
+        .legend-line {
+            width: 28px; height: 3px; border-radius: 2px; flex-shrink: 0;
+        }
+
+        /* ─── Button ─── */
+        .btn-analyze {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #2b5797 0%, #3b6ba5 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(43,87,151,0.35);
+            transition: all 0.2s;
+            margin-bottom: 28px;
+        }
+        .btn-analyze:hover {
+            background: linear-gradient(135deg, #1e3f72, #2b5797);
+            transform: translateY(-1px);
+        }
+        .btn-analyze i { margin-right: 8px; }
+
+        /* ─── Results ─── */
+        #resultsSection { display: none; }
+        .divider { border: none; border-top: 1px solid #d5dff0; margin: 0 0 24px 0; }
+
+        .steps-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .step-item {
+            display: flex; align-items: flex-start; gap: 14px;
+            background: white; border-radius: 10px;
+            padding: 11px 16px; border-left: 4px solid #ddd;
+        }
+        .step-item.pass { border-left-color: #27ae60; }
+        .step-item.fail { border-left-color: #e74c3c; }
+        .step-item.info { border-left-color: #2b5797; }
+        .step-icon { font-size: 18px; width: 22px; flex-shrink: 0; margin-top: 1px; text-align: center; }
+        .step-item.pass .step-icon { color: #27ae60; }
+        .step-item.fail .step-icon { color: #e74c3c; }
+        .step-item.info .step-icon { color: #2b5797; }
+        .step-body { flex: 1; }
+        .step-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; }
+        .step-detail { font-size: 13px; color: #333; margin-top: 2px; line-height: 1.55; }
+
+        /* ─── Result card ─── */
+        .result-card {
+            border-radius: 14px;
+            padding: 22px 28px;
+            display: flex; justify-content: space-between; align-items: center;
+            color: white;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            margin-top: 16px;
+        }
+        .bg-high            { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+        .bg-medium          { background: linear-gradient(135deg, #ca6f1e, #e67e22); }
+        .bg-low             { background: linear-gradient(135deg, #9a7d0a, #d4ac0d); }
+        .bg-negligible      { background: linear-gradient(135deg, #1a7a42, #27ae60); }
+        .bg-not-susceptible { background: linear-gradient(135deg, #5d6d7e, #7f8c8d); }
+        .bg-error           { background: linear-gradient(135deg, #7d3c98, #9b59b6); }
+
+        .metrics { display: flex; gap: 22px; flex-wrap: wrap; }
+        .metric { text-align: center; }
+        .metric-value { font-size: 24px; font-weight: 700; line-height: 1; }
+        .metric-label { font-size: 10px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+        .result-level { text-align: right; }
+        .level-tag  { font-size: 11px; opacity: 0.8; text-transform: uppercase; margin-bottom: 2px; }
+        .level-value { font-size: 28px; font-weight: 700; line-height: 1.1; }
+        .reason-text { font-size: 14px; opacity: 0.9; }
+
+        /* ─── Correction factor badge ─── */
+        .factor-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #eef3fb; border: 1px solid #c0d0e8;
+            border-radius: 6px; padding: 5px 10px;
+            font-size: 12px; color: #2b5797; font-weight: 600;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">Artemis</div>
+    <nav class="header-nav">
+        <a href="javascript:history.back()"><i class="fa-solid fa-circle-arrow-left"></i> Back</a>
+        <a href="/projects"><i class="fa-solid fa-folder-open"></i> Projects</a>
+        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+    </nav>
+</header>
+
+<div class="page-wrapper">
+<div class="card">
+
+    <div class="page-title">
+        <i class="fa-solid fa-fire-flame-curved"></i>
+        Sulfidation Corrosion Analysis
+    </div>
+    <div class="page-subtitle">API 571 | McConomy Curves Method</div>
+
+    <!-- Step 1: Sulfur compound -->
+    <div class="form-panel-full">
+        <div class="section-label">Step 1 — Sulfur Compound Presence</div>
+        <div class="field">
+            <label>Is Sulfur Compound Present When Operating?</label>
+            <div class="toggle-row">
+                <button class="toggle-btn active-yes" id="btnSulfYes" onclick="setToggle('sulf','YES')">
+                    <i class="fa-solid fa-check"></i> YES
+                </button>
+                <button class="toggle-btn" id="btnSulfNo" onclick="setToggle('sulf','NO')">
+                    <i class="fa-solid fa-xmark"></i> NO
+                </button>
+            </div>
+            <input type="hidden" id="sulfPresent" value="YES">
+        </div>
+    </div>
+
+    <!-- Step 2 & 3: Temp + pH -->
+    <div class="form-grid">
+        <div class="form-panel">
+            <div class="section-label">Step 2 — Operating Temperature</div>
+            <div class="field">
+                <label>Operating Temperature</label>
+                <div class="input-row">
+                    <input type="number" id="opTemp" placeholder="e.g. 320" min="0" step="1" oninput="drawChart()">
+                    <span class="unit">°C</span>
+                </div>
+                <div class="hint">Must be &gt; 260°C to be susceptible</div>
+            </div>
+        </div>
+
+        <div class="form-panel">
+            <div class="section-label">Step 3 — Operating pH</div>
+            <div class="field">
+                <label>Operating pH of Process Stream</label>
+                <div class="input-row">
+                    <input type="number" id="opPH" placeholder="e.g. 5.5" min="0" max="14" step="0.01">
+                    <span class="unit">pH</span>
+                </div>
+                <div class="hint">Susceptible range: 4.5 – 7.0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 4 & Material -->
+    <div class="form-grid">
+        <!-- Material -->
+        <div class="form-panel">
+            <div class="section-label">Material of Construction</div>
+            <div class="field">
+                <label>Material</label>
+                <select id="material" onchange="drawChart()">
+                    <option value="">— Select Material —</option>
+                    <optgroup label="Carbon & Low Alloy Steel">
+                        <option value="Carbon Steel">Carbon Steel</option>
+                        <option value="1Cr-0.5Mo">1Cr-½Mo</option>
+                        <option value="2.25Cr-1Mo">2¼Cr-1Mo</option>
+                        <option value="3Cr-1Mo">3Cr-1Mo</option>
+                        <option value="5Cr-0.5Mo">5Cr-½Mo</option>
+                        <option value="7Cr-0.5Mo">7Cr-½Mo</option>
+                        <option value="9Cr-1Mo">9Cr-1Mo</option>
+                        <option value="12Cr">12Cr (Type 410)</option>
+                    </optgroup>
+                    <optgroup label="Stainless Steel">
+                        <option value="SS304">Type 304 SS</option>
+                        <option value="SS316">Type 316 SS</option>
+                        <option value="SS410">Type 410 SS</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="field">
+                <label>Design Corrosion Rate (Allowable)</label>
+                <div class="input-row">
+                    <input type="number" id="designCR" placeholder="e.g. 1.0" min="0.001" step="0.01">
+                    <span class="unit">mm/y</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Actual CR -->
+        <div class="form-panel">
+            <div class="section-label">Step 4 — Actual Corrosion Rate</div>
+            <div class="field">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="useActualCR" onchange="toggleActualCR()">
+                    Actual (Measured) CR Available?
+                </label>
+                <div id="actualCRWrapper" class="hidden">
+                    <div class="input-row">
+                        <input type="number" id="actualCR" placeholder="e.g. 2.5" min="0" step="0.01">
+                        <span class="unit">mm/y</span>
+                    </div>
+                    <div class="hint">Overrides McConomy curve lookup</div>
+                </div>
+                <div id="noCRNote" class="hint" style="margin-top:6px;">
+                    ถ้าไม่มีค่า Actual CR ระบบจะ lookup จาก McConomy Curves ตาม Material และ Temperature
+                </div>
+            </div>
+
+            <!-- H2S correction -->
+            <div class="field" style="margin-top: 10px;">
+                <label>H₂S Content in Stream (for correction factor)</label>
+                <select id="h2sContent">
+                    <option value="1.0">ไม่มี H₂S / &lt;0.2 mol% → Factor = 1.0</option>
+                    <option value="1.5">0.2–0.5 mol% H₂S → Factor = 1.5×</option>
+                    <option value="2.0">0.5–1.0 mol% H₂S → Factor = 2.0×</option>
+                    <option value="3.0">&gt;1.0 mol% H₂S → Factor = 3.0×</option>
+                </select>
+                <div class="hint">McConomy base curve × correction factor for H₂S severity</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- McConomy Chart -->
+    <div class="chart-wrapper">
+        <div class="section-label" style="margin-bottom:12px;">McConomy Curves Reference — Corrosion Rate vs Temperature</div>
+        <canvas id="mcconomyCanvas" height="380"></canvas>
+        <div class="chart-legend" id="chartLegend"></div>
+        <div class="hint" style="margin-top:8px;">
+            <i class="fa-solid fa-circle-info"></i>
+            เส้นที่ Highlight = Material ที่เลือก &nbsp;|&nbsp;
+            เส้นแนวตั้งสีแดง = Operating Temperature ที่กรอก
+        </div>
+    </div>
+
+    <!-- Analyze -->
+    <button class="btn-analyze" onclick="runAnalysis()">
+        <i class="fa-solid fa-magnifying-glass-chart"></i>
+        Analyze Sulfidation Susceptibility
+    </button>
+
+    <!-- Results -->
+    <div id="resultsSection">
+        <hr class="divider">
+        <div class="section-label" style="margin-bottom:14px;">Analysis Flowchart</div>
+        <div class="steps-list" id="stepsList"></div>
+        <div id="resultCard"></div>
+    </div>
+
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// McCONOMY CURVE DATA (Base corrosion rate mm/y vs Temperature °C)
+// Digitised from API 941 / McConomy & Mosher curves
+// Format: [temp_°C, base_CR_mm/y]
+// ═══════════════════════════════════════════════════════════════
+const MCCONOMY = {
+    "Carbon Steel": {
+        color: "#e74c3c",
+        points: [
+            [260,0.10],[288,0.20],[316,0.38],[343,0.64],[371,1.02],
+            [399,1.65],[427,2.54],[454,3.81],[482,5.84],[510,8.89]
+        ]
+    },
+    "1Cr-0.5Mo": {
+        color: "#e67e22",
+        points: [
+            [260,0.05],[288,0.10],[316,0.18],[343,0.30],[371,0.51],
+            [399,0.84],[427,1.40],[454,2.29],[482,3.56],[510,5.59]
+        ]
+    },
+    "2.25Cr-1Mo": {
+        color: "#f1c40f",
+        points: [
+            [260,0.03],[288,0.05],[316,0.10],[343,0.18],[371,0.30],
+            [399,0.51],[427,0.84],[454,1.40],[482,2.29],[510,3.56]
+        ]
+    },
+    "3Cr-1Mo": {
+        color: "#2ecc71",
+        points: [
+            [260,0.025],[288,0.04],[316,0.08],[343,0.14],[371,0.24],
+            [399,0.40],[427,0.66],[454,1.09],[482,1.78],[510,2.79]
+        ]
+    },
+    "5Cr-0.5Mo": {
+        color: "#3498db",
+        points: [
+            [260,0.013],[288,0.025],[316,0.05],[343,0.09],[371,0.15],
+            [399,0.25],[427,0.41],[454,0.69],[482,1.14],[510,1.78]
+        ]
+    },
+    "7Cr-0.5Mo": {
+        color: "#9b59b6",
+        points: [
+            [260,0.010],[288,0.018],[316,0.035],[343,0.065],[371,0.11],
+            [399,0.18],[427,0.30],[454,0.51],[482,0.84],[510,1.32]
+        ]
+    },
+    "9Cr-1Mo": {
+        color: "#1abc9c",
+        points: [
+            [260,0.008],[288,0.013],[316,0.025],[343,0.046],[371,0.08],
+            [399,0.13],[427,0.22],[454,0.37],[482,0.61],[510,0.97]
+        ]
+    },
+    "12Cr": {
+        color: "#e91e63",
+        points: [
+            [260,0.005],[288,0.008],[316,0.013],[343,0.025],[371,0.046],
+            [399,0.08],[427,0.13],[454,0.22],[482,0.37],[510,0.61]
+        ]
+    },
+    "SS304": {
+        color: "#00bcd4",
+        points: [
+            [260,0.003],[288,0.005],[316,0.008],[343,0.013],[371,0.025],
+            [399,0.046],[427,0.076],[454,0.13],[482,0.22],[510,0.36]
+        ]
+    },
+    "SS316": {
+        color: "#607d8b",
+        points: [
+            [260,0.002],[288,0.003],[316,0.005],[343,0.010],[371,0.018],
+            [399,0.030],[427,0.051],[454,0.086],[482,0.14],[510,0.24]
+        ]
+    },
+    "SS410": {
+        color: "#795548",
+        points: [
+            [260,0.004],[288,0.007],[316,0.012],[343,0.020],[371,0.036],
+            [399,0.061],[427,0.10],[454,0.17],[482,0.28],[510,0.46]
+        ]
+    },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// INTERPOLATE CR at given temperature
+// ═══════════════════════════════════════════════════════════════
+function interpolateCR(points, temp) {
+    if (temp <= points[0][0]) return points[0][1];
+    if (temp >= points[points.length-1][0]) return points[points.length-1][1];
+    for (let i = 0; i < points.length-1; i++) {
+        const [x1,y1] = points[i];
+        const [x2,y2] = points[i+1];
+        if (temp >= x1 && temp <= x2) {
+            const t = (temp - x1) / (x2 - x1);
+            return y1 + t*(y2 - y1);
+        }
+    }
+    return null;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DRAW McCONOMY CHART
+// ═══════════════════════════════════════════════════════════════
+const CHART_T_MIN = 230;
+const CHART_T_MAX = 540;
+const CHART_CR_MIN = 0.001;
+const CHART_CR_MAX = 12;
+
+function toX(temp, W, pad) {
+    return pad.left + ((temp - CHART_T_MIN) / (CHART_T_MAX - CHART_T_MIN)) * (W - pad.left - pad.right);
+}
+function toY(cr, H, pad) {
+    // log scale for CR
+    const logMin = Math.log10(CHART_CR_MIN);
+    const logMax = Math.log10(CHART_CR_MAX);
+    const logVal = Math.log10(Math.max(cr, CHART_CR_MIN));
+    return H - pad.bottom - ((logVal - logMin) / (logMax - logMin)) * (H - pad.top - pad.bottom);
+}
+
+function drawChart() {
+    const canvas = document.getElementById("mcconomyCanvas");
+    const dpr    = window.devicePixelRatio || 1;
+    const W      = canvas.parentElement.clientWidth - 44;
+    const H      = 380;
+    canvas.style.width  = W + "px";
+    canvas.style.height = H + "px";
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+
+    const pad = { top: 20, right: 24, bottom: 50, left: 68 };
+
+    // Background
+    ctx.fillStyle = "#fafcff";
+    ctx.fillRect(0,0,W,H);
+
+    // Grid — Temperature
+    const tempTicks = [260,288,316,343,371,399,427,454,482,510];
+    ctx.strokeStyle = "#e8edf5";
+    ctx.lineWidth = 1;
+    for (const t of tempTicks) {
+        const x = toX(t, W, pad);
+        ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, H-pad.bottom); ctx.stroke();
+        ctx.fillStyle = "#999"; ctx.font = "9px Segoe UI"; ctx.textAlign = "center";
+        ctx.fillText(t+"°C", x, H-pad.bottom+13);
+    }
+
+    // Grid — CR (log)
+    const crTicks = [0.01, 0.05, 0.1, 0.5, 1, 5, 10];
+    for (const cr of crTicks) {
+        const y = toY(cr, H, pad);
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W-pad.right, y); ctx.stroke();
+        ctx.fillStyle = "#999"; ctx.font = "9px Segoe UI"; ctx.textAlign = "right";
+        ctx.fillText(cr, pad.left-6, y+3);
+    }
+
+    // Axes
+    ctx.strokeStyle = "#aab"; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top); ctx.lineTo(pad.left, H-pad.bottom);
+    ctx.lineTo(W-pad.right, H-pad.bottom); ctx.stroke();
+
+    // Axis labels
+    ctx.fillStyle = "#555"; ctx.font = "bold 11px Segoe UI";
+    ctx.textAlign = "center";
+    ctx.fillText("Temperature (°C)", (pad.left + W - pad.right)/2, H-4);
+    ctx.save();
+    ctx.translate(14, (pad.top + H - pad.bottom)/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillText("Corrosion Rate (mm/y)", 0, 0);
+    ctx.restore();
+
+    const selMat = document.getElementById("material").value;
+
+    // Draw all curves
+    for (const [matName, matData] of Object.entries(MCCONOMY)) {
+        const isSelected = (matName === selMat);
+        ctx.beginPath();
+        const pts = matData.points;
+        for (let i=0; i<pts.length; i++) {
+            const x = toX(pts[i][0], W, pad);
+            const y = toY(pts[i][1], H, pad);
+            i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle = isSelected ? matData.color : matData.color + "40";
+        ctx.lineWidth   = isSelected ? 2.8 : 1;
+        ctx.stroke();
+
+        // Label at last point
+        if (isSelected) {
+            const last = pts[pts.length-1];
+            ctx.fillStyle = matData.color;
+            ctx.font = "bold 10px Segoe UI";
+            ctx.textAlign = "left";
+            ctx.fillText(matName, toX(last[0], W, pad)+4, toY(last[1], H, pad)-4);
+        }
+    }
+
+    // Operating temperature line
+    const opT = parseFloat(document.getElementById("opTemp").value);
+    if (!isNaN(opT) && opT > 0) {
+        const ox = toX(opT, W, pad);
+        ctx.strokeStyle = "rgba(231,76,60,0.7)";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([5,4]);
+        ctx.beginPath(); ctx.moveTo(ox, pad.top); ctx.lineTo(ox, H-pad.bottom); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = "#e74c3c";
+        ctx.font = "bold 10px Segoe UI";
+        ctx.textAlign = "center";
+        ctx.fillText(opT+"°C", ox, pad.top-4);
+
+        // Operating point dot on selected curve
+        if (selMat && MCCONOMY[selMat]) {
+            const cr = interpolateCR(MCCONOMY[selMat].points, opT);
+            const factor = parseFloat(document.getElementById("h2sContent").value) || 1.0;
+            const correctedCR = cr * factor;
+            if (cr !== null) {
+                const oy = toY(correctedCR, H, pad);
+                ctx.beginPath(); ctx.arc(ox, oy, 6, 0, Math.PI*2);
+                ctx.fillStyle = "#e74c3c"; ctx.fill();
+                ctx.strokeStyle = "white"; ctx.lineWidth = 2; ctx.stroke();
+                ctx.fillStyle = "#c0392b"; ctx.font = "bold 10px Segoe UI";
+                ctx.textAlign = "left";
+                ctx.fillText(`CR = ${correctedCR.toFixed(3)} mm/y`, ox+10, oy-4);
+            }
+        }
+    }
+
+    buildLegend();
+}
+
+function buildLegend() {
+    const sel = document.getElementById("material").value;
+    const lg  = document.getElementById("chartLegend");
+    lg.innerHTML = "";
+    for (const [name, data] of Object.entries(MCCONOMY)) {
+        const div = document.createElement("div");
+        div.className = "legend-item";
+        div.innerHTML = `<div class="legend-line" style="background:${data.color};opacity:${name===sel?1:0.35}"></div>
+                         <span style="opacity:${name===sel?1:0.45}">${name}</span>`;
+        lg.appendChild(div);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONTROLS
+// ═══════════════════════════════════════════════════════════════
+const state = { sulf: "YES" };
+
+function setToggle(key, val) {
+    state[key] = val;
+    const cap = key.charAt(0).toUpperCase() + key.slice(1);
+    document.getElementById(`btn${cap}Yes`).className = "toggle-btn" + (val==="YES"?" active-yes":"");
+    document.getElementById(`btn${cap}No`).className  = "toggle-btn" + (val==="NO" ?" active-no" :"");
+    document.getElementById(key+"Present").value = val;
+}
+
+function toggleActualCR() {
+    const show = document.getElementById("useActualCR").checked;
+    document.getElementById("actualCRWrapper").classList.toggle("hidden", !show);
+    document.getElementById("noCRNote").classList.toggle("hidden", show);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VALIDATE
+// ═══════════════════════════════════════════════════════════════
+function validate() {
+    const sulf      = document.getElementById("sulfPresent").value;
+    const temp      = parseFloat(document.getElementById("opTemp").value);
+    const ph        = parseFloat(document.getElementById("opPH").value);
+    const material  = document.getElementById("material").value;
+    const designCR  = parseFloat(document.getElementById("designCR").value);
+    const useActual = document.getElementById("useActualCR").checked;
+    const actualCR  = parseFloat(document.getElementById("actualCR").value);
+    const factor    = parseFloat(document.getElementById("h2sContent").value) || 1.0;
+
+    if (!material)                          { alert("กรุณาเลือก Material"); return null; }
+    if (isNaN(temp) || temp <= 0)           { alert("กรุณาระบุ Operating Temperature"); return null; }
+    if (isNaN(ph)   || ph < 0 || ph > 14)  { alert("กรุณาระบุ Operating pH ที่ถูกต้อง"); return null; }
+    if (isNaN(designCR) || designCR <= 0)  { alert("กรุณาระบุ Design CR (> 0)"); return null; }
+    if (useActual && (isNaN(actualCR) || actualCR <= 0)) {
+        alert("กรุณาระบุ Actual CR ที่ถูกต้อง (> 0)"); return null;
+    }
+    return { sulf, temp, ph, material, designCR, useActual, actualCR, factor };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ANALYSIS LOGIC
+// ═══════════════════════════════════════════════════════════════
+function analyze(p) {
+    const steps = [];
+
+    // Step 1: Sulfur compound present?
+    if (p.sulf !== "YES") {
+        steps.push({ step:1, label:"Sulfur Compound Presence", pass:false,
+            detail:"ไม่มีสาร Sulfur Compound → ไม่เกิด Sulfidation Corrosion" });
+        return { steps, susceptibility:"Not Susceptible", reason:"No sulfur compound present" };
+    }
+    steps.push({ step:1, label:"Sulfur Compound Presence", pass:true,
+        detail:"Sulfur compound มีอยู่ในระบบ → ดำเนินการตรวจสอบต่อ" });
+
+    // Step 2: Temp > 260°C?
+    if (p.temp <= 260) {
+        steps.push({ step:2, label:"Operating Temperature Check", pass:false,
+            detail:`Operating Temp = ${p.temp}°C ≤ 260°C → ต่ำเกินไป ไม่เกิด Sulfidation` });
+        return { steps, susceptibility:"Not Susceptible", reason:`Temperature ${p.temp}°C is at or below 260°C threshold` };
+    }
+    steps.push({ step:2, label:"Operating Temperature Check", pass:true,
+        detail:`Operating Temp = ${p.temp}°C > 260°C → อยู่ในช่วง Sulfidation Susceptible` });
+
+    // Step 3: pH 4.5–7.0?
+    const phOk = (p.ph >= 4.5 && p.ph <= 7.0);
+    if (!phOk) {
+        const msg = p.ph < 4.5
+            ? `pH = ${p.ph} < 4.5 → Strongly acidic; Sulfidation less dominant, HCl corrosion may prevail`
+            : `pH = ${p.ph} > 7.0 → Alkaline; Sulfidation less likely at this pH`;
+        steps.push({ step:3, label:"Operating pH Check", pass:false, detail: msg });
+        return { steps, susceptibility:"Not Susceptible",
+            reason: `pH ${p.ph} is outside the Sulfidation susceptible range (4.5–7.0)` };
+    }
+    steps.push({ step:3, label:"Operating pH Check", pass:true,
+        detail:`pH = ${p.ph} → อยู่ในช่วง 4.5–7.0 → เหมาะสำหรับ Sulfidation` });
+
+    // Step 4: Determine CR
+    let finalCR, crSource;
+    if (p.useActual) {
+        finalCR  = p.actualCR;
+        crSource = `ใช้ Actual CR ที่วัดได้: ${finalCR} mm/y`;
+    } else {
+        const matData = MCCONOMY[p.material];
+        if (!matData) {
+            steps.push({ step:4, label:"McConomy Lookup", pass:false,
+                detail:`ไม่พบข้อมูล McConomy สำหรับ ${p.material}` });
+            return { steps, susceptibility:"Error", reason:"Material not found in McConomy database" };
+        }
+        const baseCR   = interpolateCR(matData.points, p.temp);
+        finalCR        = baseCR * p.factor;
+        crSource       = `McConomy Lookup: Base CR = ${baseCR.toFixed(4)} mm/y × H₂S Factor ${p.factor} = ${finalCR.toFixed(4)} mm/y`;
+    }
+
+    steps.push({ step:4, label:"Corrosion Rate Determination", pass:true,
+        detail: crSource });
+
+    // Step 5: Ratio & Susceptibility
+    const ratio = finalCR / p.designCR;
+    let level;
+    if      (ratio > 4)   level = "High";
+    else if (ratio >= 1)  level = "Medium";
+    else if (ratio >= 0.5)level = "Low";
+    else                  level = "Negligible";
+
+    steps.push({ step:5, label:"Susceptibility Assessment (CR / Design CR)", pass: true,
+        detail:`CR = ${finalCR.toFixed(4)} mm/y ÷ Design CR = ${p.designCR} mm/y → Ratio = ${ratio.toFixed(2)} → ${level.toUpperCase()}` });
+
+    return { steps, susceptibility:level, corrosion_rate: parseFloat(finalCR.toFixed(4)),
+             design_cr: p.designCR, ratio: ratio.toFixed(2) };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RUN & RENDER
+// ═══════════════════════════════════════════════════════════════
+function runAnalysis() {
+    const p = validate();
+    if (!p) return;
+    drawChart();
+    const result = analyze(p);
+    renderResults(result);
+}
+
+function renderResults(data) {
+    const stepsList = document.getElementById("stepsList");
+    stepsList.innerHTML = "";
+    for (const s of data.steps) {
+        const cls  = s.pass ? "pass" : "fail";
+        const icon = s.pass ? "fa-circle-check" : "fa-circle-xmark";
+        const div  = document.createElement("div");
+        div.className = `step-item ${cls}`;
+        div.innerHTML = `
+            <div class="step-icon"><i class="fa-solid ${icon}"></i></div>
+            <div class="step-body">
+                <div class="step-label">Step ${s.step} — ${s.label}</div>
+                <div class="step-detail">${s.detail}</div>
+            </div>`;
+        stepsList.appendChild(div);
+    }
+
+    const level   = data.susceptibility;
+    const bgMap   = { High:"bg-high", Medium:"bg-medium", Low:"bg-low",
+                      Negligible:"bg-negligible", "Not Susceptible":"bg-not-susceptible", Error:"bg-error" };
+    const cardEl  = document.getElementById("resultCard");
+
+    let inner = "";
+    if (data.corrosion_rate !== undefined) {
+        inner = `
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value">${data.corrosion_rate}</div>
+                    <div class="metric-label">CR (mm/y)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${data.design_cr}</div>
+                    <div class="metric-label">Design CR (mm/y)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${data.ratio}</div>
+                    <div class="metric-label">Ratio (CR / Design)</div>
+                </div>
+            </div>
+            <div class="result-level">
+                <div class="level-tag">Susceptibility</div>
+                <div class="level-value">${level.toUpperCase()}</div>
+            </div>`;
+    } else {
+        inner = `
+            <div>
+                <div class="level-tag">Result</div>
+                <div class="level-value" style="font-size:22px;">${level.toUpperCase()}</div>
+                <div class="reason-text" style="margin-top:6px;">${data.reason || ""}</div>
+            </div>`;
+    }
+    cardEl.innerHTML = `<div class="result-card ${bgMap[level] || 'bg-not-susceptible'}">${inner}</div>`;
+
+    const section = document.getElementById("resultsSection");
+    section.style.display = "block";
+    section.scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+window.addEventListener("load", () => {
+    drawChart();
+    window.addEventListener("resize", drawChart);
+    document.getElementById("h2sContent").addEventListener("change", drawChart);
+    document.getElementById("material").addEventListener("change", drawChart);
+});
+document.addEventListener("keydown", e => {
+    if (e.key === "Enter" && e.target.tagName !== "BUTTON") runAnalysis();
+});
+</script>
+
+</body>
+</html>

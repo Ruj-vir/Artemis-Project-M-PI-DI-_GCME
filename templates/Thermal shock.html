@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thermal Shock Analysis — Artemis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #000 0%, #111 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ─── Header ─── */
+        header {
+            background-color: #2b5797;
+            color: white;
+            padding: 0 24px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .brand { font-size: 26px; font-weight: 700; letter-spacing: 1px; }
+        .header-nav { display: flex; gap: 20px; }
+        .header-nav a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 13px;
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .header-nav a:hover { background: rgba(255,255,255,0.15); color: white; }
+
+        /* ─── Layout ─── */
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 30px 20px 50px;
+        }
+        .card {
+            background: #f0f2f5;
+            width: 100%;
+            max-width: 960px;
+            border-radius: 28px;
+            padding: 32px 40px;
+            box-shadow: 0 0 40px rgba(255,255,255,0.08);
+        }
+        .page-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a2f5a;
+            margin-bottom: 6px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .page-title i { color: #2b5797; font-size: 22px; }
+        .page-subtitle {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 28px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #2b5797;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #2b5797;
+            padding-bottom: 5px;
+            margin-bottom: 16px;
+        }
+
+        /* ─── Panels ─── */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+        .form-panel {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 20px 22px;
+        }
+        .form-panel-full {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 20px 22px;
+            margin-bottom: 18px;
+        }
+
+        /* ─── Fields ─── */
+        .field { margin-bottom: 14px; }
+        .field:last-child { margin-bottom: 0; }
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+        .field input, .field select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid #c0d0e8;
+            border-radius: 7px;
+            font-size: 14px;
+            color: #222;
+            background: #fafcff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .field input:focus, .field select:focus {
+            border-color: #2b5797;
+            box-shadow: 0 0 0 3px rgba(43,87,151,0.12);
+            background: white;
+        }
+        .field input::placeholder { color: #bbb; }
+        .input-row { display: flex; }
+        .input-row input { flex: 1; border-radius: 7px 0 0 7px; }
+        .unit {
+            background: #2b5797;
+            color: white;
+            padding: 9px 11px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 0 7px 7px 0;
+            white-space: nowrap;
+            display: flex; align-items: center;
+        }
+
+        /* ─── Toggle ─── */
+        .toggle-row { display: flex; gap: 10px; }
+        .toggle-btn {
+            flex: 1;
+            padding: 9px 0;
+            border: 2px solid #c0d0e8;
+            border-radius: 7px;
+            background: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.18s;
+            color: #666;
+        }
+        .toggle-btn:hover { border-color: #2b5797; color: #2b5797; }
+        .toggle-btn.active-yes { background: #27ae60; border-color: #27ae60; color: white; }
+        .toggle-btn.active-no  { background: #e74c3c; border-color: #e74c3c; color: white; }
+
+        .hint { font-size: 11px; color: #aaa; margin-top: 4px; }
+        .hidden { display: none !important; }
+
+        /* ─── Equipment icon chips ─── */
+        .equip-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+        .equip-chip {
+            border: 2px solid #c0d0e8;
+            border-radius: 10px;
+            padding: 12px 14px;
+            cursor: pointer;
+            background: white;
+            transition: all 0.18s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #555;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .equip-chip:hover { border-color: #2b5797; color: #2b5797; background: #f0f5ff; }
+        .equip-chip.selected { border-color: #2b5797; background: #2b5797; color: white; }
+        .equip-chip i { font-size: 18px; width: 22px; text-align: center; flex-shrink: 0; }
+        .equip-chip .equip-sub { font-size: 10px; opacity: 0.75; font-weight: 400; margin-top: 2px; }
+
+        /* ─── Temperature swing visualizer ─── */
+        .swing-visual {
+            background: #f7f9ff;
+            border: 1.5px solid #d0dcf0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-top: 10px;
+        }
+        .swing-bar-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .swing-bar-track {
+            flex: 1;
+            height: 12px;
+            background: #e0e8f5;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+        .swing-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.4s ease, background 0.4s;
+            background: #27ae60;
+        }
+        .swing-bar-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #555;
+            white-space: nowrap;
+        }
+        .swing-ratio-text {
+            font-size: 12px;
+            color: #555;
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        /* ─── Button ─── */
+        .btn-analyze {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #2b5797 0%, #3b6ba5 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(43,87,151,0.35);
+            transition: all 0.2s;
+            margin-bottom: 28px;
+        }
+        .btn-analyze:hover {
+            background: linear-gradient(135deg, #1e3f72, #2b5797);
+            transform: translateY(-1px);
+        }
+        .btn-analyze i { margin-right: 8px; }
+
+        /* ─── Results ─── */
+        #resultsSection { display: none; }
+        .divider { border: none; border-top: 1px solid #d5dff0; margin: 0 0 24px 0; }
+
+        .steps-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .step-item {
+            display: flex; align-items: flex-start; gap: 14px;
+            background: white; border-radius: 10px;
+            padding: 11px 16px; border-left: 4px solid #ddd;
+        }
+        .step-item.pass { border-left-color: #27ae60; }
+        .step-item.fail { border-left-color: #e74c3c; }
+        .step-item.warn { border-left-color: #e67e22; }
+        .step-item.info { border-left-color: #2b5797; }
+        .step-icon { font-size: 18px; width: 22px; flex-shrink: 0; margin-top: 1px; text-align: center; }
+        .step-item.pass .step-icon { color: #27ae60; }
+        .step-item.fail .step-icon { color: #e74c3c; }
+        .step-item.warn .step-icon { color: #e67e22; }
+        .step-item.info .step-icon { color: #2b5797; }
+        .step-body { flex: 1; }
+        .step-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; }
+        .step-detail { font-size: 13px; color: #333; margin-top: 2px; line-height: 1.55; }
+
+        /* ─── Result card ─── */
+        .result-card {
+            border-radius: 14px;
+            padding: 22px 28px;
+            display: flex; justify-content: space-between; align-items: flex-start;
+            color: white;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            margin-top: 16px;
+            gap: 20px;
+        }
+        .bg-high            { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+        .bg-medium          { background: linear-gradient(135deg, #ca6f1e, #e67e22); }
+        .bg-low             { background: linear-gradient(135deg, #9a7d0a, #d4ac0d); }
+        .bg-negligible      { background: linear-gradient(135deg, #1a7a42, #27ae60); }
+        .bg-not-susceptible { background: linear-gradient(135deg, #5d6d7e, #7f8c8d); }
+        .bg-specialist      { background: linear-gradient(135deg, #1a4a7a, #2b5797); }
+
+        .result-left { flex: 1; }
+        .result-level { text-align: right; flex-shrink: 0; }
+        .level-tag   { font-size: 11px; opacity: 0.8; text-transform: uppercase; margin-bottom: 2px; }
+        .level-value { font-size: 28px; font-weight: 700; line-height: 1.1; }
+        .reason-text { font-size: 14px; opacity: 0.9; margin-bottom: 10px; }
+
+        /* Recommendations */
+        .rec-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+        .rec-item {
+            display: flex; align-items: flex-start; gap: 8px;
+            font-size: 12px; opacity: 0.95; line-height: 1.4;
+        }
+        .rec-item i { font-size: 11px; margin-top: 2px; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">Artemis</div>
+    <nav class="header-nav">
+        <a href="javascript:history.back()"><i class="fa-solid fa-circle-arrow-left"></i> Back</a>
+        <a href="/projects"><i class="fa-solid fa-folder-open"></i> Projects</a>
+        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+    </nav>
+</header>
+
+<div class="page-wrapper">
+<div class="card">
+
+    <div class="page-title">
+        <i class="fa-solid fa-temperature-arrow-up"></i>
+        Thermal Shock Analysis
+    </div>
+    <div class="page-subtitle">API 571 | Damage Mechanism Screening</div>
+
+    <!-- ── Step 1: Equipment Type ── -->
+    <div class="form-panel-full">
+        <div class="section-label">Step 1 — Equipment Type</div>
+        <div class="field">
+            <label>Is this a Furnace or Coil Equipment?</label>
+            <div class="equip-grid" id="equipGrid">
+                <div class="equip-chip" data-val="Furnace" onclick="selectEquip(this)">
+                    <i class="fa-solid fa-fire"></i>
+                    <div>
+                        <div>Furnace</div>
+                        <div class="equip-sub">Direct-fired heater, Box furnace</div>
+                    </div>
+                </div>
+                <div class="equip-chip" data-val="Fired Heater" onclick="selectEquip(this)">
+                    <i class="fa-solid fa-bolt"></i>
+                    <div>
+                        <div>Fired Heater</div>
+                        <div class="equip-sub">Process heater, Reboiler</div>
+                    </div>
+                </div>
+                <div class="equip-chip" data-val="Coil" onclick="selectEquip(this)">
+                    <i class="fa-solid fa-rotate"></i>
+                    <div>
+                        <div>Coil / Tube Bundle</div>
+                        <div class="equip-sub">Furnace coil, Radiant tube</div>
+                    </div>
+                </div>
+                <div class="equip-chip" data-val="Reformer" onclick="selectEquip(this)">
+                    <i class="fa-solid fa-flask"></i>
+                    <div>
+                        <div>Reformer / Reactor</div>
+                        <div class="equip-sub">Catalytic reformer, Steam reformer</div>
+                    </div>
+                </div>
+                <div class="equip-chip" data-val="Waste Heat Boiler" onclick="selectEquip(this)">
+                    <i class="fa-solid fa-wind"></i>
+                    <div>
+                        <div>Waste Heat Boiler</div>
+                        <div class="equip-sub">Heat recovery, HRSG</div>
+                    </div>
+                </div>
+                <div class="equip-chip" data-val="Other" onclick="selectEquip(this)">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <div>
+                        <div>Other High-Temp Equipment</div>
+                        <div class="equip-sub">Not listed above</div>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="equipType" value="">
+            <div id="equipNoneNote" class="hint" style="margin-top:8px; color:#e74c3c; display:none;">
+                <i class="fa-solid fa-circle-xmark"></i>
+                Equipment ประเภทนี้ไม่ใช่ Furnace/Coil → ไม่อยู่ในขอบเขต Thermal Shock mechanism
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Step 2: Temperature Changes ── -->
+    <div class="form-panel-full">
+        <div class="section-label">Step 2 — Temperature Change Characteristics</div>
+        <div class="form-grid" style="margin-bottom:0;">
+            <div class="field">
+                <label>Large and Rapid Temperature Changes When Operating?</label>
+                <div class="toggle-row">
+                    <button class="toggle-btn active-yes" id="btnTempYes" onclick="setToggle('temp','YES')">
+                        <i class="fa-solid fa-check"></i> YES
+                    </button>
+                    <button class="toggle-btn" id="btnTempNo" onclick="setToggle('temp','NO')">
+                        <i class="fa-solid fa-xmark"></i> NO
+                    </button>
+                </div>
+                <input type="hidden" id="tempPresent" value="YES">
+            </div>
+            <div class="field">
+                <label>Material of Construction</label>
+                <select id="material">
+                    <option value="">— Select Material —</option>
+                    <optgroup label="Carbon & Low Alloy Steel">
+                        <option value="Carbon Steel">Carbon Steel</option>
+                        <option value="Low Alloy Steel">Low Alloy Steel</option>
+                        <option value="Cr-Mo Steel">Cr-Mo Steel</option>
+                    </optgroup>
+                    <optgroup label="Stainless Steel">
+                        <option value="300 Series SS">300 Series SS</option>
+                        <option value="400 Series SS">400 Series SS</option>
+                    </optgroup>
+                    <optgroup label="High Alloy">
+                        <option value="Nickel Alloy">Nickel Alloy</option>
+                        <option value="Inconel">Inconel / High-Temp Alloy</option>
+                    </optgroup>
+                    <optgroup label="Refractory">
+                        <option value="Refractory">Refractory Lining</option>
+                        <option value="Castable">Castable Refractory</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Step 3: Swing Temp vs Design Heat Rate ── -->
+    <div class="form-grid">
+        <div class="form-panel">
+            <div class="section-label">Step 3 — Temperature Swing vs Design Heat Rate</div>
+            <div class="field">
+                <label>Actual Temperature Swing Rate</label>
+                <div class="input-row">
+                    <input type="number" id="swingRate" placeholder="e.g. 80" min="0" step="1" oninput="updateSwingViz()">
+                    <span class="unit">°C/hr</span>
+                </div>
+            </div>
+            <div class="field">
+                <label>Design (Allowable) Heat Rate of Plant</label>
+                <div class="input-row">
+                    <input type="number" id="designRate" placeholder="e.g. 50" min="0.1" step="1" oninput="updateSwingViz()">
+                    <span class="unit">°C/hr</span>
+                </div>
+            </div>
+
+            <!-- Swing visualizer -->
+            <div class="swing-visual" id="swingViz">
+                <div style="font-size:11px; font-weight:700; color:#2b5797; text-transform:uppercase; letter-spacing:0.5px;">
+                    Swing Rate vs Design Rate
+                </div>
+                <div class="swing-bar-wrapper">
+                    <span class="swing-bar-label">Design</span>
+                    <div class="swing-bar-track">
+                        <div class="swing-bar-fill" id="designBar" style="width:60%; background:#2b5797;"></div>
+                    </div>
+                </div>
+                <div class="swing-bar-wrapper">
+                    <span class="swing-bar-label">Actual&nbsp;&nbsp;</span>
+                    <div class="swing-bar-track">
+                        <div class="swing-bar-fill" id="swingBar" style="width:80%; background:#e74c3c;"></div>
+                    </div>
+                </div>
+                <div class="swing-ratio-text" id="swingRatioText">กรอก Swing Rate และ Design Rate เพื่อเปรียบเทียบ</div>
+            </div>
+        </div>
+
+        <!-- Severity factors -->
+        <div class="form-panel">
+            <div class="section-label">Additional Severity Factors</div>
+            <div class="field">
+                <label>Quenching / Steam Injection Incident?</label>
+                <div class="toggle-row">
+                    <button class="toggle-btn" id="btnQuenchYes" onclick="setToggle('quench','YES')">
+                        <i class="fa-solid fa-check"></i> YES
+                    </button>
+                    <button class="toggle-btn active-no" id="btnQuenchNo" onclick="setToggle('quench','NO')">
+                        <i class="fa-solid fa-xmark"></i> NO
+                    </button>
+                </div>
+                <input type="hidden" id="quenchPresent" value="NO">
+                <div class="hint">การฉีดน้ำ/Steam เข้าระบบที่ร้อนจัด เพิ่มความเสี่ยง Thermal Shock</div>
+            </div>
+            <div class="field">
+                <label>Emergency Shutdown / Upset History?</label>
+                <div class="toggle-row">
+                    <button class="toggle-btn" id="btnEsdYes" onclick="setToggle('esd','YES')">
+                        <i class="fa-solid fa-check"></i> YES
+                    </button>
+                    <button class="toggle-btn active-no" id="btnEsdNo" onclick="setToggle('esd','NO')">
+                        <i class="fa-solid fa-xmark"></i> NO
+                    </button>
+                </div>
+                <input type="hidden" id="esdPresent" value="NO">
+                <div class="hint">ประวัติ ESD หรือ Upset ที่เกิดการเปลี่ยนแปลงอุณหภูมิกะทันหัน</div>
+            </div>
+            <div class="field">
+                <label>Refractory / Lining Present?</label>
+                <div class="toggle-row">
+                    <button class="toggle-btn" id="btnRefYes" onclick="setToggle('ref','YES')">
+                        <i class="fa-solid fa-check"></i> YES
+                    </button>
+                    <button class="toggle-btn active-no" id="btnRefNo" onclick="setToggle('ref','NO')">
+                        <i class="fa-solid fa-xmark"></i> NO
+                    </button>
+                </div>
+                <input type="hidden" id="refPresent" value="NO">
+                <div class="hint">Refractory อาจแตกร้าวได้เมื่อเกิด Thermal Shock</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analyze -->
+    <button class="btn-analyze" onclick="runAnalysis()">
+        <i class="fa-solid fa-magnifying-glass-chart"></i>
+        Analyze Thermal Shock Susceptibility
+    </button>
+
+    <!-- Results -->
+    <div id="resultsSection">
+        <hr class="divider">
+        <div class="section-label" style="margin-bottom:14px;">Analysis Flowchart</div>
+        <div class="steps-list" id="stepsList"></div>
+        <div id="resultCard"></div>
+    </div>
+
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+const state = {
+    temp:   "YES",
+    quench: "NO",
+    esd:    "NO",
+    ref:    "NO",
+};
+
+function setToggle(key, val) {
+    state[key] = val;
+    const cap  = key.charAt(0).toUpperCase() + key.slice(1);
+    document.getElementById(`btn${cap}Yes`).className = "toggle-btn" + (val==="YES"?" active-yes":"");
+    document.getElementById(`btn${cap}No`).className  = "toggle-btn" + (val==="NO" ?" active-no" :"");
+    document.getElementById(key+"Present").value = val;
+}
+
+// ─── Equipment selector ───────────────────────────────────────
+const FURNACE_COIL_TYPES = ["Furnace","Fired Heater","Coil","Reformer","Waste Heat Boiler","Other"];
+
+function selectEquip(el) {
+    document.querySelectorAll(".equip-chip").forEach(c => c.classList.remove("selected"));
+    el.classList.add("selected");
+    document.getElementById("equipType").value = el.dataset.val;
+}
+
+// ─── Swing Rate Visualizer ───────────────────────────────────
+function updateSwingViz() {
+    const swing  = parseFloat(document.getElementById("swingRate").value);
+    const design = parseFloat(document.getElementById("designRate").value);
+    if (isNaN(swing) || isNaN(design) || design <= 0) return;
+
+    const ratio = swing / design;
+    const pctSwing  = Math.min(ratio * 50, 100);   // scale: design = 50% always
+    const pctDesign = 50;
+
+    const swingBar  = document.getElementById("swingBar");
+    const designBar = document.getElementById("designBar");
+    designBar.style.width = pctDesign + "%";
+    swingBar.style.width  = pctSwing + "%";
+
+    let color = "#27ae60";
+    if (ratio >= 1)     color = "#e74c3c";
+    else if (ratio >= 0.7) color = "#e67e22";
+    swingBar.style.background = color;
+
+    const ratioText = document.getElementById("swingRatioText");
+    if (ratio >= 1) {
+        ratioText.innerHTML = `<span style="color:#e74c3c; font-weight:700;">⚠ Swing Rate (${swing} °C/hr) เกิน Design Rate (${design} °C/hr) — Ratio = ${ratio.toFixed(2)}×</span>`;
+    } else {
+        ratioText.innerHTML = `Swing Rate (${swing} °C/hr) / Design Rate (${design} °C/hr) = <strong>${ratio.toFixed(2)}×</strong>`;
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VALIDATE
+// ═══════════════════════════════════════════════════════════════
+function validate() {
+    const equipType = document.getElementById("equipType").value;
+    const material  = document.getElementById("material").value;
+    const tempChg   = document.getElementById("tempPresent").value;
+    const swingRate = parseFloat(document.getElementById("swingRate").value);
+    const designRate= parseFloat(document.getElementById("designRate").value);
+    const quench    = document.getElementById("quenchPresent").value;
+    const esd       = document.getElementById("esdPresent").value;
+    const ref       = document.getElementById("refPresent").value;
+
+    if (!equipType)                             { alert("กรุณาเลือกประเภท Equipment"); return null; }
+    if (!material)                              { alert("กรุณาเลือก Material"); return null; }
+    if (isNaN(swingRate) || swingRate <= 0)     { alert("กรุณาระบุ Actual Temperature Swing Rate"); return null; }
+    if (isNaN(designRate) || designRate <= 0)   { alert("กรุณาระบุ Design Heat Rate (> 0)"); return null; }
+
+    return { equipType, material, tempChg, swingRate, designRate, quench, esd, ref };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SPECIALIST RECOMMENDATIONS BY MATERIAL & SEVERITY
+// ═══════════════════════════════════════════════════════════════
+function getRecommendations(p, ratio) {
+    const recs = [
+        "ดำเนินการประเมินโดย Corrosion/Mechanical Specialist หรือ Metallurgist",
+        "ทบทวน Startup/Shutdown procedure เพื่อลด Rate of Temperature Change ให้ไม่เกิน Design",
+        "ตรวจสอบ Inspection History และ Crack Indication ด้วย WFMT หรือ TOFD",
+    ];
+
+    if (p.quench === "YES") recs.push("ตรวจสอบและ Review ระบบ Steam / Water Injection Interlock เพื่อป้องกัน Quenching");
+    if (p.esd   === "YES") recs.push("วิเคราะห์ Root Cause ของ ESD/Upset ที่เกิดขึ้น และประเมิน Cumulative Damage");
+    if (p.ref   === "YES") recs.push("ตรวจสอบ Refractory Lining สำหรับ Cracking, Spalling และ Hot Spot ด้วย Thermal Imaging");
+    if (p.material.includes("Refractory") || p.material.includes("Castable"))
+        recs.push("Refractory: ใช้ Controlled Heat-up Curve ตาม Manufacturer specification อย่างเคร่งครัด");
+    if (ratio >= 2.0) recs.push("Ratio สูงมาก (≥ 2×) — พิจารณาหยุดดำเนินการเพื่อตรวจสอบก่อนเดินเครื่องต่อ");
+
+    return recs;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ANALYSIS LOGIC
+// ═══════════════════════════════════════════════════════════════
+function analyze(p) {
+    const steps = [];
+    const ratio  = p.swingRate / p.designRate;
+
+    // Step 1: Furnace/Coil equipment?
+    const isFurnaceCoil = FURNACE_COIL_TYPES.includes(p.equipType);
+    if (!isFurnaceCoil) {
+        steps.push({ step:1, label:"Equipment Type Check", cls:"fail", icon:"fa-circle-xmark",
+            detail:`${p.equipType} ไม่ใช่ Furnace หรือ Coil Equipment → ไม่อยู่ในขอบเขต Thermal Shock mechanism` });
+        return { steps, susceptibility:"Not Susceptible",
+            reason:`Equipment type "${p.equipType}" is not a Furnace or Coil — not in scope for Thermal Shock` };
+    }
+    steps.push({ step:1, label:"Equipment Type Check", cls:"pass", icon:"fa-circle-check",
+        detail:`${p.equipType} — อยู่ในขอบเขต Thermal Shock mechanism (Furnace/Coil Equipment)` });
+
+    // Step 2: Large and rapid temperature changes?
+    if (p.tempChg !== "YES") {
+        steps.push({ step:2, label:"Temperature Change Characteristics", cls:"fail", icon:"fa-circle-xmark",
+            detail:"ไม่มี Large/Rapid Temperature Changes → ความเสี่ยง Thermal Shock ต่ำมาก" });
+        return { steps, susceptibility:"Not Susceptible",
+            reason:"No large or rapid temperature changes identified during operation" };
+    }
+    steps.push({ step:2, label:"Temperature Change Characteristics", cls:"pass", icon:"fa-circle-check",
+        detail:"มีการเปลี่ยนแปลงอุณหภูมิอย่างรวดเร็วและมาก → ดำเนินการตรวจสอบต่อ" });
+
+    // Severity factors note
+    const factors = [];
+    if (p.quench === "YES") factors.push("Quenching/Steam Injection");
+    if (p.esd    === "YES") factors.push("ESD/Upset History");
+    if (p.ref    === "YES") factors.push("Refractory Lining Present");
+    if (factors.length > 0) {
+        steps.push({ step:"2b", label:"Additional Severity Factors", cls:"warn", icon:"fa-triangle-exclamation",
+            detail:`พบปัจจัยเพิ่มเติมที่เพิ่มความเสี่ยง: ${factors.join(", ")}` });
+    }
+
+    // Step 3: Swing Temp > Design Heat Rate?
+    steps.push({ step:3, label:"Swing Rate vs Design Heat Rate", cls: ratio >= 1 ? "warn" : "pass",
+        icon: ratio >= 1 ? "fa-triangle-exclamation" : "fa-circle-check",
+        detail:`Actual Swing Rate = ${p.swingRate} °C/hr | Design Rate = ${p.designRate} °C/hr | Ratio = ${ratio.toFixed(2)}× → ${ratio >= 1 ? "เกิน Design Rate ⚠" : "อยู่ในขอบเขต Design"}` });
+
+    if (ratio >= 1) {
+        // Exceeds design → Refer to Specialist
+        const recs = getRecommendations(p, ratio);
+        steps.push({ step:"3b", label:"Determination — Refer to Specialist", cls:"warn", icon:"fa-user-tie",
+            detail:`Swing Rate เกิน Design Heat Rate → ต้องให้ Specialist ประเมิน Thermal Fatigue และ Damage Accumulation` });
+        return { steps, susceptibility:"Refer to Specialist",
+            swingRate: p.swingRate, designRate: p.designRate,
+            ratio: ratio.toFixed(2), recommendations: recs };
+    }
+
+    // Below design rate → determine by ratio band
+    let level;
+    if      (ratio >= 0.85) level = "Medium";
+    else if (ratio >= 0.6)  level = "Low";
+    else                    level = "Negligible";
+
+    steps.push({ step:"3b", label:"Susceptibility Assessment", cls:"pass", icon:"fa-circle-check",
+        detail:`Ratio = ${ratio.toFixed(2)}× (อยู่ต่ำกว่า Design Rate) → Susceptibility: ${level.toUpperCase()}` });
+
+    return { steps, susceptibility: level,
+             swingRate: p.swingRate, designRate: p.designRate, ratio: ratio.toFixed(2) };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RUN & RENDER
+// ═══════════════════════════════════════════════════════════════
+function runAnalysis() {
+    const p = validate();
+    if (!p) return;
+    const result = analyze(p);
+    renderResults(result);
+}
+
+function renderResults(data) {
+    const stepsList = document.getElementById("stepsList");
+    stepsList.innerHTML = "";
+
+    for (const s of data.steps) {
+        const div = document.createElement("div");
+        div.className = `step-item ${s.cls}`;
+        div.innerHTML = `
+            <div class="step-icon"><i class="fa-solid ${s.icon}"></i></div>
+            <div class="step-body">
+                <div class="step-label">Step ${s.step} — ${s.label}</div>
+                <div class="step-detail">${s.detail}</div>
+            </div>`;
+        stepsList.appendChild(div);
+    }
+
+    const level  = data.susceptibility;
+    const cardEl = document.getElementById("resultCard");
+
+    const bgMap = {
+        "High": "bg-high", "Medium": "bg-medium", "Low": "bg-low",
+        "Negligible": "bg-negligible", "Not Susceptible": "bg-not-susceptible",
+        "Refer to Specialist": "bg-specialist"
+    };
+    const bgClass = bgMap[level] || "bg-not-susceptible";
+
+    let inner = "";
+
+    if (level === "Refer to Specialist") {
+        const recHTML = (data.recommendations || []).map(r =>
+            `<div class="rec-item"><i class="fa-solid fa-arrow-right"></i><span>${r}</span></div>`
+        ).join("");
+
+        inner = `
+            <div class="result-left">
+                <div style="font-size:10px;opacity:0.8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Result</div>
+                <div style="font-size:13px;margin-bottom:8px;">
+                    Actual Swing Rate (${data.swingRate} °C/hr) เกิน Design Heat Rate (${data.designRate} °C/hr) — Ratio = ${data.ratio}×<br>
+                    ต้องให้ <strong>Specialist ประเมิน Thermal Fatigue Damage</strong> ก่อนดำเนินการต่อ
+                </div>
+                <div class="rec-list">${recHTML}</div>
+            </div>
+            <div class="result-level">
+                <div class="level-tag">Susceptibility</div>
+                <div class="level-value" style="font-size:18px; text-align:right;">REFER TO<br>SPECIALIST</div>
+            </div>`;
+    } else if (data.swingRate !== undefined) {
+        inner = `
+            <div class="metrics" style="display:flex;gap:22px;flex-wrap:wrap;">
+                <div class="metric">
+                    <div class="metric-value">${data.swingRate}</div>
+                    <div class="metric-label">Swing Rate (°C/hr)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${data.designRate}</div>
+                    <div class="metric-label">Design Rate (°C/hr)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${data.ratio}×</div>
+                    <div class="metric-label">Ratio</div>
+                </div>
+            </div>
+            <div class="result-level">
+                <div class="level-tag">Susceptibility</div>
+                <div class="level-value">${level.toUpperCase()}</div>
+            </div>`;
+    } else {
+        inner = `
+            <div>
+                <div class="level-tag">Result</div>
+                <div class="level-value" style="font-size:22px;">${level.toUpperCase()}</div>
+                <div class="reason-text" style="margin-top:6px;">${data.reason || ""}</div>
+            </div>`;
+    }
+
+    cardEl.innerHTML = `<div class="result-card ${bgClass}">${inner}</div>`;
+
+    const section = document.getElementById("resultsSection");
+    section.style.display = "block";
+    section.scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener("keydown", e => {
+    if (e.key === "Enter" && e.target.tagName !== "BUTTON") runAnalysis();
+});
+</script>
+
+</body>
+</html>

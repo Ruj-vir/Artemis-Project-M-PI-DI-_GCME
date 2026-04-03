@@ -1,0 +1,9 @@
+services:
+  artemis:
+    build: .
+    container_name: artemis_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./templates:/app/templates
+    restart: unless-stopped
