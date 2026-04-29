@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HF Acid Corrosion Analysis — Artemis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #000 0%, #111 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background-color: #2b5797;
+            color: white;
+            padding: 0 24px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .brand { font-size: 26px; font-weight: 700; letter-spacing: 1px; }
+        .header-nav { display: flex; gap: 20px; }
+        .header-nav a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 13px;
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .header-nav a:hover { background: rgba(255,255,255,0.15); color: white; }
+        .sso-user { color: rgba(255,255,255,0.85); font-size: 13px; padding: 6px 14px; display: flex; align-items: center; gap: 6px; }
+        .sso-logout { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 13px; padding: 6px 14px; border-radius: 6px; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.4); transition: background 0.2s; }
+        .sso-logout:hover { background: rgba(255,255,255,0.18); color: white; }
+
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 30px 20px 50px;
+        }
+        .card {
+            background: #f0f2f5;
+            width: 100%;
+            max-width: 1020px;
+            border-radius: 28px;
+            padding: 32px 40px;
+            box-shadow: 0 0 40px rgba(255,255,255,0.08);
+        }
+        .page-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a2f5a;
+            margin-bottom: 6px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .page-title i { color: #2b5797; }
+        .page-subtitle { text-align: center; font-size: 12px; color: #888; margin-bottom: 28px; }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #2b5797;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #2b5797;
+            padding-bottom: 5px;
+            margin-bottom: 16px;
+        }
+
+        .form-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+        .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+        .form-panel {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 20px 22px;
+        }
+        .form-panel-full {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 20px 22px;
+            margin-bottom: 18px;
+        }
+
+        .field { margin-bottom: 14px; }
+        .field:last-child { margin-bottom: 0; }
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+        .field input, .field select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid #c0d0e8;
+            border-radius: 7px;
+            font-size: 14px;
+            color: #222;
+            background: #fafcff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .field input:focus, .field select:focus {
+            border-color: #2b5797;
+            box-shadow: 0 0 0 3px rgba(43,87,151,0.12);
+            background: white;
+        }
+        .field input::placeholder { color: #bbb; }
+        .input-row { display: flex; }
+        .input-row input { flex: 1; border-radius: 7px 0 0 7px; }
+        .unit {
+            background: #2b5797;
+            color: white;
+            padding: 9px 11px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 0 7px 7px 0;
+            white-space: nowrap;
+            display: flex; align-items: center;
+        }
+
+        .toggle-row { display: flex; gap: 10px; }
+        .toggle-btn {
+            flex: 1;
+            padding: 9px 0;
+            border: 2px solid #c0d0e8;
+            border-radius: 7px;
+            background: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.18s;
+            color: #666;
+        }
+        .toggle-btn:hover { border-color: #2b5797; color: #2b5797; }
+        .toggle-btn.active-yes { background: #27ae60; border-color: #27ae60; color: white; }
+        .toggle-btn.active-no  { background: #e74c3c; border-color: #e74c3c; color: white; }
+
+        /* Material tabs */
+        .mat-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+        .mat-tab {
+            padding: 7px 16px;
+            border: 2px solid #c0d0e8;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #666;
+            background: white;
+            transition: all 0.18s;
+        }
+        .mat-tab:hover { border-color: #2b5797; color: #2b5797; }
+        .mat-tab.active { background: #2b5797; border-color: #2b5797; color: white; }
+
+        /* Residual toggle (Carbon Steel specific) */
+        .residual-row { display: flex; gap: 8px; margin-top: 8px; }
+        .residual-btn {
+            flex: 1;
+            padding: 7px 0;
+            border: 2px solid #c0d0e8;
+            border-radius: 7px;
+            background: white;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.18s;
+            color: #666;
+        }
+        .residual-btn.active { background: #e67e22; border-color: #e67e22; color: white; }
+
+        .checkbox-label {
+            display: flex; align-items: center; gap: 8px;
+            cursor: pointer; font-size: 13px; color: #555;
+            margin-bottom: 8px; user-select: none;
+        }
+        .checkbox-label input[type="checkbox"] {
+            width: 15px; height: 15px;
+            accent-color: #2b5797; cursor: pointer;
+        }
+        .hidden { display: none !important; }
+        .hint { font-size: 11px; color: #aaa; margin-top: 4px; }
+
+        /* Cond panels */
+        .cond-panel { display: none; }
+        .cond-panel.visible { display: block; }
+
+        /* Reference table */
+        .ref-table-wrapper {
+            background: white;
+            border: 1px solid #d0dcf0;
+            border-radius: 14px;
+            padding: 18px 22px;
+            margin-bottom: 18px;
+            overflow-x: auto;
+        }
+        .ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            min-width: 700px;
+        }
+        .ref-table th {
+            background: #2b5797;
+            color: white;
+            padding: 6px 8px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .ref-table th:first-child  { border-radius: 6px 0 0 0; text-align: left; }
+        .ref-table th:last-child   { border-radius: 0 6px 0 0; }
+        .ref-table td {
+            padding: 5px 8px;
+            border-bottom: 1px solid #eef0f5;
+            color: #333;
+            text-align: center;
+        }
+        .ref-table td:first-child  { text-align: left; font-weight: 600; }
+        .ref-table tr:last-child td { border-bottom: none; }
+        .ref-table tr:nth-child(even) td { background: #f7f9fd; }
+        .ref-table .hl { background: #fff3cd !important; font-weight: 700; color: #856404; }
+
+        .btn-analyze {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #2b5797 0%, #3b6ba5 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(43,87,151,0.35);
+            transition: all 0.2s;
+            margin-bottom: 28px;
+        }
+        .btn-analyze:hover { background: linear-gradient(135deg,#1e3f72,#2b5797); transform: translateY(-1px); }
+        .btn-analyze i { margin-right: 8px; }
+
+        #resultsSection { display: none; }
+        .divider { border: none; border-top: 1px solid #d5dff0; margin: 0 0 24px 0; }
+
+        .steps-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .step-item {
+            display: flex; align-items: flex-start; gap: 14px;
+            background: white; border-radius: 10px;
+            padding: 11px 16px; border-left: 4px solid #ddd;
+        }
+        .step-item.pass { border-left-color: #27ae60; }
+        .step-item.fail { border-left-color: #e74c3c; }
+        .step-item.info { border-left-color: #2b5797; }
+        .step-icon { font-size: 18px; width: 22px; flex-shrink: 0; margin-top: 1px; text-align: center; }
+        .step-item.pass .step-icon { color: #27ae60; }
+        .step-item.fail .step-icon { color: #e74c3c; }
+        .step-item.info .step-icon { color: #2b5797; }
+        .step-body { flex: 1; }
+        .step-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; }
+        .step-detail { font-size: 13px; color: #333; margin-top: 2px; line-height: 1.55; }
+
+        .result-card {
+            border-radius: 14px;
+            padding: 22px 28px;
+            display: flex; justify-content: space-between; align-items: center;
+            color: white;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            margin-top: 16px;
+        }
+        .bg-high            { background: linear-gradient(135deg,#c0392b,#e74c3c); }
+        .bg-medium          { background: linear-gradient(135deg,#ca6f1e,#e67e22); }
+        .bg-low             { background: linear-gradient(135deg,#9a7d0a,#d4ac0d); }
+        .bg-negligible      { background: linear-gradient(135deg,#1a7a42,#27ae60); }
+        .bg-not-susceptible { background: linear-gradient(135deg,#5d6d7e,#7f8c8d); }
+        .bg-error           { background: linear-gradient(135deg,#7d3c98,#9b59b6); }
+
+        .metrics { display: flex; gap: 22px; flex-wrap: wrap; }
+        .metric { text-align: center; }
+        .metric-value { font-size: 24px; font-weight: 700; line-height: 1; }
+        .metric-label { font-size: 10px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+        .result-level { text-align: right; }
+        .level-tag  { font-size: 11px; opacity: 0.8; text-transform: uppercase; margin-bottom: 2px; }
+        .level-value { font-size: 28px; font-weight: 700; line-height: 1.1; }
+        .reason-text { font-size: 14px; opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">Artemis</div>
+    <nav class="header-nav">
+        <a href="javascript:history.back()"><i class="fa-solid fa-circle-arrow-left"></i> Back</a>
+        <a href="/projects"><i class="fa-solid fa-folder-open"></i> Projects</a>
+        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+        <span class="sso-user"><i class="fa-solid fa-circle-user"></i> {{ current_user }}</span>
+        <a href="/logout" class="sso-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </nav>
+</header>
+
+<div class="page-wrapper">
+<div class="card">
+
+    <div class="page-title">
+        <i class="fa-solid fa-biohazard"></i>
+        Hydrofluoric Acid (HF) Corrosion Analysis
+    </div>
+    <div class="page-subtitle">API 571 | Table 2.B.2.3M Screening Method</div>
+
+    <!-- Step 1: HF Present -->
+    <div class="form-panel-full">
+        <div class="section-label">Step 1 — HF Acid Presence During Operation</div>
+        <div class="field">
+            <label>Is HF Acid Present When Operating?</label>
+            <div class="toggle-row">
+                <button class="toggle-btn active-yes" id="btnHfYes" onclick="setToggle('hf','YES')">
+                    <i class="fa-solid fa-check"></i> YES
+                </button>
+                <button class="toggle-btn" id="btnHfNo" onclick="setToggle('hf','NO')">
+                    <i class="fa-solid fa-xmark"></i> NO
+                </button>
+            </div>
+            <input type="hidden" id="hfPresent" value="YES">
+        </div>
+    </div>
+
+    <!-- Step 2: Water -->
+    <div class="form-panel-full">
+        <div class="section-label">Step 2 — Water Droplets / Condensed Water</div>
+        <div class="field">
+            <label>Is Water Droplets or Condensed Water Present?</label>
+            <div class="toggle-row">
+                <button class="toggle-btn active-yes" id="btnWaterYes" onclick="setToggle('water','YES')">
+                    <i class="fa-solid fa-check"></i> YES
+                </button>
+                <button class="toggle-btn" id="btnWaterNo" onclick="setToggle('water','NO')">
+                    <i class="fa-solid fa-xmark"></i> NO
+                </button>
+            </div>
+            <input type="hidden" id="waterPresent" value="YES">
+        </div>
+    </div>
+
+    <!-- Step 3: Material + Design CR -->
+    <div class="form-panel-full">
+        <div class="section-label">Step 3 — Material of Construction</div>
+
+        <!-- Material group tabs -->
+        <div class="field">
+            <label>Material Group</label>
+            <div class="mat-tabs">
+                <div class="mat-tab active" data-grp="cs"    onclick="selectMat('cs')">Carbon Steel / Low Alloy</div>
+                <div class="mat-tab"        data-grp="cuni"  onclick="selectMat('cuni')">Cu-Ni Alloy / Alloy 400</div>
+                <div class="mat-tab"        data-grp="ss300" onclick="selectMat('ss300')">300/400 Series SS (not in scope)</div>
+            </div>
+            <input type="hidden" id="matGroup" value="cs">
+        </div>
+
+        <div class="form-grid" style="margin-bottom:0;">
+            <!-- Specific material -->
+            <div class="field">
+                <label>Specific Material</label>
+                <select id="materialSelect">
+                    <option value="Carbon Steel">Carbon Steel</option>
+                    <option value="Low Alloy Steel">Low Alloy Steel</option>
+                </select>
+            </div>
+            <!-- Design CR -->
+            <div class="field">
+                <label>Design Corrosion Rate (Allowable)</label>
+                <div class="input-row">
+                    <input type="number" id="designCR" placeholder="e.g. 1.0" min="0.001" step="0.01">
+                    <span class="unit">mm/y</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 4: Actual CR + Operating Conditions -->
+    <div class="form-grid">
+        <!-- Step 4: Actual CR -->
+        <div class="form-panel">
+            <div class="section-label">Step 4 — Actual Corrosion Rate</div>
+            <div class="field">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="useActualCR" onchange="toggleActualCR()">
+                    Actual (Measured) CR Available?
+                </label>
+                <div id="actualCRWrapper" class="hidden">
+                    <div class="input-row">
+                        <input type="number" id="actualCR" placeholder="e.g. 2.5" min="0" step="0.01">
+                        <span class="unit">mm/y</span>
+                    </div>
+                    <div class="hint">Overrides table lookup value</div>
+                </div>
+                <div id="noCRNote" class="hint" style="margin-top:6px;">
+                    ถ้าไม่มีค่า Actual CR ระบบจะ lookup จาก Table 2.B.2.3M ตาม Material และ Operating Conditions
+                </div>
+            </div>
+        </div>
+
+        <!-- Operating Conditions -->
+        <div class="form-panel" id="opCondPanel">
+            <div class="section-label">Operating Conditions</div>
+
+            <!-- HF Concentration -->
+            <div class="field">
+                <label>HF in Water Concentration</label>
+                <select id="hfConc">
+                    <option value="0">— Select Range —</option>
+                    <option value="1">&gt;0–1 wt%</option>
+                    <option value="2">&gt;1–2 wt%</option>
+                    <option value="3">&gt;2–5 wt%</option>
+                    <option value="4">&gt;5–6 wt%</option>
+                    <option value="5">&gt;6–63 wt%</option>
+                    <option value="6">&gt;63–64 wt%</option>
+                    <option value="7">&gt;64–80 wt%</option>
+                    <option value="8">≥80 wt%</option>
+                </select>
+            </div>
+
+            <!-- Temperature -->
+            <div class="field">
+                <label>Operating Temperature</label>
+                <select id="opTemp">
+                    <option value="">— Select Range —</option>
+                    <option value="0">0–27 °C</option>
+                    <option value="1">&gt;27–41 °C (CS) / &gt;27–52 °C (Cu-Ni)</option>
+                    <option value="2">&gt;41–60 °C (CS) / &gt;52–79 °C (Cu-Ni)</option>
+                    <option value="3">&gt;60–66 °C (CS) / &gt;79–93 °C (Cu-Ni)</option>
+                    <option value="4">&gt;66–75 °C (CS only)</option>
+                    <option value="5">&gt;75–86 °C (CS only)</option>
+                    <option value="6">&gt;86–93 °C (CS only)</option>
+                </select>
+            </div>
+
+            <!-- CS only: Velocity + Residual -->
+            <div id="csExtraPanel">
+                <div class="field">
+                    <label>Flow Velocity</label>
+                    <div class="toggle-row">
+                        <button class="toggle-btn active-yes" id="btnVelLow" onclick="setVel('low')">
+                            &lt; 3.05 m/s
+                        </button>
+                        <button class="toggle-btn" id="btnVelHigh" onclick="setVel('high')">
+                            ≥ 3.05 m/s
+                        </button>
+                    </div>
+                    <input type="hidden" id="velocity" value="low">
+                </div>
+                <!-- Residual (only when HF ≥80%) -->
+                <div id="residualPanel" class="hidden field">
+                    <label>HF Residual Level (for ≥80% HF)</label>
+                    <div class="residual-row">
+                        <button class="residual-btn active" id="btnResLow" onclick="setResidual('low')">Low Residual</button>
+                        <button class="residual-btn"        id="btnResHigh" onclick="setResidual('high')">High Residual</button>
+                    </div>
+                    <input type="hidden" id="residual" value="low">
+                </div>
+            </div>
+
+            <!-- Cu-Ni/Alloy 400 only: Aerated -->
+            <div id="cuniExtraPanel" class="hidden field">
+                <label>Aerated / Oxygen Present?</label>
+                <div class="toggle-row">
+                    <button class="toggle-btn" id="btnAerYes" onclick="setToggle('aer','YES')">
+                        <i class="fa-solid fa-check"></i> YES
+                    </button>
+                    <button class="toggle-btn active-no" id="btnAerNo" onclick="setToggle('aer','NO')">
+                        <i class="fa-solid fa-xmark"></i> NO
+                    </button>
+                </div>
+                <input type="hidden" id="aerPresent" value="NO">
+            </div>
+        </div>
+    </div>
+
+    <!-- Reference Tables -->
+    <div class="ref-table-wrapper">
+        <div class="section-label" style="margin-bottom:12px;" id="refTableTitle">
+            Table 2.B.2.3M — Carbon Steel: Estimated Corrosion Rate (mm/y) — Velocity × HF Concentration × Temperature
+        </div>
+        <!-- CS Table -->
+        <div id="csTableDiv">
+            <table class="ref-table">
+                <thead>
+                    <tr>
+                        <th>Temp (°C)</th>
+                        <th>Velocity</th>
+                        <th>&gt;0–1%</th>
+                        <th>&gt;1–2%</th>
+                        <th>&gt;2–5%</th>
+                        <th>&gt;5–6%</th>
+                        <th>&gt;6–63%</th>
+                        <th>&gt;63–64%</th>
+                        <th>&gt;64–80%</th>
+                        <th>≥80% Low</th>
+                        <th>≥80% High</th>
+                    </tr>
+                </thead>
+                <tbody id="csTableBody"></tbody>
+            </table>
+        </div>
+        <!-- Cu-Ni Table -->
+        <div id="cuniTableDiv" class="hidden">
+            <table class="ref-table">
+                <thead>
+                    <tr>
+                        <th>Temp (°C)</th>
+                        <th>Aerated?</th>
+                        <th>&gt;0–1%</th>
+                        <th>&gt;1–2%</th>
+                        <th>&gt;2–5%</th>
+                        <th>&gt;5–6%</th>
+                        <th>&gt;6–63%</th>
+                        <th>&gt;63–64%</th>
+                        <th>&gt;64–80%</th>
+                        <th>≥80%</th>
+                    </tr>
+                </thead>
+                <tbody id="cuniTableBody"></tbody>
+            </table>
+        </div>
+        <div class="hint" style="margin-top:8px;">
+            <i class="fa-solid fa-circle-info"></i>
+            ค่าที่ highlight <span style="background:#fff3cd;padding:1px 5px;border-radius:3px;font-weight:700;color:#856404;">สีเหลือง</span> = ช่องที่ตรงกับ Operating Conditions ที่กรอก
+        </div>
+    </div>
+
+    <!-- Analyze -->
+    <button class="btn-analyze" onclick="runAnalysis()">
+        <i class="fa-solid fa-magnifying-glass-chart"></i>
+        Analyze HF Corrosion Susceptibility
+    </button>
+
+    <!-- Results -->
+    <div id="resultsSection">
+        <hr class="divider">
+        <div class="section-label" style="margin-bottom:14px;">Analysis Flowchart</div>
+        <div class="steps-list" id="stepsList"></div>
+        <div id="resultCard"></div>
+    </div>
+
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// TABLE DATA
+// ═══════════════════════════════════════════════════════════════
+
+// Carbon Steel Table 2.B.2.3M
+// Key: tempIdx (0-6) → velIdx (0=<3.05, 1=>=3.05) → hfIdx (0-8)
+// hfIdx: 0=>0-1, 1=>1-2, 2=>2-5, 3=>5-6, 4=>6-63, 5=>63-64, 6=>64-80, 7=>=80 Low, 8=>=80 High
+const CS_TABLE = [
+    // 0-27°C
+    [ [0.05, 3.81, 3.81, 20.32, 20.32, 0.13, 0.13, 0.05, 0.15],
+      [0.51, 25.37, 25.37, 25.37, 25.37, 1.27, 1.27, 0.51, 1.52] ],
+    // >27-41°C
+    [ [0.25, 12.70, 12.70, 25.37, 25.37, 0.76, 0.76, 0.13, 0.38],
+      [5.08, 25.37, 25.37, 25.37, 25.37, 7.62, 7.62, 1.27, 3.81] ],
+    // >41-60°C
+    [ [0.25, 12.70, 12.70, 25.37, 25.37, 0.76, 0.76, 0.25, 0.76],
+      [2.54, 25.37, 25.37, 25.37, 25.37, 7.62, 7.62, 2.54, 7.62] ],
+    // >60-66°C
+    [ [2.54, 25.37, 25.37, 25.37, 25.37, 12.70, 12.70, 0.51, 1.52],
+      [25.37, 25.37, 25.37, 25.37, 25.37, 25.37, 25.37, 5.08, 15.24] ],
+    // >66-75°C
+    [ [2.54, 25.37, 25.37, 25.37, 25.37, 12.70, 12.70, 1.27, 3.81],
+      [25.37, 25.37, 25.37, 25.37, 25.37, 25.37, 25.37, 1.27, 25.37] ],
+    // >75-86°C
+    [ [2.54, 25.37, 25.37, 25.37, 25.37, 12.70, 12.70, 1.78, 5.33],
+      [25.37, 25.37, 25.37, 25.37, 25.37, 25.37, 25.37, 17.78, 25.37] ],
+    // >86-93°C
+    [ [12.70, 25.37, 25.37, 25.37, 25.37, 25.37, 25.37, 2.54, 7.62],
+      [25.37, 25.37, 25.37, 25.37, 25.37, 25.37, 25.37, 25.37, 25.37] ],
+];
+
+const CS_TEMP_LABELS = [
+    "0–27", ">27–41", ">41–60", ">60–66", ">66–75", ">75–86", ">86–93"
+];
+const HF_CONC_LABELS = [">0–1%",">1–2%",">2–5%",">5–6%",">6–63%",">63–64%",">64–80%","≥80% Low","≥80% High"];
+
+// Cu-Ni / Alloy 400 Table
+// Key: tempIdx (0-3) → aerIdx (0=No, 1=Yes) → hfIdx (0-7)
+// hfIdx: 0=>0-1,1=>1-2,2=>2-5,3=>5-6,4=>6-63,5=>63-64,6=>64-80,7=>=80
+const CUNI_TABLE = [
+    // 0-27°C
+    [ [0.03, 0.03, 0.03, 0.25, 0.25, 0.03, 0.03, 0.05],
+      [0.25, 0.25, 0.25, 0.64, 0.64, 0.25, 0.25, 0.38] ],
+    // >27-52°C
+    [ [0.03, 0.03, 0.03, 0.38, 0.38, 0.13, 0.13, 0.08],
+      [0.25, 0.25, 0.25, 0.76, 0.76, 0.51, 0.51, 0.38] ],
+    // >52-79°C
+    [ [0.13, 0.13, 0.13, 0.51, 0.51, 0.25, 0.25, 0.13],
+      [0.51, 0.51, 0.51, 2.54, 2.54, 1.27, 1.27, 0.51] ],
+    // >79-93°C
+    [ [0.25, 0.25, 0.25, 0.51, 0.51, 0.51, 0.51, 0.25],
+      [2.54, 2.54, 2.54, 5.08, 5.08, 5.08, 5.08, 2.54] ],
+];
+
+const CUNI_TEMP_LABELS = ["0–27", ">27–52", ">52–79", ">79–93"];
+const CUNI_HF_LABELS   = [">0–1%",">1–2%",">2–5%",">5–6%",">6–63%",">63–64%",">64–80%","≥80%"];
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+const state = { hf:"YES", water:"YES", aer:"NO" };
+let velState     = "low";
+let residualState= "low";
+
+function setToggle(key, val) {
+    state[key] = val;
+    const cap = key.charAt(0).toUpperCase() + key.slice(1);
+    const yBtn = document.getElementById(`btn${cap}Yes`);
+    const nBtn = document.getElementById(`btn${cap}No`);
+    if (yBtn) yBtn.className = "toggle-btn" + (val==="YES"?" active-yes":"");
+    if (nBtn) nBtn.className = "toggle-btn" + (val==="NO" ?" active-no" :"");
+    const h = document.getElementById(key+"Present");
+    if (h) h.value = val;
+}
+
+function setVel(v) {
+    velState = v;
+    document.getElementById("btnVelLow").className  = "toggle-btn" + (v==="low" ?" active-yes":"");
+    document.getElementById("btnVelHigh").className = "toggle-btn" + (v==="high"?" active-yes":"");
+    document.getElementById("velocity").value = v;
+}
+
+function setResidual(r) {
+    residualState = r;
+    document.getElementById("btnResLow").className  = "residual-btn" + (r==="low" ?" active":"");
+    document.getElementById("btnResHigh").className = "residual-btn" + (r==="high"?" active":"");
+    document.getElementById("residual").value = r;
+}
+
+// ─── HF conc change → show residual panel if ≥80% ─────────────
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("hfConc").addEventListener("change", () => {
+        const v = parseInt(document.getElementById("hfConc").value);
+        const show = (v === 8 && document.getElementById("matGroup").value === "cs");
+        document.getElementById("residualPanel").classList.toggle("hidden", !show);
+    });
+    buildTables();
+    highlightTable();
+});
+
+// ─── Material group selector ───────────────────────────────────
+const MAT_OPTIONS = {
+    cs:    ["Carbon Steel","Low Alloy Steel"],
+    cuni:  ["Cu-Ni Alloy (70/30)","Cu-Ni Alloy (90/10)","Alloy 400"],
+    ss300: ["300 Series SS (not in scope)","400 Series SS (not in scope)"],
+};
+
+function selectMat(grp) {
+    document.getElementById("matGroup").value = grp;
+    document.querySelectorAll(".mat-tab").forEach(t => t.classList.toggle("active", t.dataset.grp === grp));
+
+    const sel = document.getElementById("materialSelect");
+    sel.innerHTML = MAT_OPTIONS[grp].map(m => `<option value="${m}">${m}</option>`).join("");
+
+    // Show/hide extra panels
+    const isCS   = grp === "cs";
+    const isCuni = grp === "cuni";
+    document.getElementById("csExtraPanel").style.display   = isCS   ? "" : "none";
+    document.getElementById("cuniExtraPanel").classList.toggle("hidden", !isCuni);
+
+    // Show/hide reference tables
+    document.getElementById("csTableDiv").classList.toggle("hidden", !isCS);
+    document.getElementById("cuniTableDiv").classList.toggle("hidden", !isCuni);
+    document.getElementById("refTableTitle").textContent = isCS
+        ? "Table 2.B.2.3M — Carbon Steel: Estimated Corrosion Rate (mm/y)"
+        : isCuni
+            ? "Table 2.B.2.3M — Cu-Ni / Alloy 400: Estimated Corrosion Rate (mm/y)"
+            : "300/400 Series SS — Not in scope for HF Acid Corrosion";
+
+    // Temp options: CS has 7 rows, Cu-Ni has 4
+    const tempSel = document.getElementById("opTemp");
+    if (isCS) {
+        tempSel.innerHTML = `
+            <option value="">— Select Range —</option>
+            <option value="0">0–27 °C</option>
+            <option value="1">&gt;27–41 °C</option>
+            <option value="2">&gt;41–60 °C</option>
+            <option value="3">&gt;60–66 °C</option>
+            <option value="4">&gt;66–75 °C</option>
+            <option value="5">&gt;75–86 °C</option>
+            <option value="6">&gt;86–93 °C</option>`;
+    } else {
+        tempSel.innerHTML = `
+            <option value="">— Select Range —</option>
+            <option value="0">0–27 °C</option>
+            <option value="1">&gt;27–52 °C</option>
+            <option value="2">&gt;52–79 °C</option>
+            <option value="3">&gt;79–93 °C</option>`;
+    }
+    highlightTable();
+}
+
+// ─── Build static table bodies ────────────────────────────────
+function buildTables() {
+    // CS table body
+    const csBody = document.getElementById("csTableBody");
+    csBody.innerHTML = "";
+    CS_TABLE.forEach((velPair, ti) => {
+        velPair.forEach((row, vi) => {
+            const tr = document.createElement("tr");
+            tr.dataset.ti = ti;
+            tr.dataset.vi = vi;
+            tr.innerHTML = `<td>${CS_TEMP_LABELS[ti]}°C</td><td>${vi===0?"&lt; 3.05 m/s":"≥ 3.05 m/s"}</td>`
+                + row.map((v, hi) => `<td data-hi="${hi}">${v}</td>`).join("");
+            csBody.appendChild(tr);
+        });
+    });
+
+    // Cu-Ni table body
+    const cuniBody = document.getElementById("cuniTableBody");
+    cuniBody.innerHTML = "";
+    CUNI_TABLE.forEach((aerPair, ti) => {
+        aerPair.forEach((row, ai) => {
+            const tr = document.createElement("tr");
+            tr.dataset.ti = ti;
+            tr.dataset.ai = ai;
+            tr.innerHTML = `<td>${CUNI_TEMP_LABELS[ti]}°C</td><td>${ai===0?"No":"Yes"}</td>`
+                + row.map((v, hi) => `<td data-hi="${hi}">${v}</td>`).join("");
+            cuniBody.appendChild(tr);
+        });
+    });
+}
+
+// ─── Highlight matching cell in table ─────────────────────────
+function highlightTable() {
+    // Clear all highlights
+    document.querySelectorAll(".ref-table td.hl").forEach(td => td.classList.remove("hl"));
+
+    const grp     = document.getElementById("matGroup").value;
+    const tempIdx = parseInt(document.getElementById("opTemp").value);
+    const hfIdx   = parseInt(document.getElementById("hfConc").value) - 1; // 0-based (col 0-8 for CS, 0-7 for cuni)
+    if (isNaN(tempIdx) || isNaN(hfIdx) || hfIdx < 0) return;
+
+    if (grp === "cs") {
+        const velIdx = velState === "low" ? 0 : 1;
+        // find ≥80 col: hfConc=8 → hfIdx=7, split into Low(7) High(8)
+        const colIdx = hfIdx; // col in table: 0-8 (9 cols after temp & vel)
+        document.querySelectorAll(`#csTableBody tr[data-ti="${tempIdx}"][data-vi="${velIdx}"] td[data-hi]`).forEach(td => {
+            if (parseInt(td.dataset.hi) === colIdx) td.classList.add("hl");
+        });
+    } else if (grp === "cuni") {
+        const aerIdx = state.aer === "YES" ? 1 : 0;
+        const colIdx = hfIdx; // 0-7
+        document.querySelectorAll(`#cuniTableBody tr[data-ti="${tempIdx}"][data-ai="${aerIdx}"] td[data-hi]`).forEach(td => {
+            if (parseInt(td.dataset.hi) === colIdx) td.classList.add("hl");
+        });
+    }
+}
+
+// Watch inputs to update highlight
+["opTemp","hfConc"].forEach(id => {
+    document.addEventListener("change", e => { if (e.target.id === id) highlightTable(); });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// ACTUAL CR TOGGLE
+// ═══════════════════════════════════════════════════════════════
+function toggleActualCR() {
+    const show = document.getElementById("useActualCR").checked;
+    document.getElementById("actualCRWrapper").classList.toggle("hidden", !show);
+    document.getElementById("noCRNote").classList.toggle("hidden", show);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VALIDATE
+// ═══════════════════════════════════════════════════════════════
+function validate() {
+    const hf       = document.getElementById("hfPresent").value;
+    const water    = document.getElementById("waterPresent").value;
+    const grp      = document.getElementById("matGroup").value;
+    const material = document.getElementById("materialSelect").value;
+    const designCR = parseFloat(document.getElementById("designCR").value);
+    const useActual= document.getElementById("useActualCR").checked;
+    const actualCR = parseFloat(document.getElementById("actualCR").value);
+    const hfConc   = parseInt(document.getElementById("hfConc").value);
+    const tempIdx  = parseInt(document.getElementById("opTemp").value);
+    const aer      = document.getElementById("aerPresent").value;
+    const residual = document.getElementById("residual").value;
+
+    if (!material)                          { alert("กรุณาเลือก Material"); return null; }
+    if (isNaN(designCR) || designCR <= 0)   { alert("กรุณาระบุ Design CR (> 0)"); return null; }
+    if (useActual && (isNaN(actualCR) || actualCR <= 0)) {
+        alert("กรุณาระบุ Actual CR ที่ถูกต้อง (> 0)"); return null;
+    }
+    if (!useActual) {
+        if (!hfConc)         { alert("กรุณาเลือก HF Concentration"); return null; }
+        if (isNaN(tempIdx))  { alert("กรุณาเลือก Operating Temperature Range"); return null; }
+    }
+
+    return { hf, water, grp, material, designCR, useActual, actualCR,
+             hfConcIdx: hfConc - 1, tempIdx, velState, aer, residual };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ANALYSIS LOGIC
+// ═══════════════════════════════════════════════════════════════
+function analyze(p) {
+    const steps = [];
+
+    // Step 1
+    if (p.hf !== "YES") {
+        steps.push({ step:1, label:"HF Acid Presence", pass:false,
+            detail:"ไม่มี HF Acid ในระบบ → ไม่เกิด HF Corrosion" });
+        return { steps, susceptibility:"Not Susceptible", reason:"No HF acid present" };
+    }
+    steps.push({ step:1, label:"HF Acid Presence", pass:true,
+        detail:"HF Acid มีอยู่ในระบบ → ดำเนินการตรวจสอบต่อ" });
+
+    // Step 2
+    if (p.water !== "YES") {
+        steps.push({ step:2, label:"Water / Condensate", pass:false,
+            detail:"ไม่มีน้ำหรือ Condensate → HF ไม่ละลาย ไม่เกิด Acid Corrosion" });
+        return { steps, susceptibility:"Not Susceptible", reason:"No water or condensed water present" };
+    }
+    steps.push({ step:2, label:"Water / Condensate", pass:true,
+        detail:"มีน้ำ / Condensate → HF สามารถละลายและกัดกร่อนได้" });
+
+    // Step 3: Material
+    if (p.grp === "ss300") {
+        steps.push({ step:3, label:"Material Check", pass:false,
+            detail:"300/400 Series SS — ไม่อยู่ในขอบเขตตาราง HF Corrosion (Not in scope)" });
+        return { steps, susceptibility:"Not Susceptible", reason:"SS 300/400 Series is not in scope for this HF corrosion table" };
+    }
+    steps.push({ step:3, label:"Material Check", pass:true,
+        detail:`${p.material} — อยู่ในขอบเขตการวิเคราะห์` });
+
+    // Step 4: CR
+    let finalCR, crSource;
+    const hfConcLabels = [">0–1%",">1–2%",">2–5%",">5–6%",">6–63%",">63–64%",">64–80%","≥80% (Low)","≥80% (High)"];
+    const cuniHfLabels = [">0–1%",">1–2%",">2–5%",">5–6%",">6–63%",">63–64%",">64–80%","≥80%"];
+
+    if (p.useActual) {
+        finalCR  = p.actualCR;
+        crSource = `ใช้ Actual CR ที่วัดได้: ${finalCR} mm/y`;
+    } else {
+        if (p.grp === "cs") {
+            const velIdx = p.velState === "low" ? 0 : 1;
+            // For ≥80% (hfConcIdx=7): split Low(7) / High(8)
+            let colIdx = p.hfConcIdx;
+            if (p.hfConcIdx === 7) colIdx = p.residual === "low" ? 7 : 8;
+            if (p.tempIdx > 6) {
+                steps.push({ step:4, label:"Table Lookup", pass:false,
+                    detail:"Temperature range ไม่ตรงกับตาราง Carbon Steel" });
+                return { steps, susceptibility:"Error", reason:"Temperature out of CS table range" };
+            }
+            finalCR  = CS_TABLE[p.tempIdx][velIdx][colIdx];
+            const tempLabel = CS_TEMP_LABELS[p.tempIdx];
+            const velLabel  = p.velState === "low" ? "< 3.05 m/s" : "≥ 3.05 m/s";
+            crSource = `Table Lookup: Temp = ${tempLabel}°C | Vel = ${velLabel} | HF = ${hfConcLabels[p.hfConcIdx]} → CR = ${finalCR} mm/y`;
+        } else {
+            // Cu-Ni / Alloy 400
+            const aerIdx = p.aer === "YES" ? 1 : 0;
+            let colIdx   = p.hfConcIdx;
+            if (colIdx > 7) colIdx = 7; // Cu-Ni table only has 8 cols (0-7)
+            if (p.tempIdx > 3) {
+                steps.push({ step:4, label:"Table Lookup", pass:false,
+                    detail:"Temperature range ไม่ตรงกับตาราง Cu-Ni/Alloy 400" });
+                return { steps, susceptibility:"Error", reason:"Temperature out of Cu-Ni table range" };
+            }
+            finalCR  = CUNI_TABLE[p.tempIdx][aerIdx][colIdx];
+            const tempLabel = CUNI_TEMP_LABELS[p.tempIdx];
+            const aerLabel  = p.aer === "YES" ? "Yes" : "No";
+            crSource = `Table Lookup: Temp = ${tempLabel}°C | Aerated = ${aerLabel} | HF = ${cuniHfLabels[Math.min(p.hfConcIdx,7)]} → CR = ${finalCR} mm/y`;
+        }
+    }
+
+    steps.push({ step:4, label:"Corrosion Rate Determination", pass:true, detail: crSource });
+
+    // Step 5: Ratio
+    const ratio = finalCR / p.designCR;
+    let level;
+    if      (ratio > 4)   level = "High";
+    else if (ratio >= 1)  level = "Medium";
+    else if (ratio >= 0.5)level = "Low";
+    else                  level = "Negligible";
+
+    steps.push({ step:"4.3", label:"Susceptibility Assessment (CR / Design CR)", pass:true,
+        detail:`CR = ${finalCR} mm/y ÷ Design CR = ${p.designCR} mm/y → Ratio = ${ratio.toFixed(2)} → ${level.toUpperCase()}` });
+
+    return { steps, susceptibility:level, corrosion_rate: finalCR, design_cr: p.designCR, ratio: ratio.toFixed(2) };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RUN & RENDER
+// ═══════════════════════════════════════════════════════════════
+function runAnalysis() {
+    const p = validate();
+    if (!p) return;
+    highlightTable();
+    const result = analyze(p);
+    renderResults(result);
+}
+
+function renderResults(data) {
+    const stepsList = document.getElementById("stepsList");
+    stepsList.innerHTML = "";
+    for (const s of data.steps) {
+        const cls  = s.pass ? "pass" : "fail";
+        const icon = s.pass ? "fa-circle-check" : "fa-circle-xmark";
+        const div  = document.createElement("div");
+        div.className = `step-item ${cls}`;
+        div.innerHTML = `
+            <div class="step-icon"><i class="fa-solid ${icon}"></i></div>
+            <div class="step-body">
+                <div class="step-label">Step ${s.step} — ${s.label}</div>
+                <div class="step-detail">${s.detail}</div>
+            </div>`;
+        stepsList.appendChild(div);
+    }
+
+    const level   = data.susceptibility;
+    const bgMap   = { High:"bg-high", Medium:"bg-medium", Low:"bg-low",
+                      Negligible:"bg-negligible", "Not Susceptible":"bg-not-susceptible", Error:"bg-error" };
+    const cardEl  = document.getElementById("resultCard");
+
+    let inner = "";
+    if (data.corrosion_rate !== undefined) {
+        inner = `
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value">${data.corrosion_rate}</div>
+                    <div class="metric-label">CR (mm/y)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${data.design_cr}</div>
+                    <div class="metric-label">Design CR (mm/y)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${data.ratio}</div>
+                    <div class="metric-label">Ratio (CR / Design)</div>
+                </div>
+            </div>
+            <div class="result-level">
+                <div class="level-tag">Susceptibility</div>
+                <div class="level-value">${level.toUpperCase()}</div>
+            </div>`;
+    } else {
+        inner = `
+            <div>
+                <div class="level-tag">Result</div>
+                <div class="level-value" style="font-size:22px;">${level.toUpperCase()}</div>
+                <div class="reason-text" style="margin-top:6px;">${data.reason || ""}</div>
+            </div>`;
+    }
+    cardEl.innerHTML = `<div class="result-card ${bgMap[level] || 'bg-not-susceptible'}">${inner}</div>`;
+
+    const section = document.getElementById("resultsSection");
+    section.style.display = "block";
+    section.scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+selectMat("cs");
+document.addEventListener("keydown", e => {
+    if (e.key === "Enter" && e.target.tagName !== "BUTTON") runAnalysis();
+});
+</script>
+
+</body>
+</html>

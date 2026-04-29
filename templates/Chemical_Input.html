@@ -253,6 +253,12 @@
 
 <header>
     <div class="brand">Artemis</div>
+    <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:rgba(255,255,255,0.85);">
+        <span><i class="fa-solid fa-circle-user"></i> {{ current_user }}</span>
+        <a href="/logout" style="color:rgba(255,255,255,0.85);text-decoration:none;border:1px solid rgba(255,255,255,0.4);padding:5px 12px;border-radius:6px;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='transparent'">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+    </div>
 </header>
 
 <div class="main-container">

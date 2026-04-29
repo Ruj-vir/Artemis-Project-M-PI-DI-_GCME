@@ -37,6 +37,27 @@
         }
         .header-nav a:hover { background: rgba(255,255,255,0.18); color: white; }
         .header-nav a.active { background: rgba(255,255,255,0.22); color: white; font-weight: 600; }
+        .sso-user {
+            color: rgba(255,255,255,0.85);
+            font-size: 13px;
+            padding: 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .sso-logout {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 6px 14px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(255,255,255,0.4);
+            transition: background 0.2s;
+        }
+        .sso-logout:hover { background: rgba(255,255,255,0.18); color: white; }
 
         /* ─── Nav cards ──────────────────────────────────────────────────── */
         .nav-card {
@@ -92,6 +113,10 @@
             <a href="/htha"><i class="fa-solid fa-atom"></i> HTHA</a>
             <a href="/sulfidation"><i class="fa-solid fa-fire-flame-curved"></i> Sulfidation</a>
             <a href="/thermal_shock"><i class="fa-solid fa-temperature-arrow-down"></i> Thermal Shock</a>
+            <a href="/hf_corrosion"><i class="fa-solid fa-biohazard"></i> HF Corrosion</a>
+            <a href="/customer_company"><i class="fa-solid fa-building"></i> Customer Company</a>
+            <span class="sso-user"><i class="fa-solid fa-circle-user"></i> {{ current_user }}</span>
+            <a href="/logout" class="sso-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
         </nav>
     </header>
 
@@ -169,6 +194,24 @@
                     </div>
                     <h5 class="fw-bold mb-1">Thermal Shock</h5>
                     <p class="text-muted small mb-0">วิเคราะห์ความเสี่ยง Thermal Shock</p>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="/hf_corrosion" class="nav-card card shadow-sm d-block p-4">
+                    <div class="icon-circle bg-danger bg-opacity-10">
+                        <i class="fa-solid fa-biohazard text-danger"></i>
+                    </div>
+                    <h5 class="fw-bold mb-1">HF Acid Corrosion</h5>
+                    <p class="text-muted small mb-0">วิเคราะห์ Corrosion จาก Hydrofluoric Acid</p>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="/customer_company" class="nav-card card shadow-sm d-block p-4">
+                    <div class="icon-circle bg-primary bg-opacity-10">
+                        <i class="fa-solid fa-building text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-1">Customer Company</h5>
+                    <p class="text-muted small mb-0">จัดการข้อมูล Customer Company</p>
                 </a>
             </div>
         </div>

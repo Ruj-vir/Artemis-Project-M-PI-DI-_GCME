@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis - Add New Tag</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Header ── */
+        header {
+            background-color: #2b5797;
+            color: white;
+            padding: 0 20px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .brand { font-size: 20px; font-weight: bold; }
+
+        /* ── Outer wrapper ── */
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            background: linear-gradient(to bottom, #000 0%, #111 100%);
+        }
+
+        /* ── Card ── */
+        .card {
+            background-color: #f0f2f5;
+            width: 100%;
+            max-width: 1020px;
+            border-radius: 14px;
+            padding: 16px 28px 20px;
+            box-shadow: 0 0 24px rgba(255,255,255,0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        /* ── Top bar ── */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .type-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .type-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            font-weight: normal;
+        }
+        .type-group input[type="checkbox"] {
+            width: 15px; height: 15px; cursor: pointer;
+        }
+
+        .cl-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+        .cl-group label { font-weight: 600; white-space: nowrap; }
+        .cl-group label .req { color: red; }
+
+        .nav-links {
+            margin-left: auto;
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #000;
+        }
+        .nav-links div {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .nav-links div:hover { opacity: 0.6; }
+
+        /* ── Two-column form grid ── */
+        .form-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 40px;
+        }
+
+        /* ── Field row ── */
+        .field-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 0;
+        }
+        .field-label {
+            width: 175px;
+            flex-shrink: 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: #222;
+            line-height: 1.3;
+        }
+        .field-label .req { color: red; }
+        .field-colon {
+            width: 14px;
+            flex-shrink: 0;
+            font-size: 13px;
+            color: #444;
+        }
+        .field-control { flex: 1; display: flex; align-items: center; gap: 6px; }
+
+        /* ── Inputs ── */
+        .f-text, .f-number {
+            width: 100%;
+            padding: 5px 8px;
+            font-size: 13px;
+            border: 1px solid #7a9fd4;
+            border-radius: 3px;
+            background: white;
+            outline: none;
+        }
+        .f-number { width: 90px; flex-shrink: 0; }
+
+        /* ── Custom dropdown ── */
+        .f-select-wrap {
+            position: relative;
+            flex: 1;
+        }
+        .f-select-wrap.short { flex: unset; width: 90px; }
+        .f-select {
+            width: 100%;
+            padding: 5px 32px 5px 8px;
+            font-size: 13px;
+            border: 1px solid #7a9fd4;
+            border-radius: 3px;
+            appearance: none;
+            -webkit-appearance: none;
+            background: white;
+            cursor: pointer;
+            outline: none;
+        }
+        .f-arrow {
+            pointer-events: none;
+            position: absolute;
+            right: 0; top: 0; bottom: 0;
+            width: 28px;
+            background: #2b5797;
+            border-radius: 0 3px 3px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .f-arrow span { color: white; font-size: 11px; }
+
+        /* ── Unit label ── */
+        .unit-label { font-size: 12px; color: #444; flex-shrink: 0; }
+
+        /* ── Radio (Yes / No) ── */
+        .radio-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            font-weight: normal;
+        }
+        .radio-group input[type="radio"] { cursor: pointer; }
+
+        /* ── Divider between columns ── */
+        .col-divider { border-left: 1px solid #c8cfd8; }
+
+        /* ── Footer ── */
+        .form-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 18px;
+        }
+        .btn {
+            background-color: #2b5797;
+            color: white;
+            border: none;
+            padding: 8px 26px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+        .btn:hover { background-color: #1e3f72; }
+        .btn-cancel { background-color: #5a6a80; }
+        .btn-cancel:hover { background-color: #3e4d5c; }
+    </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+    <div class="brand" id="pageBrand">Artemis: Company 1 &gt; Plant 1 &gt; Unit 1000 &gt; Add New Tag</div>
+    <div style="display:flex;align-items:center;gap:12px;font-size:13px;margin-left:auto;color:rgba(255,255,255,0.85);">
+        <span><i class="fa-solid fa-circle-user"></i> {{ current_user }}</span>
+        <a href="/logout" style="color:rgba(255,255,255,0.85);text-decoration:none;border:1px solid rgba(255,255,255,0.4);padding:5px 12px;border-radius:6px;">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+    </div>
+</header>
+
+<div class="page-wrapper">
+    <div class="card">
+
+        <!-- Top bar -->
+        <div class="top-bar">
+            <div class="type-group">
+                <strong>Type:</strong>
+                <label><input type="checkbox" id="typeEquipment" checked onchange="handleTypeChange('Equipment')"> Equipment</label>
+                <label><input type="checkbox" id="typePiping" onchange="handleTypeChange('Piping')"> Piping</label>
+            </div>
+
+            <div class="cl-group">
+                <label>Corrosion Loop<span class="req">*</span> :</label>
+                <div class="f-select-wrap" style="width:200px; flex:unset;">
+                    <select class="f-select" id="corrosionLoopSelect">
+                        <option value=""></option>
+                        <option>CL01 XXXXXX</option>
+                        <option>CL02 XXXXXX</option>
+                        <option>CL03 XXXXXX</option>
+                    </select>
+                    <div class="f-arrow"><span>&#9660;</span></div>
+                </div>
+            </div>
+
+            <div class="nav-links">
+                <div onclick="history.back()"><i class="fa-solid fa-circle-arrow-left"></i> Back</div>
+                <div onclick="window.location.href='/'"><i class="fa-solid fa-house"></i> Home</div>
+            </div>
+        </div>
+
+        <!-- Two-column form -->
+        <div class="form-columns">
+
+            <!-- ── Left column ── -->
+            <div class="left-col">
+
+                <div class="field-row">
+                    <div class="field-label">Tag Name<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <input type="text" class="f-text" id="tagName">
+                    </div>
+                </div>
+
+                <div class="field-row" id="rowEquipmentName">
+                    <div class="field-label">Equipment Name<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <input type="text" class="f-text" id="equipmentName">
+                    </div>
+                </div>
+
+                <div class="field-row" id="rowEquipmentType">
+                    <div class="field-label">Equipment type<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <div class="f-select-wrap">
+                            <select class="f-select" id="equipmentType">
+                                <option value=""></option>
+                                <option>Heat Exchanger</option>
+                                <option>Vessel</option>
+                                <option>Column</option>
+                                <option>Tank</option>
+                                <option>Pump</option>
+                                <option>Compressor</option>
+                                <option>Reactor</option>
+                                <option>Furnace</option>
+                            </select>
+                            <div class="f-arrow"><span>&#9660;</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Component<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <input type="text" class="f-text" id="component">
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Material grade<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <input type="text" class="f-text" id="materialGrade">
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Material type<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <div class="f-select-wrap">
+                            <select class="f-select" id="materialType">
+                                <option value=""></option>
+                                <option>Carbon Steel</option>
+                                <option>Low Alloy</option>
+                                <option>300 series SS</option>
+                                <option>400 series SS</option>
+                                <option>Duplex SS</option>
+                                <option>Nickel Alloy</option>
+                                <option>Copper Alloy</option>
+                                <option>Titanium</option>
+                            </select>
+                            <div class="f-arrow"><span>&#9660;</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Material group<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <div class="f-select-wrap">
+                            <select class="f-select" id="materialGroup">
+                                <option value=""></option>
+                                <option>Group 1</option>
+                                <option>Group 2</option>
+                                <option>Group 3</option>
+                            </select>
+                            <div class="f-arrow"><span>&#9660;</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Cladding/lining<span class="req"> *</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <div class="radio-group">
+                            <label><input type="radio" name="cladding" value="Yes"> Yes</label>
+                            <label><input type="radio" name="cladding" value="No" checked> NO</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Design Code</div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <input type="text" class="f-text" id="designCode">
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Fluid Name</div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <input type="text" class="f-text" id="fluidName">
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Fluid phase<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <div class="f-select-wrap">
+                            <select class="f-select" id="fluidPhase">
+                                <option value=""></option>
+                                <option>Liquid</option>
+                                <option>Gas</option>
+                                <option>Two-phase</option>
+                                <option>Steam</option>
+                            </select>
+                            <div class="f-arrow"><span>&#9660;</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Operating Pressure<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <input type="number" class="f-number" id="opPressure">
+                        <span class="unit-label">Unit</span>
+                        <div class="f-select-wrap short">
+                            <select class="f-select" id="opPressureUnit">
+                                <option></option>
+                                <option>barg</option>
+                                <option>bara</option>
+                                <option>kPa</option>
+                                <option>MPa</option>
+                                <option>psi</option>
+                            </select>
+                            <div class="f-arrow"><span>&#9660;</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Operating Temperature<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <input type="number" class="f-number" id="opTemp">
+                        <span class="unit-label">Unit</span>
+                        <div class="f-select-wrap short">
+                            <select class="f-select" id="opTempUnit">
+                                <option></option>
+                                <option>°C</option>
+                                <option>°F</option>
+                                <option>K</option>
+                            </select>
+                            <div class="f-arrow"><span>&#9660;</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Design Pressure<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <input type="number" class="f-number" id="dsnPressure">
+                        <span class="unit-label">Unit</span>
+                        <div class="f-select-wrap short">
+                            <select class="f-select" id="dsnPressureUnit">
+                                <option></option>
+                                <option>barg</option>
+                                <option>bara</option>
+                                <option>kPa</option>
+                                <option>MPa</option>
+                                <option>psi</option>
+                            </select>
+                            <div class="f-arrow"><span>&#9660;</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Design Temperature<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <input type="number" class="f-number" id="dsnTemp">
+                        <span class="unit-label">Unit</span>
+                        <div class="f-select-wrap short">
+                            <select class="f-select" id="dsnTempUnit">
+                                <option></option>
+                                <option>°C</option>
+                                <option>°F</option>
+                                <option>K</option>
+                            </select>
+                            <div class="f-arrow"><span>&#9660;</span></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- end left-col -->
+
+            <!-- ── Right column ── -->
+            <div class="right-col col-divider" style="padding-left:28px;">
+
+                <div class="field-row">
+                    <div class="field-label">Operating Velocity<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <input type="number" class="f-number" id="opVelocity">
+                        <span class="unit-label">Unit</span>
+                        <div class="f-select-wrap short">
+                            <select class="f-select" id="opVelocityUnit">
+                                <option></option>
+                                <option>m/s</option>
+                                <option>ft/s</option>
+                            </select>
+                            <div class="f-arrow"><span>&#9660;</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Design Velocity<span class="req"> *</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <input type="number" class="f-number" id="dsnVelocity">
+                        <span class="unit-label">Unit</span>
+                        <div class="f-select-wrap short">
+                            <select class="f-select" id="dsnVelocityUnit">
+                                <option></option>
+                                <option>m/s</option>
+                                <option>ft/s</option>
+                            </select>
+                            <div class="f-arrow"><span>&#9660;</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Cycling/Sweating Operation<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <div class="radio-group">
+                            <label><input type="radio" name="cycling" value="Yes"> Yes</label>
+                            <label><input type="radio" name="cycling" value="No" checked> NO</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label" style="width:185px;">Post Weld Heat Treatment (PWHT) / stress relief<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <div class="radio-group">
+                            <label><input type="radio" name="pwht" value="Yes"> Yes</label>
+                            <label><input type="radio" name="pwht" value="No" checked> NO</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Insulation<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <div class="radio-group">
+                            <label><input type="radio" name="insulation" value="Yes"> Yes</label>
+                            <label><input type="radio" name="insulation" value="No" checked> NO</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Fire-Proofing<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <div class="radio-group">
+                            <label><input type="radio" name="fireproofing" value="Yes"> Yes</label>
+                            <label><input type="radio" name="fireproofing" value="No" checked> NO</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Environment<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <div class="f-select-wrap">
+                            <select class="f-select" id="environment">
+                                <option value=""></option>
+                                <option>Onshore</option>
+                                <option>Offshore</option>
+                                <option>Coastal</option>
+                                <option>Tropical</option>
+                                <option>Desert</option>
+                            </select>
+                            <div class="f-arrow"><span>&#9660;</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Traced and Jacketed<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <div class="radio-group">
+                            <label><input type="radio" name="traced" value="Yes"> Yes</label>
+                            <label><input type="radio" name="traced" value="No" checked> NO</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Coating<span class="req">*</span></div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <div class="radio-group">
+                            <label><input type="radio" name="coating" value="Yes"> Yes</label>
+                            <label><input type="radio" name="coating" value="No" checked> NO</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Outer Diameter</div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <input type="number" class="f-number" id="outerDiam">
+                        <span class="unit-label">Unit</span>
+                        <div class="f-select-wrap short">
+                            <select class="f-select" id="outerDiamUnit">
+                                <option></option>
+                                <option>mm</option>
+                                <option>inch</option>
+                                <option>m</option>
+                            </select>
+                            <div class="f-arrow"><span>&#9660;</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-label">Inner Diameter</div>
+                    <div class="field-colon">:</div>
+                    <div class="field-control">
+                        <input type="number" class="f-number" id="innerDiam">
+                        <span class="unit-label">Unit</span>
+                        <div class="f-select-wrap short">
+                            <select class="f-select" id="innerDiamUnit">
+                                <option></option>
+                                <option>mm</option>
+                                <option>inch</option>
+                                <option>m</option>
+                            </select>
+                            <div class="f-arrow"><span>&#9660;</span></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- end right-col -->
+
+        </div><!-- end form-columns -->
+
+        <!-- Footer buttons -->
+        <div class="form-footer">
+            <button class="btn" onclick="saveTag()">Save</button>
+            <button class="btn btn-cancel" onclick="history.back()">Cancel</button>
+        </div>
+
+    </div><!-- end card -->
+</div>
+
+<script>
+    // ── Read URL params → set header ──────────────────────────────────
+    (function() {
+        var params = new URLSearchParams(window.location.search);
+        var plant = params.get('plant') || 'Plant 1';
+        var unit  = params.get('unit')  || 'Unit 1000';
+        document.getElementById('pageBrand').textContent =
+            'Artemis: Company 1 \u003e ' + plant + ' \u003e ' + unit + ' \u003e Add New Tag';
+        document.title = 'Artemis - Add New Tag';
+    })();
+
+    // ── Toggle Equipment/Piping checkboxes (mutually exclusive) ──────
+    function handleTypeChange(selected) {
+        if (selected === 'Equipment') {
+            document.getElementById('typePiping').checked = false;
+            document.getElementById('typeEquipment').checked = true;
+        } else {
+            document.getElementById('typeEquipment').checked = false;
+            document.getElementById('typePiping').checked = true;
+        }
+        var isEquip = selected === 'Equipment';
+        document.getElementById('rowEquipmentName').style.display = isEquip ? '' : 'none';
+        document.getElementById('rowEquipmentType').style.display = isEquip ? '' : 'none';
+    }
+
+    // ── Validate required fields ──────────────────────────────────────
+    var requiredFields = [
+        { id: 'tagName',          label: 'Tag Name' },
+        { id: 'component',        label: 'Component' },
+        { id: 'materialGrade',    label: 'Material grade' },
+        { id: 'materialType',     label: 'Material type' },
+        { id: 'materialGroup',    label: 'Material group' },
+        { id: 'fluidPhase',       label: 'Fluid phase' },
+        { id: 'opPressure',       label: 'Operating Pressure' },
+        { id: 'opPressureUnit',   label: 'Operating Pressure Unit' },
+        { id: 'opTemp',           label: 'Operating Temperature' },
+        { id: 'opTempUnit',       label: 'Operating Temperature Unit' },
+        { id: 'dsnPressure',      label: 'Design Pressure' },
+        { id: 'dsnPressureUnit',  label: 'Design Pressure Unit' },
+        { id: 'dsnTemp',          label: 'Design Temperature' },
+        { id: 'dsnTempUnit',      label: 'Design Temperature Unit' },
+        { id: 'opVelocity',       label: 'Operating Velocity' },
+        { id: 'opVelocityUnit',   label: 'Operating Velocity Unit' },
+        { id: 'dsnVelocity',      label: 'Design Velocity' },
+        { id: 'dsnVelocityUnit',  label: 'Design Velocity Unit' },
+        { id: 'environment',      label: 'Environment' },
+        { id: 'corrosionLoopSelect', label: 'Corrosion Loop' },
+    ];
+
+    function saveTag() {
+        // Check equipment-specific fields
+        var isEquip = document.getElementById('typeEquipment').checked;
+        if (isEquip) {
+            if (!document.getElementById('equipmentName').value.trim()) {
+                Swal.fire('กรุณากรอกข้อมูล', 'Equipment Name ยังไม่ได้กรอก', 'warning');
+                return;
+            }
+            if (!document.getElementById('equipmentType').value) {
+                Swal.fire('กรุณากรอกข้อมูล', 'Equipment type ยังไม่ได้เลือก', 'warning');
+                return;
+            }
+        }
+
+        for (var i = 0; i < requiredFields.length; i++) {
+            var el = document.getElementById(requiredFields[i].id);
+            if (!el) continue;
+            var val = el.value ? el.value.trim() : '';
+            if (!val) {
+                Swal.fire('กรุณากรอกข้อมูล', requiredFields[i].label + ' ยังไม่ได้กรอก/เลือก', 'warning');
+                el.focus();
+                return;
+            }
+        }
+
+        Swal.fire({
+            title: 'บันทึกสำเร็จ!',
+            text: 'Tag "' + document.getElementById('tagName').value.trim() + '" ถูกเพิ่มแล้ว',
+            icon: 'success',
+            confirmButtonColor: '#2b5797'
+        }).then(function() {
+            history.back();
+        });
+    }
+</script>
+
+</body>
+</html>

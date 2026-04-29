@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis - Unit Detail</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── Header ── */
+        header {
+            background-color: #2b5797;
+            color: white;
+            padding: 0 20px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .brand { font-size: 22px; font-weight: bold; }
+        .header-nav { display: flex; gap: 24px; font-size: 15px; font-weight: bold; }
+        .header-nav div { cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .header-nav div:hover { opacity: 0.8; }
+
+        /* ── Layout ── */
+        .layout { display: flex; flex: 1; overflow: hidden; }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: 162px;
+            background-color: #f5f0dc;
+            border-right: 1px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            flex-shrink: 0;
+            padding-bottom: 12px;
+        }
+        .sidebar::-webkit-scrollbar { width: 5px; }
+        .sidebar::-webkit-scrollbar-thumb { background: #c1c1c1; }
+
+        .sidebar-add-links {
+            background-color: #eaf5ea;
+            padding: 7px 10px 8px;
+            border-bottom: 1px solid #c8c090;
+        }
+        .sidebar-add-links a {
+            display: block;
+            color: #1a7a1a;
+            font-size: 12px;
+            text-decoration: none;
+            padding: 2px 0;
+            cursor: pointer;
+        }
+        .sidebar-add-links a:hover { text-decoration: underline; }
+
+        .sidebar-section-title {
+            background-color: #b8860b;
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 5px 10px;
+        }
+
+        .sidebar-dropdown-wrap { padding: 7px 10px; }
+        .sidebar-dropdown {
+            width: 100%;
+            padding: 5px 8px;
+            font-size: 13px;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .sidebar-search-wrap { padding: 4px 10px 5px; }
+        .sidebar-search-label { font-size: 11px; color: #555; margin-bottom: 3px; }
+        .sidebar-search {
+            width: 100%;
+            padding: 4px 7px;
+            font-size: 12px;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .sidebar-list { padding: 0 10px; list-style: none; }
+        .sidebar-list li {
+            font-size: 12px;
+            color: #333;
+            padding: 5px 0;
+            border-bottom: 1px solid #e0d8b0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .sidebar-list li:hover { background-color: #ece8cc; margin: 0 -10px; padding: 5px 10px; }
+        .sidebar-list li .fa-trash-can { color: #888; font-size: 11px; cursor: pointer; }
+        .sidebar-list li .fa-trash-can:hover { color: #c00; }
+
+        /* ── Main content ── */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #f0f2f5;
+        }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            background-color: #d0d8e4;
+            border-bottom: 2px solid #2b5797;
+            flex-shrink: 0;
+        }
+        .tab {
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #333;
+            border: none;
+            background: transparent;
+            border-right: 1px solid #b0bcc8;
+            white-space: nowrap;
+        }
+        .tab:hover { background-color: #bcc8d8; }
+        .tab.active {
+            background-color: white;
+            color: #2b5797;
+            border-bottom: 2px solid white;
+            margin-bottom: -2px;
+        }
+
+        /* ── Tab panels ── */
+        .tab-panel { display: none; flex: 1; overflow-y: auto; padding: 16px 20px; }
+        .tab-panel.active { display: block; }
+        .tab-panel::-webkit-scrollbar { width: 16px; }
+        .tab-panel::-webkit-scrollbar-track { background: #f1f1f1; border-left: 1px solid #ccc; }
+        .tab-panel::-webkit-scrollbar-thumb { background: #c1c1c1; border: 3px solid #f1f1f1; }
+
+        /* ── Summary title ── */
+        .summary-title { font-size: 15px; font-weight: bold; margin-bottom: 14px; color: #000; }
+
+        .summary-top {
+            display: flex;
+            gap: 28px;
+            margin-bottom: 22px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        /* Filter + bar chart */
+        .summary-left { flex: 1; min-width: 280px; }
+
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #555;
+        }
+        .filter-select {
+            padding: 4px 26px 4px 10px;
+            font-size: 13px;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            appearance: none;
+            -webkit-appearance: none;
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath d='M0 0l5 7 5-7z' fill='%232b5797'/%3E%3C/svg%3E") no-repeat right 8px center;
+            background-size: 9px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .bar-chart { width: 100%; }
+        .bar-row { display: flex; align-items: center; margin-bottom: 7px; gap: 8px; }
+
+        .bar-label {
+            width: 80px;
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+            padding: 5px 6px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+        .bar-label.low-text  { color: #333; }
+        .bar-label.med-text  { color: #333; }
+
+        .bar-track {
+            height: 28px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            padding-left: 12px;
+            font-size: 13px;
+            font-weight: bold;
+            color: white;
+            min-width: 60px;
+            transition: width 0.4s ease;
+        }
+        .bar-track.low-text  { color: #333; }
+        .bar-track.med-text  { color: #333; }
+
+        .bg-negligible { background-color: #00b050; }
+        .bg-low        { background-color: #92d050; }
+        .bg-medium     { background-color: #ffc000; }
+        .bg-high       { background-color: #ff0000; }
+        .bg-na         { background-color: #808080; }
+
+        /* ── Damage matrix ── */
+        .summary-right { flex-shrink: 0; }
+
+        .damage-matrix { border-collapse: collapse; font-size: 12px; }
+        .damage-matrix th, .damage-matrix td {
+            border: 1px solid #999;
+            text-align: center;
+            padding: 4px 6px;
+            min-width: 38px;
+        }
+
+        /* corner cell with diagonal */
+        .corner-cell {
+            position: relative;
+            background-color: #b8cce4;
+            min-width: 110px;
+            height: 65px;
+            overflow: hidden;
+            padding: 0;
+        }
+        .corner-cell::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(
+                to bottom right,
+                transparent calc(50% - 0.5px),
+                #888 50%,
+                transparent calc(50% + 0.5px)
+            );
+        }
+        .corner-top {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: right;
+            line-height: 1.3;
+        }
+        .corner-bottom {
+            position: absolute;
+            bottom: 6px;
+            left: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .rotated-header {
+            writing-mode: vertical-lr;
+            transform: rotate(180deg);
+            font-weight: bold;
+            background-color: #dce6f1;
+            padding: 8px 4px;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+        .row-header-cell {
+            font-weight: bold;
+            color: white;
+            font-size: 12px;
+            text-align: center;
+        }
+        .row-header-cell.low-text  { color: #333; }
+        .row-header-cell.med-text  { color: #333; }
+
+        /* ── Detail table ── */
+        .detail-table-title { font-size: 13px; font-weight: bold; margin-bottom: 8px; color: #000; }
+        .detail-table-wrap { overflow-x: auto; border: 1px solid #aaa; }
+
+        .detail-table { border-collapse: collapse; font-size: 12px; width: 100%; }
+        .detail-table th {
+            background-color: #2b5797;
+            color: white;
+            padding: 7px 12px;
+            text-align: center;
+            border: 1px solid #4a6fa5;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .detail-table td {
+            padding: 5px 12px;
+            border: 1px solid #ccc;
+            text-align: center;
+            background: white;
+            white-space: nowrap;
+        }
+        .detail-table tr:nth-child(even) td { background-color: #f8f9fa; }
+        .detail-table tr:hover td { background-color: #dce8f5 !important; }
+
+        /* Susceptibility cell colors */
+        .cell-negligible { background-color: #00b050 !important; color: white !important; font-weight: bold; }
+        .cell-low        { background-color: #92d050 !important; color: #333  !important; font-weight: bold; }
+        .cell-medium     { background-color: #ffc000 !important; color: #333  !important; font-weight: bold; }
+        .cell-high       { background-color: #ff0000 !important; color: white !important; font-weight: bold; }
+        .cell-na         { background-color: #808080 !important; color: white !important; font-weight: bold; }
+
+        /* Placeholder for other tabs */
+        .placeholder-panel {
+            display: flex; align-items: center; justify-content: center;
+            height: 200px; color: #888; font-size: 17px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+    <div class="brand" id="pageBrand">Artemis</div>
+    <div class="header-nav">
+        <div onclick="history.back()">
+            <i class="fa-solid fa-circle-arrow-left"></i> Back
+        </div>
+        <div onclick="window.location.href='/'">
+            <i class="fa-solid fa-house"></i> Home
+        </div>
+        <span style="font-size:13px;font-weight:normal;display:flex;align-items:center;gap:6px;"><i class="fa-solid fa-circle-user"></i> {{ current_user }}</span>
+        <a href="/logout" style="color:white;text-decoration:none;font-size:13px;font-weight:normal;border:1px solid rgba(255,255,255,0.4);padding:5px 12px;border-radius:6px;">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+    </div>
+</header>
+
+<div class="layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+
+        <!-- Add links -->
+        <div class="sidebar-add-links">
+            <a onclick="addCorrosionLoop()">
+                <i class="fa-solid fa-plus" style="font-size:10px;"></i> Add new corrosion loop
+            </a>
+            <a onclick="addTag()" style="margin-top:5px;">
+                <i class="fa-solid fa-plus" style="font-size:10px;"></i> Add new tag
+            </a>
+        </div>
+
+        <!-- Corrosion Loop -->
+        <div class="sidebar-section-title">Corrosion Loop</div>
+        <div class="sidebar-dropdown-wrap">
+            <select class="sidebar-dropdown" id="clDropdown" onchange="filterByLoop()">
+                <option value="all">All</option>
+                <option value="CL01">CL01 XXXXXX</option>
+                <option value="CL02">CL02 XXXXXX</option>
+                <option value="CL03">CL03 XXXXXX</option>
+            </select>
+        </div>
+
+        <!-- Equipment -->
+        <div class="sidebar-section-title">Equipment</div>
+        <div class="sidebar-search-wrap">
+            <div class="sidebar-search-label">Search:</div>
+            <input type="text" class="sidebar-search" id="equipSearch"
+                   oninput="filterSidebar('equip')" placeholder="">
+        </div>
+        <ul class="sidebar-list" id="equipList">
+            <li><span>Equipment 1</span><i class="fa-solid fa-trash-can" onclick="deleteSidebarItem(this)"></i></li>
+            <li><span>Equipment 2</span><i class="fa-solid fa-trash-can" onclick="deleteSidebarItem(this)"></i></li>
+            <li><span>Equipment 3</span><i class="fa-solid fa-trash-can" onclick="deleteSidebarItem(this)"></i></li>
+        </ul>
+
+        <!-- Piping -->
+        <div class="sidebar-section-title" style="margin-top:8px;">Piping</div>
+        <div class="sidebar-search-wrap">
+            <div class="sidebar-search-label">Search:</div>
+            <input type="text" class="sidebar-search" id="pipingSearch"
+                   oninput="filterSidebar('piping')" placeholder="">
+        </div>
+        <ul class="sidebar-list" id="pipingList">
+            <li><span>Piping 1</span><i class="fa-solid fa-trash-can" onclick="deleteSidebarItem(this)"></i></li>
+            <li><span>Piping 2</span><i class="fa-solid fa-trash-can" onclick="deleteSidebarItem(this)"></i></li>
+            <li><span>Piping 3</span><i class="fa-solid fa-trash-can" onclick="deleteSidebarItem(this)"></i></li>
+            <li><span>Piping 4</span><i class="fa-solid fa-trash-can" onclick="deleteSidebarItem(this)"></i></li>
+            <li><span>Piping 5</span><i class="fa-solid fa-trash-can" onclick="deleteSidebarItem(this)"></i></li>
+            <li><span>Piping 6</span><i class="fa-solid fa-trash-can" onclick="deleteSidebarItem(this)"></i></li>
+        </ul>
+
+    </aside>
+
+    <!-- ── Main Content ── -->
+    <div class="main-content">
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('summary', this)">Summary</button>
+            <button class="tab" onclick="switchTab('general', this)">General Information</button>
+            <button class="tab" onclick="switchTab('process', this)">Process Composition</button>
+            <button class="tab" onclick="switchTab('corrosion', this)">Corrosion Manual</button>
+            <button class="tab" onclick="switchTab('loop', this)">Loop Detail</button>
+        </div>
+
+        <!-- ── Summary Panel ── -->
+        <div id="tab-summary" class="tab-panel active">
+            <div class="summary-title">Project summary</div>
+
+            <div class="summary-top">
+
+                <!-- Left: filter + bar chart -->
+                <div class="summary-left">
+                    <div class="filter-row">
+                        <span>Filter</span>
+                        <select class="filter-select" id="summaryFilter" onchange="applyFilter()">
+                            <option value="all">All</option>
+                            <option value="Equipment">Equipment</option>
+                            <option value="Piping">Piping</option>
+                        </select>
+                    </div>
+                    <div class="bar-chart">
+                        <div class="bar-row">
+                            <div class="bar-label bg-negligible">Negligible</div>
+                            <div class="bar-track bg-negligible" style="width:72%;">XX.XX%</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label bg-low low-text">Low</div>
+                            <div class="bar-track bg-low low-text" style="width:56%;">XX.XX%</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label bg-medium med-text">Medium</div>
+                            <div class="bar-track bg-medium med-text" style="width:40%;">XX.XX%</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label bg-high">High</div>
+                            <div class="bar-track bg-high" style="width:24%;">XX.XX%</div>
+                        </div>
+                        <div class="bar-row">
+                            <div class="bar-label bg-na">N/A</div>
+                            <div class="bar-track bg-na" style="width:14%;">XX.XX%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: damage mechanism matrix -->
+                <div class="summary-right">
+                    <table class="damage-matrix">
+                        <thead>
+                            <tr>
+                                <th class="corner-cell">
+                                    <span class="corner-top">Damage<br>mechanism</span>
+                                    <span class="corner-bottom">Susceptibility</span>
+                                </th>
+                                <th class="rotated-header">Damage 1</th>
+                                <th class="rotated-header">Damage 2</th>
+                                <th class="rotated-header">Damage 3</th>
+                                <th class="rotated-header">Damage 4</th>
+                                <th class="rotated-header">Damage 5</th>
+                                <th class="rotated-header">Damage 6</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="row-header-cell bg-negligible">Negligible</td>
+                                <td>2</td><td>1</td><td>-</td><td>1</td><td>-</td><td>1</td>
+                            </tr>
+                            <tr>
+                                <td class="row-header-cell bg-low low-text">Low</td>
+                                <td>2</td><td>1</td><td>1</td><td>2</td><td>1</td><td>1</td>
+                            </tr>
+                            <tr>
+                                <td class="row-header-cell bg-medium med-text">Medium</td>
+                                <td>1</td><td>-</td><td>2</td><td>2</td><td>-</td><td>1</td>
+                            </tr>
+                            <tr>
+                                <td class="row-header-cell bg-high">High</td>
+                                <td>-</td><td>-</td><td>1</td><td>-</td><td>1</td><td>1</td>
+                            </tr>
+                            <tr>
+                                <td class="row-header-cell bg-na">N/A</td>
+                                <td>-</td><td>2</td><td>1</td><td>-</td><td>1</td><td>1</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Detail table -->
+            <div class="detail-table-title">Damage mechanism and susceptibility by corrosion loop</div>
+            <div class="detail-table-wrap">
+                <table class="detail-table" id="detailTable">
+                    <thead>
+                        <tr>
+                            <th>Corrosion Loop</th>
+                            <th>Tag</th>
+                            <th>Component</th>
+                            <th>Damage 1</th>
+                            <th>Damage 2</th>
+                            <th>Damage 3</th>
+                            <th>Damage 4</th>
+                            <th>Damage 5</th>
+                            <th>Damage 6</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-loop="CL01" data-type="Equipment">
+                            <td>CL01 XXXXXX</td><td>Equipment 1</td><td>Shell</td>
+                            <td class="cell-negligible">Negligible</td><td></td><td></td><td></td><td></td><td class="cell-medium">Medium</td>
+                        </tr>
+                        <tr data-loop="CL01" data-type="Equipment">
+                            <td>CL01 XXXXXX</td><td>Equipment 1</td><td>Channel</td>
+                            <td></td><td class="cell-na">N/A</td><td class="cell-medium">Medium</td><td></td><td class="cell-low">Low</td><td class="cell-na">N/A</td>
+                        </tr>
+                        <tr data-loop="CL01" data-type="Equipment">
+                            <td>CL01 XXXXXX</td><td>Equipment 2</td><td>Shell</td>
+                            <td></td><td class="cell-low">Low</td><td></td><td class="cell-medium">Medium</td><td></td><td></td>
+                        </tr>
+                        <tr data-loop="CL02" data-type="Equipment">
+                            <td>CL02 XXXXXX</td><td>Equipment 3</td><td>Tube</td>
+                            <td class="cell-medium">Medium</td><td></td><td class="cell-high">High</td><td class="cell-low">Low</td><td></td><td class="cell-negligible">Negligible</td>
+                        </tr>
+                        <tr data-loop="CL02" data-type="Piping">
+                            <td>CL02 XXXXXX</td><td>Piping 1</td><td>Piping</td>
+                            <td></td><td class="cell-na">N/A</td><td></td><td></td><td class="cell-high">High</td><td></td>
+                        </tr>
+                        <tr data-loop="CL03" data-type="Piping">
+                            <td>CL03 XXXXXX</td><td>Piping 2</td><td>Piping</td>
+                            <td class="cell-low">Low</td><td></td><td class="cell-na">N/A</td><td class="cell-negligible">Negligible</td><td></td><td class="cell-high">High</td>
+                        </tr>
+                        <tr data-loop="CL03" data-type="Piping">
+                            <td>CL03 XXXXXX</td><td>Piping 3</td><td>Piping</td>
+                            <td class="cell-low">Low</td><td class="cell-negligible">Negligible</td><td class="cell-medium">Medium</td><td></td><td class="cell-na">N/A</td><td class="cell-low">Low</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Second table -->
+            <div class="detail-table-title" style="margin-top:20px;">Damage mechanism and susceptibility by corrosion tag</div>
+            <div class="detail-table-wrap">
+                <table class="detail-table" id="tagTable">
+                    <thead>
+                        <tr>
+                            <th>Corrosion Loop</th>
+                            <th>Tag</th>
+                            <th>Component</th>
+                            <th>Damage 1</th>
+                            <th>Damage 2</th>
+                            <th>Damage 3</th>
+                            <th>Damage 5</th>
+                            <th>Damage 6</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-loop="CL01" data-type="Equipment">
+                            <td>CL01 XXXXXX</td><td>Equipment 1</td><td>Shell</td>
+                            <td class="cell-negligible">Negligible</td><td></td><td></td><td></td><td class="cell-medium">Medium</td>
+                        </tr>
+                        <tr data-loop="CL01" data-type="Equipment">
+                            <td>CL01 XXXXXX</td><td>Equipment 1</td><td>Channel</td>
+                            <td></td><td class="cell-na">N/A</td><td class="cell-medium">Medium</td><td class="cell-low">Low</td><td class="cell-na">N/A</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── General Information Panel ── -->
+        <div id="tab-general" class="tab-panel">
+            <div class="placeholder-panel">
+                <i class="fa-solid fa-circle-info" style="margin-right:10px; color:#2b5797;"></i>
+                General Information — (content coming soon)
+            </div>
+        </div>
+
+        <!-- ── Process Composition Panel ── -->
+        <div id="tab-process" class="tab-panel">
+            <div class="placeholder-panel">
+                <i class="fa-solid fa-flask" style="margin-right:10px; color:#2b5797;"></i>
+                Process Composition — (content coming soon)
+            </div>
+        </div>
+
+        <!-- ── Corrosion Manual Panel ── -->
+        <div id="tab-corrosion" class="tab-panel">
+            <div class="placeholder-panel">
+                <i class="fa-solid fa-book" style="margin-right:10px; color:#2b5797;"></i>
+                Corrosion Manual — (content coming soon)
+            </div>
+        </div>
+
+        <!-- ── Loop Detail Panel ── -->
+        <div id="tab-loop" class="tab-panel">
+            <div class="placeholder-panel">
+                <i class="fa-solid fa-diagram-project" style="margin-right:10px; color:#2b5797;"></i>
+                Loop Detail — (content coming soon)
+            </div>
+        </div>
+
+    </div><!-- end main-content -->
+</div><!-- end layout -->
+
+<script>
+    // ── Read URL params → set header breadcrumb ──────────────────────
+    (function() {
+        var params = new URLSearchParams(window.location.search);
+        var plant = params.get('plant') || 'Plant 1';
+        var unit  = params.get('unit')  || 'Unit 1000';
+        document.getElementById('pageBrand').textContent =
+            'Artemis: Company 1 \u003e ' + plant + ' \u003e ' + unit;
+        document.title = 'Artemis - ' + plant + ' - ' + unit;
+    })();
+
+    // ── Tab switching ────────────────────────────────────────────────
+    function switchTab(name, btn) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    // ── Filter detail table by Corrosion Loop dropdown ───────────────
+    function filterByLoop() {
+        applyFilter();
+    }
+
+    // ── Combined filter: loop + type ─────────────────────────────────
+    function applyFilter() {
+        var loop = document.getElementById('clDropdown').value;
+        var type = document.getElementById('summaryFilter').value;
+        document.querySelectorAll('#detailTable tbody tr').forEach(function(row) {
+            var matchLoop = (loop === 'all' || row.dataset.loop === loop);
+            var matchType = (type === 'all' || row.dataset.type === type);
+            row.style.display = (matchLoop && matchType) ? '' : 'none';
+        });
+    }
+
+    // ── Sidebar search ───────────────────────────────────────────────
+    function filterSidebar(type) {
+        var searchId = type === 'equip' ? 'equipSearch' : 'pipingSearch';
+        var listId   = type === 'equip' ? 'equipList'   : 'pipingList';
+        var q = document.getElementById(searchId).value.toLowerCase();
+        document.querySelectorAll('#' + listId + ' li').forEach(function(li) {
+            li.style.display = li.querySelector('span').innerText.toLowerCase().includes(q) ? '' : 'none';
+        });
+    }
+
+    // ── Delete sidebar item ──────────────────────────────────────────
+    function deleteSidebarItem(btn) {
+        Swal.fire({
+            title: 'ลบรายการนี้?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'ใช่, ลบเลย!',
+            cancelButtonText: 'ยกเลิก'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                btn.closest('li').remove();
+                Swal.fire({ title: 'ลบเรียบร้อย!', icon: 'success', timer: 1200, showConfirmButton: false });
+            }
+        });
+    }
+
+    // ── Add new corrosion loop ───────────────────────────────────────
+    function addCorrosionLoop() {
+        document.getElementById('clNumber').value = '';
+        document.getElementById('clName').value = '';
+        var modal = document.getElementById('clModal');
+        modal.style.display = 'flex';
+        document.getElementById('clNumber').focus();
+    }
+
+    function closeClModal() {
+        document.getElementById('clModal').style.display = 'none';
+    }
+
+    function saveCorrosionLoop() {
+        var num  = document.getElementById('clNumber').value.trim();
+        var name = document.getElementById('clName').value.trim();
+        if (!num)  { Swal.fire('กรุณากรอก', 'Corrosion loop number', 'warning'); return; }
+        if (!name) { Swal.fire('กรุณากรอก', 'Corrosion loop name', 'warning'); return; }
+        var fullName = num + ' ' + name;
+        var sel = document.getElementById('clDropdown');
+        var opt = document.createElement('option');
+        opt.value = num;
+        opt.text  = fullName;
+        sel.appendChild(opt);
+        closeClModal();
+        Swal.fire({ title: 'เพิ่มสำเร็จ!', text: fullName, icon: 'success', timer: 1500, showConfirmButton: false });
+    }
+
+    // ปิด modal เมื่อคลิก backdrop
+    document.getElementById('clModal').addEventListener('click', function(e) {
+        if (e.target === this) closeClModal();
+    });
+
+    // ── Add new tag ──────────────────────────────────────────────────
+    function addTag() {
+        var params = new URLSearchParams(window.location.search);
+        var plant = params.get('plant') || 'Plant 1';
+        var unit  = params.get('unit')  || 'Unit 1000';
+        window.location.href = '/add_tag_from_unit?plant=' + encodeURIComponent(plant) + '&unit=' + encodeURIComponent(unit);
+    }
+</script>
+
+
+<!-- ── Add Corrosion Loop Modal ── -->
+<div id="clModal" style="
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.45); z-index:2000;
+    justify-content:center; align-items:center;">
+    <div style="
+        background:#dce8f8; border-radius:14px; padding:28px 32px 24px;
+        width:380px; box-shadow:0 6px 24px rgba(0,0,0,0.35);
+        font-family:'Segoe UI',sans-serif;">
+        <h2 style="text-align:center; font-size:18px; font-weight:bold; color:#000; margin-bottom:22px;">
+            Add new corrosion loop
+        </h2>
+        <div style="font-size:12px; color:#555; margin-bottom:5px;">Corrosion loop number</div>
+        <input type="text" id="clNumber" placeholder="CL04" style="
+            width:100%; padding:10px 14px; font-size:15px; text-align:center;
+            border:1px solid #7a9fd4; border-radius:6px; background:white;
+            outline:none; margin-bottom:16px; box-sizing:border-box;">
+        <div style="font-size:12px; color:#555; margin-bottom:5px;">Corrosion loop name</div>
+        <input type="text" id="clName" placeholder="XXXXXX" style="
+            width:100%; padding:10px 14px; font-size:15px; text-align:center;
+            border:1px solid #7a9fd4; border-radius:6px; background:white;
+            outline:none; margin-bottom:22px; box-sizing:border-box;">
+        <div style="display:flex; justify-content:center; gap:14px;">
+            <button onclick="saveCorrosionLoop()" style="
+                background:#2b5797; color:white; border:none; padding:9px 32px;
+                font-size:14px; border-radius:6px; cursor:pointer; font-weight:600;">Save</button>
+            <button onclick="closeClModal()" style="
+                background:#5a6a80; color:white; border:none; padding:9px 32px;
+                font-size:14px; border-radius:6px; cursor:pointer; font-weight:600;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis - Customer Company</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #2b5797;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 50px;
+        }
+
+        .brand {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(to bottom, #000 0%, #111 100%);
+        }
+
+        .card {
+            background-color: #f0f2f5;
+            width: 100%;
+            max-width: 900px;
+            height: 550px;
+            border-radius: 40px;
+            padding: 20px 40px;
+            box-sizing: border-box;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .top-nav div {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: normal;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #6d9eeb;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        .table-wrapper {
+            border: 1px solid #6d9eeb;
+            height: 280px;
+            overflow-y: scroll;
+            background-color: white;
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        tr { border-bottom: 1px solid #ddd; }
+        tr:nth-child(even) { background-color: #fff; }
+        tr:nth-child(odd)  { background-color: #dbe9f5; }
+        tr.selected        { background-color: #b8d2ea; }
+
+        td {
+            padding: 8px 10px;
+            color: #555;
+        }
+
+        .company-name {
+            font-weight: bold;
+            color: #000;
+            font-size: 16px;
+        }
+
+        .icons i {
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+        .trash-icon { color: #333; }
+
+        .footer-section {
+            margin-top: auto;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: #3b6ba5;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover { background-color: #2a4e7a; }
+
+        .table-wrapper::-webkit-scrollbar { width: 20px; }
+        .table-wrapper::-webkit-scrollbar-track { background: #f1f1f1; border-left: 1px solid #ccc; }
+        .table-wrapper::-webkit-scrollbar-thumb { background: #c1c1c1; border: 2px solid #f1f1f1; }
+
+        /* ── Modal Base ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #e3f2fd;
+            padding: 30px;
+            border-radius: 15px;
+            width: 420px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .input-label {
+            text-align: left;
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 5px;
+            padding-left: 2px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 15px;
+            border: 1px solid #3b6ba5;
+            border-radius: 8px;
+            box-sizing: border-box;
+            color: #000;
+            margin-bottom: 15px;
+            outline: none;
+            background: white;
+        }
+
+        /* ── File input row ── */
+        .file-input-wrapper {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+            margin-bottom: 4px;
+        }
+
+        .file-display {
+            flex: 1;
+            border-radius: 8px 0 0 8px !important;
+            border-right: none !important;
+            margin-bottom: 0 !important;
+        }
+
+        .browse-btn {
+            background-color: #fff;
+            border: 1px solid #3b6ba5;
+            border-left: none;
+            border-radius: 0 8px 8px 0;
+            padding: 0 14px;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .browse-btn:hover { background-color: #dce8f5; }
+
+        .file-hint {
+            font-size: 12px;
+            color: #777;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        /* ── Modal buttons ── */
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn-modal {
+            padding: 10px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            background-color: #2b5797;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .btn-modal:hover { background-color: #1e3f72; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">Artemis</div>
+    <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:rgba(255,255,255,0.85);">
+        <span><i class="fa-solid fa-circle-user"></i> {{ current_user }}</span>
+        <a href="/logout" style="color:rgba(255,255,255,0.85);text-decoration:none;border:1px solid rgba(255,255,255,0.4);padding:5px 12px;border-radius:6px;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='transparent'">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+    </div>
+</header>
+
+<div class="main-container">
+    <div class="card">
+        <div class="top-nav">
+            <div onclick="history.back()"><i class="fa-solid fa-circle-arrow-left"></i> Back</div>
+            <div onclick="window.location.href='/'"><i class="fa-solid fa-house"></i> Home</div>
+        </div>
+
+        <h1>Customer Company</h1>
+
+        <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="">
+
+        <div class="table-wrapper">
+            <table id="companyTable">
+                <tr class="selected" onclick="goToPlant(this)" style="cursor:pointer;">
+                    <td width="25%">
+                        <span class="company-name">Company 1</span>
+                        <span class="icons">
+                            <i class="fa-solid fa-user-plus" onclick="event.stopPropagation(); openAuthModal('Company 1')"></i>
+                            <i class="fa-solid fa-trash-can trash-icon" onclick="event.stopPropagation(); confirmDelete(this)" title="Delete Company"></i>
+                        </span>
+                    </td>
+                    <td>Created date: 01/02/2022</td>
+                    <td>Modified date: 25/02/2024</td>
+                    <td>Modified by: 26009649</td>
+                </tr>
+                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                    <td width="25%"><span class="company-name">Company 2</span></td>
+                    <td>Created date: 04/01/2022</td>
+                    <td>Modified date: 04/01/2022</td>
+                    <td>Modified by: 26009649</td>
+                </tr>
+                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                    <td width="25%"><span class="company-name">Company 3</span></td>
+                    <td>Created date: 09/10/2023</td>
+                    <td>Modified date: 09/10/2023</td>
+                    <td>Modified by: 26009649</td>
+                </tr>
+                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                    <td width="25%"><span class="company-name">Company 4</span></td>
+                    <td>Created date: 11/09/2023</td>
+                    <td>Modified date: 11/09/2023</td>
+                    <td>Modified by: 26009649</td>
+                </tr>
+                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                    <td width="25%"><span class="company-name">Company 5</span></td>
+                    <td>Created date: 02/09/2023</td>
+                    <td>Modified date: 02/09/2023</td>
+                    <td>Modified by: 26009649</td>
+                </tr>
+                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                    <td width="25%"><span class="company-name">Company 6</span></td>
+                    <td>Created date: 18/06/2023</td>
+                    <td>Modified date: 18/06/2023</td>
+                    <td>Modified by: 26009649</td>
+                </tr>
+                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                    <td width="25%"><span class="company-name">Company 7</span></td>
+                    <td>Created date: 21/05/2023</td>
+                    <td>Modified date: 21/05/2023</td>
+                    <td>Modified by: 26009649</td>
+                </tr>
+                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                    <td width="25%"><span class="company-name">Company 8</span></td>
+                    <td>Created date: 10/11/2023</td>
+                    <td>Modified date: 10/11/2023</td>
+                    <td>Modified by: 26009649</td>
+                </tr>
+                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                    <td width="25%"><span class="company-name">Company 9</span></td>
+                    <td>Created date: 05/02/2024</td>
+                    <td>Modified date: 05/02/2024</td>
+                    <td>Modified by: 26009649</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="footer-section">
+            <div class="action-buttons">
+                <button class="btn" onclick="viewSelected()">View</button>
+                <button class="btn" onclick="openNewCompanyModal()">New company</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Authorization Modal ── -->
+<div id="authModal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Authorization</h2>
+        <div class="input-label" id="authLabel">Add authorized user for Company 1</div>
+        <input type="text" class="modal-input" id="authEmail" value="XXXX.X@pttgcgroup.com">
+        <div class="modal-actions">
+            <button class="btn-modal" onclick="closeAuthModal()">Send</button>
+            <button class="btn-modal" onclick="closeAuthModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Add New Company Modal ── -->
+<div id="newCompanyModal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Add new company</h2>
+
+        <div class="input-label">Company name</div>
+        <input type="text" id="newCompanyName" class="modal-input" placeholder="Company X">
+
+        <div class="input-label">Company logo</div>
+        <div class="file-input-wrapper">
+            <input type="text" id="fileNameDisplay" class="modal-input file-display" placeholder="" readonly>
+            <label for="companyLogoInput" class="browse-btn">Browse</label>
+            <input type="file" id="companyLogoInput" accept=".png,.jpg,.jpeg" style="display:none;"
+                onchange="document.getElementById('fileNameDisplay').value = this.files[0] ? this.files[0].name : ''">
+        </div>
+        <div class="file-hint">(PNG, JPG)</div>
+
+        <div class="modal-actions">
+            <button class="btn-modal" onclick="createNewCompanyRow()">Save</button>
+            <button class="btn-modal" onclick="closeNewCompanyModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ── Row click → ไปหน้า Plant ──────────────────────────
+    function goToPlant(row) {
+        var name = row.querySelector('.company-name').innerText.trim();
+        window.location.href = '/plant_customer?company=' + encodeURIComponent(name);
+    }
+
+    function viewSelected() {
+        var sel = document.querySelector('#companyTable tr.selected');
+        if (!sel) { Swal.fire('กรุณาเลือก Company', '', 'warning'); return; }
+        var name = sel.querySelector('.company-name').innerText.trim();
+        window.location.href = '/plant_customer?company=' + encodeURIComponent(name);
+    }
+
+    // ── Search / Filter ────────────────────────────────────
+    function filterTable() {
+        var filter = document.getElementById("searchInput").value.toLowerCase();
+        document.querySelectorAll("#companyTable tr").forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(filter) ? "" : "none";
+        });
+    }
+
+    // ── Delete ─────────────────────────────────────────────
+    function confirmDelete(btn) {
+        Swal.fire({
+            title: 'ยืนยันการลบ?',
+            text: "หากลบแล้วจะไม่สามารถกู้คืนข้อมูลได้!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'ใช่, ลบเลย!',
+            cancelButtonText: 'ยกเลิก'
+        }).then(result => {
+            if (result.isConfirmed) {
+                btn.closest('tr').remove();
+                Swal.fire('ลบเรียบร้อย!', 'Company นี้ถูกลบออกจากรายการแล้ว', 'success');
+            }
+        });
+    }
+
+    // ── Auth Modal ─────────────────────────────────────────
+    function openAuthModal(companyName) {
+        document.getElementById('authLabel').innerText = 'Add authorized user for ' + companyName;
+        document.getElementById('authModal').style.display = 'flex';
+    }
+    function closeAuthModal() {
+        document.getElementById('authModal').style.display = 'none';
+    }
+
+    // ── New Company Modal ──────────────────────────────────
+    function openNewCompanyModal() {
+        document.getElementById('newCompanyModal').style.display = 'flex';
+        document.getElementById('newCompanyName').value = '';
+        document.getElementById('fileNameDisplay').value = '';
+        document.getElementById('companyLogoInput').value = '';
+        document.getElementById('newCompanyName').focus();
+    }
+    function closeNewCompanyModal() {
+        document.getElementById('newCompanyModal').style.display = 'none';
+    }
+
+    function createNewCompanyRow() {
+        var name = document.getElementById('newCompanyName').value.trim();
+        if (!name) { Swal.fire('ข้อผิดพลาด', 'กรุณาระบุชื่อ Company', 'error'); return; }
+
+        var today = new Date();
+        var dateStr = today.getDate().toString().padStart(2,'0') + '/' +
+                      (today.getMonth()+1).toString().padStart(2,'0') + '/' +
+                      today.getFullYear();
+
+        var table = document.getElementById('companyTable');
+        var newRow = table.insertRow(0);
+        newRow.style.cursor = 'pointer';
+        newRow.onclick = function() { selectRow(this); };
+        newRow.innerHTML = `
+            <td width="25%">
+                <span class="company-name">${name}</span>
+                <span class="icons">
+                    <i class="fa-solid fa-user-plus" onclick="event.stopPropagation(); openAuthModal('${name}')"></i>
+                    <i class="fa-solid fa-trash-can trash-icon" onclick="event.stopPropagation(); confirmDelete(this)" title="Delete Company"></i>
+                </span>
+            </td>
+            <td>Created date: ${dateStr}</td>
+            <td>Modified date: ${dateStr}</td>
+            <td>Modified by: Me</td>
+        `;
+
+        closeNewCompanyModal();
+        Swal.fire({ title: 'สร้างสำเร็จ!', text: 'Company "' + name + '" ถูกเพิ่มลงในตารางแล้ว', icon: 'success', timer: 1500, showConfirmButton: false });
+    }
+</script>
+</body>
+</html>

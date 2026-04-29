@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis - Plant Name</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #2b5797;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 50px;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(to bottom, #000 0%, #111 100%);
+        }
+
+        .card {
+            background-color: #f0f2f5;
+            width: 100%;
+            max-width: 900px;
+            height: 570px;
+            border-radius: 40px;
+            padding: 20px 40px;
+            box-sizing: border-box;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top nav */
+        .top-nav {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .top-nav div {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Title row */
+        .title-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 14px;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: normal;
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .title-buttons {
+            position: absolute;
+            right: 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: #3b6ba5;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            font-size: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover { background-color: #2a4e7a; }
+
+        /* Search */
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #6d9eeb;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        /* Table wrapper */
+        .table-wrapper {
+            border: 1px solid #6d9eeb;
+            flex: 1;
+            overflow-y: scroll;
+            background-color: white;
+            position: relative;
+        }
+
+        .table-wrapper::-webkit-scrollbar { width: 20px; }
+        .table-wrapper::-webkit-scrollbar-track { background: #f1f1f1; border-left: 1px solid #ccc; }
+        .table-wrapper::-webkit-scrollbar-thumb { background: #c1c1c1; border: 2px solid #f1f1f1; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        tr { border-bottom: 1px solid #ddd; }
+
+        /* Plant header row */
+        tr.plant-row {
+            background-color: #d0d8e4;
+            cursor: default;
+        }
+
+        tr.plant-row td {
+            font-weight: bold;
+            font-size: 15px;
+            color: #000;
+            padding: 8px 10px;
+        }
+
+        /* Unit rows */
+        tr.unit-row {
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        tr.unit-row:hover { background-color: #dce8f5; }
+
+        tr.unit-row.selected {
+            background-color: #2b5797;
+            color: white;
+        }
+
+        tr.unit-row.selected td { color: white; }
+        tr.unit-row.selected .meta { color: #c8e0ff; }
+        tr.unit-row.selected .upload-link { color: #c8e0ff; }
+
+        td {
+            padding: 7px 10px;
+            color: #555;
+        }
+
+        .unit-name {
+            font-weight: bold;
+            color: #000;
+            font-size: 14px;
+        }
+
+        tr.unit-row.selected .unit-name { color: white; }
+
+        .icons i {
+            margin-left: 5px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .trash-icon { color: #333; }
+        tr.unit-row.selected .trash-icon { color: #ccc; }
+
+        .upload-link {
+            color: #2b5797;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .meta { color: #555; font-size: 13px; }
+
+        /* Footer */
+        .footer-section {
+            margin-top: 14px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* ── Modal Base ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #e3f2fd;
+            padding: 30px;
+            border-radius: 15px;
+            width: 420px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .input-label {
+            text-align: left;
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 15px;
+            border: 1px solid #3b6ba5;
+            border-radius: 8px;
+            box-sizing: border-box;
+            color: #000;
+            margin-bottom: 15px;
+            outline: none;
+            background: white;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn-modal {
+            padding: 10px 30px;
+            font-size: 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            background-color: #2b5797;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .btn-modal:hover { background-color: #1e3f72; }
+
+        /* Auth modal */
+        #authModal .modal-content { width: 380px; }
+
+        /* ── Upload Modal ── */
+        .upload-modal-content {
+            background-color: #e8f0fb;
+            padding: 30px 36px 28px;
+            border-radius: 16px;
+            width: 680px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.35);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .upload-modal-content h2 {
+            margin: 0 0 4px 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #000;
+        }
+        .upload-subtitle {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 22px;
+        }
+        .upload-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 14px;
+            gap: 12px;
+        }
+        .upload-label {
+            width: 220px;
+            flex-shrink: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+            padding-top: 8px;
+        }
+        .upload-label small {
+            display: block;
+            font-weight: normal;
+            color: #666;
+            font-size: 11px;
+        }
+        .upload-file-group {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .upload-file-display {
+            flex: 1;
+            padding: 7px 10px;
+            border: 1px solid #999;
+            border-radius: 4px;
+            font-size: 13px;
+            background: white;
+            color: #333;
+            outline: none;
+        }
+        .btn-browse {
+            padding: 7px 14px;
+            background: white;
+            border: 1px solid #999;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-browse:hover { background: #eee; }
+        .btn-trash-upload {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #333;
+            padding: 4px;
+        }
+        .btn-trash-upload:hover { color: #c00; }
+        .upload-hint {
+            font-size: 12px;
+            color: #444;
+            text-align: center;
+            border: 1px solid #bbb;
+            border-radius: 4px;
+            padding: 8px 16px;
+            margin: 18px auto 0;
+            display: inline-block;
+            background: white;
+        }
+        .upload-hint-row {
+            text-align: center;
+            margin-top: 16px;
+        }
+        .upload-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .btn-download-template {
+            background-color: #2b5797;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn-download-template:hover { background-color: #1e3f72; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">Artemis: Company 1</div>
+    <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:rgba(255,255,255,0.85);">
+        <span><i class="fa-solid fa-circle-user"></i> {{ current_user }}</span>
+        <a href="/logout" style="color:rgba(255,255,255,0.85);text-decoration:none;border:1px solid rgba(255,255,255,0.4);padding:5px 12px;border-radius:6px;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='transparent'">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+    </div>
+</header>
+
+<div class="main-container">
+    <div class="card">
+
+        <!-- Top nav -->
+        <div class="top-nav">
+            <div onclick="history.back()"><i class="fa-solid fa-circle-arrow-left"></i> Back</div>
+            <div onclick="window.location.href='/'"><i class="fa-solid fa-house"></i> Home</div>
+        </div>
+
+        <!-- Title + buttons -->
+        <div class="title-row">
+            <h1>Plant Name</h1>
+            <div class="title-buttons">
+                <button class="btn" onclick="openNewPlantModal()">New Plant</button>
+                <button class="btn" onclick="openNewUnitModal()">New Unit</button>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="">
+
+        <!-- Table -->
+        <div class="table-wrapper">
+            <table id="plantTable">
+
+                <!-- Plant 1 -->
+                <tr class="plant-row" id="plant-1">
+                    <td width="5%"></td>
+                    <td width="28%">
+                        Plant 1
+                        <span style="font-weight:normal; margin-left:6px;">
+                            <i class="fa-solid fa-user-plus" style="cursor:pointer;" onclick="openAuthModalPlant('plant-1')"></i>
+                            <i class="fa-solid fa-trash-can trash-icon" style="cursor:pointer; margin-left:4px;" onclick="confirmDeletePlant(this, 'plant-1')" title="Delete Plant"></i>
+                        </span>
+                    </td>
+                    <td class="meta">Created date: 01/02/2022</td>
+                    <td class="meta">Created by: 26009649</td>
+                </tr>
+                <tr class="unit-row selected" onclick="selectRow(this)" data-plant="1">
+                    <td><span class="upload-link" onclick="event.stopPropagation(); openUploadModal(this)">Upload file</span></td>
+                    <td>
+                        <span class="unit-name">Unit 1000</span>
+                        <span class="icons">
+                            <i class="fa-solid fa-user-plus" onclick="event.stopPropagation(); openAuthModalUnit(this)"></i>
+                            <i class="fa-solid fa-trash-can trash-icon" onclick="event.stopPropagation(); confirmDeleteRow(this)" title="Delete Unit"></i>
+                        </span>
+                    </td>
+                    <td class="meta">Modified date: 01/02/2022</td>
+                    <td class="meta">Modified by: 26009649</td>
+                </tr>
+                <tr class="unit-row" onclick="selectRow(this)" data-plant="1">
+                    <td><span class="upload-link" onclick="event.stopPropagation(); openUploadModal(this)">Upload file</span></td>
+                    <td><span class="unit-name">Unit 1000 [1<sup>st</sup> Reassessment]</span></td>
+                    <td class="meta">Modified date: 25/02/2024</td>
+                    <td class="meta">Modified by: 26009649</td>
+                </tr>
+                <tr class="unit-row" onclick="selectRow(this)" data-plant="1">
+                    <td><span class="upload-link" onclick="event.stopPropagation(); openUploadModal(this)">Upload file</span></td>
+                    <td><span class="unit-name">Unit 1200</span></td>
+                    <td class="meta">Modified date: 01/02/2022</td>
+                    <td class="meta">Modified by: 26009649</td>
+                </tr>
+                <tr class="unit-row" onclick="selectRow(this)" data-plant="1">
+                    <td><span class="upload-link" onclick="event.stopPropagation(); openUploadModal(this)">Upload file</span></td>
+                    <td><span class="unit-name">Unit 2800</span></td>
+                    <td class="meta">Modified date: 01/02/2022</td>
+                    <td class="meta">Modified by: 26009649</td>
+                </tr>
+
+                <!-- Plant 2 -->
+                <tr class="plant-row" id="plant-2">
+                    <td width="5%"></td>
+                    <td width="28%">Plant 2</td>
+                    <td class="meta">Created date: 01/02/2022</td>
+                    <td class="meta">Created by: 26009649</td>
+                </tr>
+                <tr class="unit-row" onclick="selectRow(this)" data-plant="2">
+                    <td><span class="upload-link" onclick="event.stopPropagation(); openUploadModal(this)">Upload file</span></td>
+                    <td><span class="unit-name">Unit 8700</span></td>
+                    <td class="meta">Modified date: 01/02/2022</td>
+                    <td class="meta">Modified by: 26009649</td>
+                </tr>
+                <tr class="unit-row" onclick="selectRow(this)" data-plant="2">
+                    <td><span class="upload-link" onclick="event.stopPropagation(); openUploadModal(this)">Upload file</span></td>
+                    <td><span class="unit-name">Unit 4500</span></td>
+                    <td class="meta">Modified date: 01/02/2022</td>
+                    <td class="meta">Modified by: 26009649</td>
+                </tr>
+
+            </table>
+        </div>
+
+        <!-- Footer buttons -->
+        <div class="footer-section">
+            <button class="btn" onclick="viewSelected()">View</button>
+            <button class="btn" onclick="viewReassessment()">Reassessment</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── Authorization Modal ── -->
+<div id="authModal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Authorization</h2>
+        <div id="authLabel" style="
+            font-size: 12px;
+            color: #777;
+            text-align: left;
+            border: 1px dashed #aaa;
+            border-radius: 6px;
+            padding: 6px 10px;
+            margin-bottom: 14px;
+            background: transparent;
+        ">Add authorized user for Company 1 &gt; Plant 1 &gt; Unit 1000</div>
+        <input type="text" class="modal-input" id="authEmail" value="XXXX.X@pttgcgroup.com">
+        <div class="modal-actions">
+            <button class="btn-modal" onclick="closeAuthModal()">Send</button>
+            <button class="btn-modal" onclick="closeAuthModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── New Plant Modal ── -->
+<div id="newPlantModal" class="modal-overlay">
+    <div class="modal-content" style="width: 380px; padding: 28px 30px 30px;">
+        <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 24px;">Add new plant</h2>
+        <div style="text-align:left; font-size:12px; color:#777; margin-bottom:6px;">Plant name</div>
+        <input type="text" id="newPlantName" class="modal-input"
+               placeholder="Plant X"
+               style="text-align:center; font-size:15px; margin-bottom:28px;">
+        <div class="modal-actions">
+            <button class="btn-modal" onclick="createNewPlant()">Save</button>
+            <button class="btn-modal" onclick="closeNewPlantModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── New Unit Modal ── -->
+<div id="newUnitModal" class="modal-overlay">
+    <div class="modal-content" style="width: 380px; padding: 28px 30px 30px;">
+        <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Add new unit</h2>
+
+        <div style="text-align:left; font-size:12px; color:#777; margin-bottom:6px;">Plant name</div>
+        <div style="position:relative; margin-bottom:18px;">
+            <select id="newUnitPlant" style="
+                width: 100%;
+                padding: 10px 36px 10px 12px;
+                font-size: 15px;
+                border: 1px solid #3b6ba5;
+                border-radius: 8px;
+                appearance: none;
+                -webkit-appearance: none;
+                background: white;
+                color: #000;
+                cursor: pointer;
+                outline: none;
+            "></select>
+            <!-- custom dropdown arrow (blue triangle) -->
+            <div style="
+                pointer-events: none;
+                position: absolute;
+                right: 0; top: 0; bottom: 0;
+                width: 36px;
+                background: #2b5797;
+                border-radius: 0 8px 8px 0;
+                display: flex; align-items: center; justify-content: center;
+            ">
+                <span style="color:white; font-size:13px;">&#9660;</span>
+            </div>
+        </div>
+
+        <div style="text-align:left; font-size:12px; color:#777; margin-bottom:6px;">Unit name</div>
+        <input type="text" id="newUnitName" class="modal-input"
+               placeholder="1011"
+               style="text-align:center; font-size:15px; margin-bottom:24px;">
+
+        <div class="modal-actions">
+            <button class="btn-modal" onclick="createNewUnit()">Save</button>
+            <button class="btn-modal" onclick="closeNewUnitModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ── Row selection ──────────────────────────────────────
+    function selectRow(row) {
+        document.querySelectorAll(".unit-row").forEach(r => r.classList.remove("selected"));
+        row.classList.add("selected");
+    }
+
+    function viewSelected() {
+        var sel = document.querySelector(".unit-row.selected");
+        if (!sel) { Swal.fire('กรุณาเลือก Unit', '', 'warning'); return; }
+        var unitName = sel.querySelector(".unit-name").innerText.trim();
+        var plantNum = sel.dataset.plant;
+        var plantName = getPlantName(plantNum);
+        window.location.href = '/unit_customer?plant=' + encodeURIComponent(plantName) + '&unit=' + encodeURIComponent(unitName);
+    }
+
+    function viewReassessment() {
+        var sel = document.querySelector(".unit-row.selected");
+        if (!sel) { Swal.fire('กรุณาเลือก Unit', '', 'warning'); return; }
+        var name = sel.querySelector(".unit-name").innerText;
+        Swal.fire('Reassessment', 'Reassessment สำหรับ: ' + name, 'info');
+    }
+
+    // ── Search ─────────────────────────────────────────────
+    function filterTable() {
+        var filter = document.getElementById("searchInput").value.toLowerCase();
+        document.querySelectorAll("#plantTable tr").forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(filter) ? "" : "none";
+        });
+    }
+
+    // ── Upload Modal ───────────────────────────────────────
+    function openUploadModal(span) {
+        var row = span.closest('tr');
+        var unitEl = row.querySelector('.unit-name');
+        var unitName = unitEl ? unitEl.innerText.trim() : '';
+        var plantNum = row.dataset.plant;
+        var plantName = getPlantName(plantNum);
+        document.getElementById('uploadTitle').innerText = 'Company 1 > ' + plantName + (unitName ? ' > ' + unitName : '');
+        ['pfdFile','pidFile','corrosionFile','otherFile'].forEach(function(id) {
+            document.getElementById(id).value = '';
+            document.getElementById(id + 'Name').value = '';
+        });
+        document.getElementById('uploadModal').style.display = 'flex';
+    }
+    function closeUploadModal() {
+        document.getElementById('uploadModal').style.display = 'none';
+    }
+    function browseFile(inputId) { document.getElementById(inputId).click(); }
+    function clearFile(inputId) {
+        document.getElementById(inputId).value = '';
+        document.getElementById(inputId + 'Name').value = '';
+    }
+    function handleFileChange(input) {
+        document.getElementById(input.id + 'Name').value = input.files[0] ? input.files[0].name : '';
+    }
+    function doUpload() {
+        var hasFile = ['pfdFile','pidFile','corrosionFile','otherFile'].some(function(id){ return document.getElementById(id).files.length > 0; });
+        if (!hasFile) { Swal.fire('กรุณาเลือกไฟล์', 'กรุณา Browse ไฟล์อย่างน้อย 1 ไฟล์', 'warning'); return; }
+        closeUploadModal();
+        Swal.fire({ title: 'Upload สำเร็จ!', icon: 'success', timer: 1500, showConfirmButton: false });
+    }
+
+    // ── Delete Unit row ────────────────────────────────────
+    function confirmDeleteRow(btn) {
+        Swal.fire({
+            title: 'ยืนยันการลบ?',
+            text: "หากลบแล้วจะไม่สามารถกู้คืนข้อมูลได้!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'ใช่, ลบเลย!',
+            cancelButtonText: 'ยกเลิก'
+        }).then(result => {
+            if (result.isConfirmed) {
+                btn.closest('tr').remove();
+                Swal.fire('ลบเรียบร้อย!', 'Unit ถูกลบออกจากรายการแล้ว', 'success');
+            }
+        });
+    }
+
+    // ── Delete Plant ───────────────────────────────────────
+    function confirmDeletePlant(btn, plantId) {
+        Swal.fire({
+            title: 'ลบ Plant นี้?',
+            text: "จะลบ Plant และ Unit ทั้งหมดที่อยู่ใน Plant นี้!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'ใช่, ลบเลย!',
+            cancelButtonText: 'ยกเลิก'
+        }).then(result => {
+            if (result.isConfirmed) {
+                // ลบ plant row
+                var plantRow = document.getElementById(plantId);
+                // ลบ unit rows ที่อยู่ใน plant นี้
+                var plantNum = plantId.replace('plant-', '');
+                document.querySelectorAll('.unit-row[data-plant="' + plantNum + '"]').forEach(r => r.remove());
+                plantRow.remove();
+                // อัปเดต dropdown
+                populatePlantDropdown();
+                Swal.fire('ลบเรียบร้อย!', 'Plant และ Unit ถูกลบออกแล้ว', 'success');
+            }
+        });
+    }
+
+    // ── Auth Modal ─────────────────────────────────────────
+    function openAuthModal(path) {
+        document.getElementById('authLabel').innerText = 'Add authorized user for ' + path;
+        document.getElementById('authModal').style.display = 'flex';
+    }
+    function closeAuthModal() {
+        document.getElementById('authModal').style.display = 'none';
+    }
+
+    // ดึงชื่อ Plant จาก plant id number
+    function getPlantName(plantNum) {
+        var plantRow = document.getElementById('plant-' + plantNum);
+        if (!plantRow) return 'Plant ?';
+        return plantRow.querySelector('td:nth-child(2)').childNodes[0].textContent.trim();
+    }
+
+    // เรียกจาก Plant row icon
+    function openAuthModalPlant(plantId) {
+        var plantRow = document.getElementById(plantId);
+        var plantName = plantRow.querySelector('td:nth-child(2)').childNodes[0].textContent.trim();
+        openAuthModal('Company 1 > ' + plantName);
+    }
+
+    // เรียกจาก Unit row icon
+    function openAuthModalUnit(iconEl) {
+        var row = iconEl.closest('tr');
+        var unitName = row.querySelector('.unit-name').innerText.trim();
+        var plantNum = row.dataset.plant;
+        var plantName = getPlantName(plantNum);
+        openAuthModal('Company 1 > ' + plantName + ' > ' + unitName);
+    }
+
+    // ── New Plant Modal ────────────────────────────────────
+    var plantCounter = 3; // เริ่มต่อจาก Plant 2
+
+    function openNewPlantModal() {
+        document.getElementById('newPlantModal').style.display = 'flex';
+        document.getElementById('newPlantName').value = '';
+        document.getElementById('newPlantName').focus();
+    }
+    function closeNewPlantModal() {
+        document.getElementById('newPlantModal').style.display = 'none';
+    }
+
+    function createNewPlant() {
+        var name = document.getElementById('newPlantName').value.trim();
+        if (!name) { Swal.fire('ข้อผิดพลาด', 'กรุณาระบุชื่อ Plant', 'error'); return; }
+
+        var today = new Date();
+        var dateStr = today.getDate().toString().padStart(2,'0') + '/' +
+                      (today.getMonth()+1).toString().padStart(2,'0') + '/' +
+                      today.getFullYear();
+
+        var table = document.getElementById('plantTable');
+        var newPlantId = 'plant-' + plantCounter;
+
+        var plantRow = table.insertRow(-1);
+        plantRow.className = 'plant-row';
+        plantRow.id = newPlantId;
+        plantRow.innerHTML = `
+            <td width="5%"></td>
+            <td width="28%">
+                ${name}
+                <span style="font-weight:normal; margin-left:6px;">
+                    <i class="fa-solid fa-user-plus" style="cursor:pointer;" onclick="openAuthModalPlant('${newPlantId}')"></i>
+                    <i class="fa-solid fa-trash-can trash-icon" style="cursor:pointer; margin-left:4px;" onclick="confirmDeletePlant(this,'${newPlantId}')" title="Delete Plant"></i>
+                </span>
+            </td>
+            <td class="meta">Created date: ${dateStr}</td>
+            <td class="meta">Created by: Me</td>
+        `;
+
+        plantCounter++;
+        populatePlantDropdown();
+        closeNewPlantModal();
+        Swal.fire({ title: 'สร้างสำเร็จ!', text: 'Plant "' + name + '" ถูกเพิ่มแล้ว', icon: 'success', timer: 1500, showConfirmButton: false });
+    }
+
+    // ── New Unit Modal ─────────────────────────────────────
+    function populatePlantDropdown() {
+        var sel = document.getElementById('newUnitPlant');
+        sel.innerHTML = '';
+        document.querySelectorAll('.plant-row').forEach(row => {
+            var plantName = row.querySelector('td:nth-child(2)').childNodes[0].textContent.trim();
+            var plantId = row.id;
+            var opt = document.createElement('option');
+            opt.value = plantId.replace('plant-', '');
+            opt.text = plantName;
+            sel.appendChild(opt);
+        });
+    }
+
+    function openNewUnitModal() {
+        populatePlantDropdown();
+        document.getElementById('newUnitModal').style.display = 'flex';
+        document.getElementById('newUnitName').value = '';
+        document.getElementById('newUnitName').focus();
+    }
+    function closeNewUnitModal() {
+        document.getElementById('newUnitModal').style.display = 'none';
+    }
+
+    function createNewUnit() {
+        var name = document.getElementById('newUnitName').value.trim();
+        var plantNum = document.getElementById('newUnitPlant').value;
+        if (!name) { Swal.fire('ข้อผิดพลาด', 'กรุณาระบุชื่อ Unit', 'error'); return; }
+
+        var today = new Date();
+        var dateStr = today.getDate().toString().padStart(2,'0') + '/' +
+                      (today.getMonth()+1).toString().padStart(2,'0') + '/' +
+                      today.getFullYear();
+
+        // หา plant row แล้วแทรก unit ต่อท้าย unit rows ของ plant นั้น
+        var table = document.getElementById('plantTable');
+        var rows = table.rows;
+        var insertIdx = -1;
+        for (var i = 0; i < rows.length; i++) {
+            if (rows[i].dataset.plant === plantNum) insertIdx = i;
+        }
+
+        var newRow = table.insertRow(insertIdx + 1);
+        newRow.className = 'unit-row';
+        newRow.dataset.plant = plantNum;
+        newRow.style.cursor = 'pointer';
+        newRow.onclick = function() { selectRow(this); };
+        newRow.innerHTML = `
+            <td><span class="upload-link" onclick="event.stopPropagation(); openUploadModal(this)">Upload file</span></td>
+            <td>
+                <span class="unit-name">${name}</span>
+                <span class="icons">
+                    <i class="fa-solid fa-user-plus" onclick="event.stopPropagation(); openAuthModalUnit(this)"></i>
+                    <i class="fa-solid fa-trash-can trash-icon" onclick="event.stopPropagation(); confirmDeleteRow(this)" title="Delete Unit"></i>
+                </span>
+            </td>
+            <td class="meta">Modified date: ${dateStr}</td>
+            <td class="meta">Modified by: Me</td>
+        `;
+
+        closeNewUnitModal();
+        Swal.fire({ title: 'สร้างสำเร็จ!', text: 'Unit "' + name + '" ถูกเพิ่มแล้ว', icon: 'success', timer: 1500, showConfirmButton: false });
+    }
+</script>
+
+<!-- ── Upload File Modal ── -->
+<div id="uploadModal" class="modal-overlay">
+    <div class="upload-modal-content">
+        <h2>Upload file</h2>
+        <div class="upload-subtitle" id="uploadTitle">Company 1 &gt; Plant 1 &gt; Unit 1000</div>
+
+        <!-- PFD File -->
+        <div class="upload-row">
+            <div class="upload-label">PFD File:<small>(PDF, JPG, PNG)</small></div>
+            <div class="upload-file-group">
+                <input type="text" id="pfdFileName" class="upload-file-display" readonly placeholder="">
+                <button class="btn-browse" onclick="browseFile('pfdFile')">Browse</button>
+                <input type="file" id="pfdFile" style="display:none;" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileChange(this)">
+                <button class="btn-trash-upload" onclick="clearFile('pfdFile')"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+        </div>
+
+        <!-- P&ID File -->
+        <div class="upload-row">
+            <div class="upload-label">P&amp;ID File:<small>(PDF, JPG, PNG)</small></div>
+            <div class="upload-file-group">
+                <input type="text" id="pidFileName" class="upload-file-display" readonly placeholder="">
+                <button class="btn-browse" onclick="browseFile('pidFile')">Browse</button>
+                <input type="file" id="pidFile" style="display:none;" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileChange(this)">
+                <button class="btn-trash-upload" onclick="clearFile('pidFile')"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+        </div>
+
+        <!-- Corrosion Manual Excel File -->
+        <div class="upload-row">
+            <div class="upload-label">Corrosion Manual Excel File:<small>(Microsoft Excel)</small></div>
+            <div class="upload-file-group" style="align-items:center;">
+                <input type="text" id="corrosionFileName" class="upload-file-display" readonly placeholder="">
+                <button class="btn-browse" onclick="browseFile('corrosionFile')">Browse</button>
+                <input type="file" id="corrosionFile" style="display:none;" accept=".xlsx,.xls" onchange="handleFileChange(this)">
+                <button class="btn-trash-upload" onclick="clearFile('corrosionFile')"><i class="fa-solid fa-trash-can"></i></button>
+                <button class="btn-download-template" onclick="Swal.fire('Download Template','กำลังดาวน์โหลด...','info')">
+                    <i class="fa-solid fa-download"></i> Download Template
+                </button>
+            </div>
+        </div>
+
+        <!-- Other File -->
+        <div class="upload-row">
+            <div class="upload-label">
+                Other File:
+                <small>Such as Coating specification, Insulation specification, Mass balance, <u>and etc.</u></small>
+                <small>(Microsoft Excel, Microsoft Word, Microsoft power point, PDF, JPG, PNG)</small>
+            </div>
+            <div class="upload-file-group">
+                <input type="text" id="otherFileName" class="upload-file-display" readonly placeholder="">
+                <button class="btn-browse" onclick="browseFile('otherFile')">Browse</button>
+                <input type="file" id="otherFile" style="display:none;" onchange="handleFileChange(this)">
+                <button class="btn-trash-upload" onclick="clearFile('otherFile')"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+        </div>
+
+        <!-- Hint -->
+        <div class="upload-hint-row">
+            <span class="upload-hint">สามารถเลือก Browse หลายไฟล์ได้พร้อมๆ กัน แล้วกด Upload ที่เดียว</span>
+        </div>
+
+        <!-- Footer -->
+        <div class="upload-footer">
+            <button class="btn" onclick="doUpload()">Upload</button>
+            <button class="btn" onclick="closeUploadModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
