@@ -1,9 +1,10 @@
 services:
   artemis:
+    image: artemis:local
     build: .
     container_name: artemis_app
     ports:
-      - "8000:8000"
+      - "8005:8005"
     volumes:
       - ./templates:/app/templates
       - ./static:/app/static
@@ -11,7 +12,7 @@ services:
       - SESSION_SECRET=${SESSION_SECRET:-artemis-secret-key-change-in-production}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/login-page"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8005/login-page" ]
       interval: 30s
       timeout: 10s
       retries: 3
