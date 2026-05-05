@@ -10,33 +10,42 @@ auth_routes.py — SSO Callback Routes (/home, /logout)
   from auth_routes import router as auth_router
   app.include_router(auth_router)
 """
-from typing import Optional
-
 from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse
+from fastapi.templating import Jinja2Templates
 
 from auth_service import clear_auth, redirect_to_sso, save_auth
+
+templates = Jinja2Templates(directory="templates")
 
 router = APIRouter()
 
 
-@router.get("/home")
+@router.get("/login-page")
+async def login_page(request: Request):
+    """หน้า Login — แสดงปุ่มก่อนไปหน้า SSO"""
+    return templates.TemplateResponse("LogIn_page.html", {"request": request})
+
+
+@router.get("/login")
+async def login_redirect():
+    """กด ปุ่ม Log in → redirect ไป SSO"""
+    return redirect_to_sso()
+
+
+@router.get("/home/{user}/{token}")
 async def sso_callback(
     request: Request,
-    token: Optional[str] = None,
-    idToken: Optional[str] = None,
-    user: Optional[str] = None,
-    id: Optional[str] = None,
+    user: str,
+    token: str,
 ):
     """
-    SSO Callback — SSO server redirect กลับมาที่นี่พร้อม token + user
+    SSO Callback — SSO server redirect กลับมาที่นี่พร้อม user + token เป็น path parameter
+    รูปแบบ: /home/{user}/{token}
     เทียบกับ HomeComponent.handleAuth() ใน Angular
     """
-    resolved_token = token or idToken
-    resolved_user = user or id or "sso-user"
-
-    if resolved_token and resolved_user:
-        save_auth(request, resolved_token, resolved_user)
+    if token and user:
+        save_auth(request, token, user)
         return RedirectResponse(url="/", status_code=302)
 
     # ไม่มี token → redirect กลับ SSO ใหม่
@@ -50,4 +59,6 @@ async def logout(request: Request):
     เทียบกับ AuthService.logout() ใน Angular
     """
     clear_auth(request)
-    return redirect_to_sso()
+    response = RedirectResponse(url="/login-page", status_code=302)
+    response.delete_cookie("session")
+    return response

@@ -4,7 +4,8 @@ import io
 import pandas as pd
 import uvicorn
 from fastapi import Depends, FastAPI, File, Request, UploadFile
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from starlette.middleware.sessions import SessionMiddleware
@@ -17,11 +18,12 @@ from auth_routes import router as auth_router
 from auth_interceptor import AuthInterceptor
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # ─── Middleware ───────────────────────────────────────────────────────────────
-app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET)
 app.add_middleware(AuthInterceptor)
+app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET)
 
 # ─── SSO Routes (/home callback + /logout) ───────────────────────────────────
 app.include_router(auth_router)
@@ -29,7 +31,7 @@ app.include_router(auth_router)
 # ─── Exception Handler: redirect ไป SSO ถ้าไม่ได้ login ─────────────────────
 @app.exception_handler(NotAuthenticatedException)
 async def not_authenticated(request: Request, exc: NotAuthenticatedException):
-    return redirect_to_sso()
+    return RedirectResponse(url="/login-page", status_code=302)
 
 
 # ─── H2S Corrosion Data ───────────────────────────────────────────────────────

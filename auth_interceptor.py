@@ -26,7 +26,7 @@ class AuthInterceptor(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Response:
         # ดึง token จาก session (ถ้ามี)
         token: str | None = None
-        if hasattr(request, "session"):
+        if "session" in request.scope:
             token = request.session.get("token")
 
         # แนบ token ไว้ใน request.state ให้ทุก route ใช้ได้
