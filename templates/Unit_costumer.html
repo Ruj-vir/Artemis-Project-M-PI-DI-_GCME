@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -328,6 +328,336 @@
             display: flex; align-items: center; justify-content: center;
             height: 200px; color: #888; font-size: 17px;
         }
+
+        /* ── General Information ── */
+        .gi-wrapper { background: white; border: 1px solid #ccc; border-radius: 4px; }
+
+        .gi-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 10px 14px 6px;
+            border-bottom: 1px solid #ddd;
+            gap: 20px;
+        }
+        .gi-header-fields { display: flex; gap: 40px; flex-wrap: wrap; flex: 1; }
+        .gi-header-field { font-size: 13px; }
+        .gi-header-field .label { font-weight: bold; color: #111; }
+        .gi-header-field .value { color: #333; margin-left: 6px; }
+
+        .gi-header-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+        .gi-action-btn {
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            padding: 2px 0;
+        }
+        .gi-action-btn.edit { color: #1a1aff; }
+        .gi-action-btn.add  { color: #1a7a1a; }
+        .gi-action-btn:hover { text-decoration: underline; }
+
+        .gi-gradient-bar {
+            height: 4px;
+            background: linear-gradient(to right, #e8c84a, #d4701e, #3a3a8c);
+        }
+
+        /* Component section */
+        .gi-component {
+            border-top: 1px solid #ccc;
+        }
+        .gi-component-header {
+            background-color: #dce8f5;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+        .gi-component-header:hover { background-color: #ccdced; }
+        .gi-component-header .toggle-icon { font-size: 10px; color: #555; }
+
+        .gi-component-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            border-top: 1px solid #e0e0e0;
+        }
+        .gi-component-body.collapsed { display: none; }
+
+        .gi-col { padding: 10px 16px 12px; }
+        .gi-col:first-child { border-right: 1px solid #e0e0e0; }
+
+        .gi-field { display: flex; align-items: baseline; margin-bottom: 7px; font-size: 13px; }
+        .gi-field .f-label {
+            color: #333;
+            min-width: 180px;
+            flex-shrink: 0;
+        }
+        .gi-field .f-sep { color: #555; margin: 0 6px; }
+        .gi-field .f-value { color: #111; }
+        .gi-field .f-unit  { color: #555; margin-left: 8px; }
+        .gi-field .f-link  { color: #0000cc; text-decoration: underline; cursor: pointer; }
+
+        .gi-sub-block { margin-top: 4px; padding-left: 16px; }
+        .gi-sub-field { font-size: 13px; color: #333; margin-bottom: 4px; }
+
+        .gi-component-footer {
+            border-top: 1px solid #ccc;
+        }
+
+        /* ── Process Composition ── */
+        .pc-component-body { padding: 8px 20px 12px 32px; }
+        .pc-component-body.collapsed { display: none; }
+
+        .pc-chem-list {
+            list-style: decimal;
+            margin: 0;
+            padding-left: 20px;
+            font-size: 13px;
+        }
+        .pc-chem-list li {
+            padding: 3px 0;
+            display: flex;
+            align-items: baseline;
+            gap: 0;
+        }
+        .pc-chem-name  { display: inline-block; min-width: 80px; color: #111; }
+        .pc-chem-value { display: inline-block; min-width: 70px; color: #111; text-align: right; padding-right: 16px; }
+        .pc-chem-unit  { color: #333; }
+
+        /* ── Corrosion Manual ── */
+        .cm-action-links {
+            display: flex;
+            gap: 18px;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+        .cm-link { color: #1a1aff; text-decoration: underline; cursor: pointer; }
+        .cm-link:hover { color: #0000aa; }
+
+        .cm-table-wrap {
+            border: 1px solid #aaa;
+            overflow-x: auto;
+            max-height: 260px;
+            overflow-y: auto;
+            margin-bottom: 14px;
+        }
+        .cm-table-wrap::-webkit-scrollbar { width: 12px; height: 12px; }
+        .cm-table-wrap::-webkit-scrollbar-thumb { background: #c1c1c1; border: 2px solid #f1f1f1; }
+
+        .cm-table { border-collapse: collapse; font-size: 12px; width: 100%; }
+        .cm-table th {
+            background-color: #9dc3e6;
+            color: #000;
+            padding: 6px 10px;
+            border: 1px solid #7aaac8;
+            font-weight: bold;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .cm-table td {
+            padding: 4px 10px;
+            border: 1px solid #ccc;
+            background: white;
+            white-space: nowrap;
+            font-size: 12px;
+        }
+        .cm-table tr:nth-child(even) td { background-color: #f8f9fa; }
+        .cm-table tr:hover td { background-color: #dce8f5 !important; }
+
+        .cm-filter-btn {
+            font-size: 9px;
+            cursor: pointer;
+            margin-left: 4px;
+            color: #2b5797;
+            vertical-align: middle;
+        }
+
+        .cm-filter-popup {
+            position: fixed;
+            background: white;
+            border: 1px solid #aaa;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            border-radius: 4px;
+            z-index: 3000;
+            min-width: 140px;
+            font-size: 12px;
+            padding: 6px 0;
+        }
+        .cm-filter-option {
+            padding: 5px 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .cm-filter-option:hover { background: #eef4ff; }
+        .cm-filter-option input[type=checkbox] { cursor: pointer; }
+
+        /* Data Requirement */
+        .cm-data-req {
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 12px 16px 14px;
+        }
+        .cm-data-req-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .cm-data-req-sub { font-size: 12px; color: #333; }
+
+        .cm-tag-label {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .cm-comp-block { margin-bottom: 10px; }
+        .cm-comp-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            margin-bottom: 8px;
+        }
+        .cm-comp-header .toggle-icon { font-size: 10px; color: #555; }
+        .cm-comp-header:hover { color: #2b5797; }
+
+        .cm-comp-body { padding-left: 16px; }
+        .cm-comp-body.collapsed { display: none; }
+
+        .cm-damage-section {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        .cm-field-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .cm-field-label { min-width: 100px; color: #333; }
+        .cm-input {
+            width: 140px;
+            height: 26px;
+            border: 1px solid #aaa;
+            border-radius: 2px;
+            padding: 0 6px;
+            font-size: 12px;
+            outline: none;
+        }
+        .cm-select-wrap { position: relative; }
+        .cm-select {
+            height: 26px;
+            min-width: 120px;
+            border: 1px solid #aaa;
+            border-radius: 2px;
+            padding: 0 24px 0 6px;
+            font-size: 12px;
+            appearance: none;
+            -webkit-appearance: none;
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath d='M0 0l5 7 5-7z' fill='%23555'/%3E%3C/svg%3E") no-repeat right 7px center;
+            background-size: 8px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .cm-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .cm-btn-save {
+            background: #2b5797;
+            color: white;
+            border: none;
+            padding: 7px 28px;
+            font-size: 13px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .cm-btn-save:hover { background: #1e3f70; }
+        .cm-btn-cancel {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 7px 22px;
+            font-size: 13px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .cm-btn-cancel:hover { background: #545b62; }
+
+        /* ── Note textarea ── */
+        .note-textarea {
+            width: 100%;
+            min-height: 160px;
+            padding: 12px 14px;
+            font-size: 13px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border: 1.5px solid #9dc3e6;
+            border-radius: 10px;
+            resize: vertical;
+            outline: none;
+            color: #111;
+            line-height: 1.6;
+            box-sizing: border-box;
+        }
+        .note-textarea:focus {
+            border-color: #2b5797;
+            box-shadow: 0 0 0 2px rgba(43,87,151,0.15);
+        }
+
+        /* ── Data Requirement toggle buttons ── */
+        .toggle-btn-dr {
+            padding: 4px 14px;
+            border: 1.5px solid #c0d0e8;
+            border-radius: 5px;
+            background: white;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.15s;
+        }
+        .toggle-btn-dr:hover { border-color: #2b5797; color: #2b5797; }
+        .active-yes-dr { background: #27ae60 !important; border-color: #27ae60 !important; color: white !important; }
+        .active-no-dr  { background: #e74c3c !important; border-color: #e74c3c !important; color: white !important; }
+
+        /* ── Empty / no-tag state ── */
+        .no-tag-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 300px;
+            font-size: 15px;
+            color: #666;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -415,7 +745,7 @@
             <button class="tab" onclick="switchTab('general', this)">General Information</button>
             <button class="tab" onclick="switchTab('process', this)">Process Composition</button>
             <button class="tab" onclick="switchTab('corrosion', this)">Corrosion Manual</button>
-            <button class="tab" onclick="switchTab('loop', this)">Loop Detail</button>
+            <button class="tab" onclick="switchTab('loop', this)">Note</button>
         </div>
 
         <!-- ── Summary Panel ── -->
@@ -583,33 +913,386 @@
 
         <!-- ── General Information Panel ── -->
         <div id="tab-general" class="tab-panel">
-            <div class="placeholder-panel">
-                <i class="fa-solid fa-circle-info" style="margin-right:10px; color:#2b5797;"></i>
-                General Information — (content coming soon)
+            <div id="gi-empty-state" class="no-tag-state" style="display:none;">
+                There is no selected tag, please add or select tag.
+            </div>
+            <div id="gi-content" class="gi-wrapper">
+
+                <!-- Header: Tag Name / Equipment Name / Edit / Add component -->
+                <div class="gi-header">
+                    <div class="gi-header-fields">
+                        <div class="gi-header-field">
+                            <span class="label">Tag Name</span>
+                            <span class="f-sep">:</span>
+                            <span class="value">Equipment 1</span>
+                        </div>
+                        <div class="gi-header-field">
+                            <span class="label">Equipment Name</span>
+                            <span class="f-sep">:</span>
+                            <span class="value">Test equipment 1</span>
+                        </div>
+                        <div class="gi-header-field" style="align-self:center;">
+                            <span class="label">Equipment type</span>
+                            <span class="f-sep">:</span>
+                            <span class="value">Vessel</span>
+                        </div>
+                    </div>
+                    <div class="gi-header-actions">
+                        <button class="gi-action-btn edit">
+                            <i class="fa-solid fa-pencil" style="font-size:11px;"></i> Edit
+                        </button>
+                        <button class="gi-action-btn add">
+                            <i class="fa-solid fa-circle-plus" style="font-size:12px;"></i> Add component
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Gradient bar -->
+                <div class="gi-gradient-bar"></div>
+
+                <!-- Component: Top shell (expanded) -->
+                <div class="gi-component">
+                    <div class="gi-component-header" onclick="toggleComponent(this)">
+                        <span class="toggle-icon">&#9660;</span>
+                        <span>Component</span>
+                        <span style="margin-left:8px;">: Top shell</span>
+                    </div>
+                    <div class="gi-component-body">
+                        <!-- Left column -->
+                        <div class="gi-col">
+                            <div class="gi-field">
+                                <span class="f-label">Material grade</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">A XX <span class="f-link">Gr.B</span></span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Material type</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">Carbon Steel</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Material Group</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">Carbon Steel</span>
+                            </div>
+                            <div class="gi-field" style="align-items:flex-start;">
+                                <span class="f-label">Cladding/lining</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">
+                                    Internal Cladding/lining
+                                    <div class="gi-sub-block">
+                                        <div class="gi-sub-field">Material : FRP</div>
+                                        <div class="gi-sub-field">Material group : Polymer</div>
+                                        <div class="gi-sub-field">Thickness : 2 mm</div>
+                                    </div>
+                                </span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Design Code</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">-</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Fluid Name</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">XXXXXX</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Fluid phase</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">Vapor and Liquid</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Operating Pressure</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">22</span>
+                                <span class="f-unit">Bar</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Operating Temperature</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">124</span>
+                                <span class="f-unit">°C</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Design Pressure</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">140</span>
+                                <span class="f-unit">Bar</span>
+                            </div>
+                        </div>
+                        <!-- Right column -->
+                        <div class="gi-col">
+                            <div class="gi-field">
+                                <span class="f-label">Design Temperature</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">200</span>
+                                <span class="f-unit">°C</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Operating Velocity</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">23</span>
+                                <span class="f-unit">m/s</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Design Velocity</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">45</span>
+                                <span class="f-unit">m/s</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Cycling/Sweating Operation</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">No</span>
+                            </div>
+                            <div class="gi-field" style="align-items:flex-start;">
+                                <span class="f-label" style="min-width:220px;">Post Weld Heat Treatment (PWHT) / stress relief</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">Yes</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Insulation</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">No</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Fire-Proofing</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">No</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Environment</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">Moderated industrial</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Traced and Jacketed</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">No</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Coating</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">No</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Outer Diameter</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">1200</span>
+                                <span class="f-unit">mm</span>
+                            </div>
+                            <div class="gi-field">
+                                <span class="f-label">Inner Diameter</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">1150</span>
+                                <span class="f-unit">mm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Component: Bottom shell (collapsed) -->
+                <div class="gi-component gi-component-footer">
+                    <div class="gi-component-header" onclick="toggleComponent(this)">
+                        <span class="toggle-icon">&#9650;</span>
+                        <span>Component</span>
+                        <span style="margin-left:8px;">: Bottom shell</span>
+                    </div>
+                    <div class="gi-component-body collapsed">
+                        <div class="gi-col">
+                            <div class="gi-field">
+                                <span class="f-label">Material grade</span>
+                                <span class="f-sep">:</span>
+                                <span class="f-value">-</span>
+                            </div>
+                        </div>
+                        <div class="gi-col"></div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
         <!-- ── Process Composition Panel ── -->
         <div id="tab-process" class="tab-panel">
-            <div class="placeholder-panel">
-                <i class="fa-solid fa-flask" style="margin-right:10px; color:#2b5797;"></i>
-                Process Composition — (content coming soon)
+            <div id="pc-empty-state" class="no-tag-state" style="display:none;">
+                There is no selected tag, please add or select tag.
+            </div>
+            <div id="pc-content" class="gi-wrapper">
+
+                <!-- Header -->
+                <div class="gi-header">
+                    <div class="gi-header-fields">
+                        <div class="gi-header-field">
+                            <span class="label">Tag Name</span>
+                            <span class="f-sep">:</span>
+                            <span class="value">Equipment 1</span>
+                        </div>
+                        <div class="gi-header-field">
+                            <span class="label">Equipment Name</span>
+                            <span class="f-sep">:</span>
+                            <span class="value">Test equipment 1</span>
+                        </div>
+                        <div class="gi-header-field" style="align-self:center;">
+                            <span class="label">Equipment type</span>
+                            <span class="f-sep">:</span>
+                            <span class="value">Vessel</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gradient bar -->
+                <div class="gi-gradient-bar"></div>
+
+                <!-- Component: Top shell (expanded) -->
+                <div class="gi-component">
+                    <div class="gi-component-header pc-comp-header" onclick="togglePcComponent(this)">
+                        <span class="toggle-icon">&#9660;</span>
+                        <span>Component</span>
+                        <span style="margin-left:8px;">: Top shell</span>
+                        <button class="gi-action-btn edit" style="margin-left:16px; font-size:12px;">
+                            <i class="fa-solid fa-pencil" style="font-size:11px;"></i> Edit
+                        </button>
+                    </div>
+                    <div class="pc-component-body">
+                        <ol class="pc-chem-list">
+                            <li>
+                                <span class="pc-chem-name">CO2</span>
+                                <span class="pc-chem-value">0.13</span>
+                                <span class="pc-chem-unit">%mol</span>
+                            </li>
+                            <li>
+                                <span class="pc-chem-name">H2O</span>
+                                <span class="pc-chem-value">28.9</span>
+                                <span class="pc-chem-unit">%mol</span>
+                            </li>
+                            <li>
+                                <span class="pc-chem-name">H2S</span>
+                                <span class="pc-chem-value">0.20</span>
+                                <span class="pc-chem-unit">%mol</span>
+                            </li>
+                            <li>
+                                <span class="pc-chem-name">Silicon</span>
+                                <span class="pc-chem-value">0.20</span>
+                                <span class="pc-chem-unit">%mol</span>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Component: Bottom shell (collapsed) -->
+                <div class="gi-component gi-component-footer">
+                    <div class="pc-comp-header gi-component-header" onclick="togglePcComponent(this)">
+                        <span class="toggle-icon">&#9650;</span>
+                        <span>Component</span>
+                        <span style="margin-left:8px;">: Bottom shell</span>
+                        <button class="gi-action-btn edit" style="margin-left:16px; font-size:12px;">
+                            <i class="fa-solid fa-pencil" style="font-size:11px;"></i> Edit
+                        </button>
+                    </div>
+                    <div class="pc-component-body collapsed">
+                        <ol class="pc-chem-list">
+                            <li>
+                                <span class="pc-chem-name">CO2</span>
+                                <span class="pc-chem-value">0.13</span>
+                                <span class="pc-chem-unit">%mol</span>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
             </div>
         </div>
 
         <!-- ── Corrosion Manual Panel ── -->
-        <div id="tab-corrosion" class="tab-panel">
-            <div class="placeholder-panel">
-                <i class="fa-solid fa-book" style="margin-right:10px; color:#2b5797;"></i>
-                Corrosion Manual — (content coming soon)
+        <div id="tab-corrosion" class="tab-panel" style="padding:12px 16px;">
+
+            <!-- Top action links -->
+            <div class="cm-action-links">
+                <a href="#" class="cm-link">View PFD, P&amp;ID and Related Documents</a>
+                <a href="#" class="cm-link">Edit on browser</a>
+                <a href="#" class="cm-link" onclick="openImportModal();return false;">Import</a>
+                <a href="#" class="cm-link">Export</a>
             </div>
+
+            <!-- Susceptibility table -->
+            <div class="cm-table-wrap">
+                <table class="cm-table" id="cmTable">
+                    <thead>
+                        <tr>
+                            <th>Tag <span class="cm-filter-btn" onclick="openCmFilter('tag',this)">&#9660;</span></th>
+                            <th>Component <span class="cm-filter-btn" onclick="openCmFilter('component',this)">&#9660;</span></th>
+                            <th>H2S/H2 <span class="cm-filter-btn" onclick="openCmFilter('d1',this)">&#9660;</span></th>
+                            <th>Flue Gas <span class="cm-filter-btn" onclick="openCmFilter('d2',this)">&#9660;</span></th>
+                            <th>HCl <span class="cm-filter-btn" onclick="openCmFilter('d3',this)">&#9660;</span></th>
+                            <th>HTHA <span class="cm-filter-btn" onclick="openCmFilter('d4',this)">&#9660;</span></th>
+                            <th>Sulfidation <span class="cm-filter-btn" onclick="openCmFilter('d5',this)">&#9660;</span></th>
+                            <th>Thermal Shock <span class="cm-filter-btn" onclick="openCmFilter('d6',this)">&#9660;</span></th>
+                            <th>HF <span class="cm-filter-btn" onclick="openCmFilter('d7',this)">&#9660;</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cmTableBody">
+                        <tr id="cmEmptyRow">
+                            <td colspan="9" style="text-align:center;color:#999;padding:20px;font-style:italic;">
+                                ยังไม่มีข้อมูล — กรุณากด Import เพื่อนำเข้าจาก Excel
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Filter dropdown popup -->
+            <div id="cmFilterPopup" class="cm-filter-popup" style="display:none;">
+                <div class="cm-filter-options" id="cmFilterOptions"></div>
+            </div>
+
+            <!-- Data Requirement section (populated dynamically after Import) -->
+            <div class="cm-data-req" id="cmDataReq">
+                <div class="cm-data-req-title">
+                    <strong>Data Requirement</strong>
+                </div>
+                <div id="cmDataReqBody" style="color:#999;font-size:13px;font-style:italic;padding:8px 0;">
+                    Import Excel ก่อนเพื่อดู Data Requirement
+                </div>
+            </div>
+
         </div>
 
-        <!-- ── Loop Detail Panel ── -->
+        <!-- ── Note Panel ── -->
         <div id="tab-loop" class="tab-panel">
-            <div class="placeholder-panel">
-                <i class="fa-solid fa-diagram-project" style="margin-right:10px; color:#2b5797;"></i>
-                Loop Detail — (content coming soon)
+            <div class="gi-wrapper">
+
+                <!-- Header -->
+                <div class="gi-header">
+                    <div class="gi-header-fields">
+                        <div class="gi-header-field">
+                            <span class="label">Tag Name</span>
+                            <span class="f-sep">:</span>
+                            <span class="value">Equipment 1</span>
+                        </div>
+                        <div class="gi-header-field">
+                            <span class="label">Equipment Name</span>
+                            <span class="f-sep">:</span>
+                            <span class="value">Test equipment 1</span>
+                        </div>
+                        <div class="gi-header-field" style="align-self:center;">
+                            <span class="label">Equipment type</span>
+                            <span class="f-sep">:</span>
+                            <span class="value">Vessel</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gradient bar -->
+                <div class="gi-gradient-bar"></div>
+
+                <!-- Note textarea -->
+                <div style="padding:16px 20px 20px;">
+                    <div style="font-size:13px; font-weight:bold; margin-bottom:8px; color:#111;">Note:</div>
+                    <textarea class="note-textarea" placeholder=""></textarea>
+                </div>
+
             </div>
         </div>
 
@@ -619,12 +1302,12 @@
 <script>
     // ── Read URL params → set header breadcrumb ──────────────────────
     (function() {
-        var params = new URLSearchParams(window.location.search);
-        var plant = params.get('plant') || 'Plant 1';
-        var unit  = params.get('unit')  || 'Unit 1000';
+        var params  = new URLSearchParams(window.location.search);
+        var company = params.get('company') || 'Company';
+        var plant   = params.get('plant')   || 'Plant';
+        var unit    = params.get('unit')    || 'Unit';
         document.getElementById('pageBrand').textContent =
-            'Artemis: Company 1 \u003e ' + plant + ' \u003e ' + unit;
-        document.title = 'Artemis - ' + plant + ' - ' + unit;
+            'Artemis: ' + company + ' > ' + plant + ' > ' + unit;
     })();
 
     // ── Tab switching ────────────────────────────────────────────────
@@ -674,9 +1357,27 @@
         }).then(function(result) {
             if (result.isConfirmed) {
                 btn.closest('li').remove();
+                checkTagsEmpty();
                 Swal.fire({ title: 'ลบเรียบร้อย!', icon: 'success', timer: 1200, showConfirmButton: false });
             }
         });
+    }
+
+    // ── Check if all tags deleted → show empty state ─────────────────
+    function checkTagsEmpty() {
+        var equipCount  = document.querySelectorAll('#equipList li').length;
+        var pipingCount = document.querySelectorAll('#pipingList li').length;
+        var isEmpty = (equipCount + pipingCount) === 0;
+
+        var giEmpty   = document.getElementById('gi-empty-state');
+        var giContent = document.getElementById('gi-content');
+        var pcEmpty   = document.getElementById('pc-empty-state');
+        var pcContent = document.getElementById('pc-content');
+
+        if (giEmpty)   giEmpty.style.display   = isEmpty ? 'flex' : 'none';
+        if (giContent) giContent.style.display  = isEmpty ? 'none' : '';
+        if (pcEmpty)   pcEmpty.style.display    = isEmpty ? 'flex' : 'none';
+        if (pcContent) pcContent.style.display  = isEmpty ? 'none' : '';
     }
 
     // ── Add new corrosion loop ───────────────────────────────────────
@@ -712,15 +1413,470 @@
         if (e.target === this) closeClModal();
     });
 
+    // ── Corrosion Manual: toggle component ───────────────────────────
+    function toggleCmComp(header) {
+        var body = header.nextElementSibling;
+        var icon = header.querySelector('.toggle-icon');
+        if (body.classList.contains('collapsed')) {
+            body.classList.remove('collapsed');
+            icon.innerHTML = '&#9660;';
+        } else {
+            body.classList.add('collapsed');
+            icon.innerHTML = '&#9650;';
+        }
+    }
+
+    // ── Corrosion Manual: column filter popup ─────────────────────────
+    var _cmFilterCol = null;
+    var _cmFilterBtn = null;
+
+    function openCmFilter(col, btn) {
+        var popup = document.getElementById('cmFilterPopup');
+        var optDiv = document.getElementById('cmFilterOptions');
+
+        if (popup.style.display !== 'none' && _cmFilterCol === col) {
+            popup.style.display = 'none';
+            return;
+        }
+        _cmFilterCol = col;
+        _cmFilterBtn = btn;
+
+        var colIndex = { tag:0, component:1, d1:2, d2:3, d3:4, d4:5, d5:6, d6:7, d7:8 }[col];
+        var rows = document.querySelectorAll('#cmTable tbody tr:not(#cmEmptyRow)');
+        var values = new Set(['(All)']);
+        rows.forEach(function(row) {
+            var cell = row.cells[colIndex];
+            if (cell) values.add(cell.innerText.trim() || '(Blank)');
+        });
+
+        optDiv.innerHTML = '';
+        values.forEach(function(val) {
+            var label = document.createElement('label');
+            label.className = 'cm-filter-option';
+            var cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.checked = true;
+            cb.value = val;
+            cb.onchange = function() { applyCmFilter(col); };
+            label.appendChild(cb);
+            label.appendChild(document.createTextNode(val));
+            optDiv.appendChild(label);
+        });
+
+        var rect = btn.getBoundingClientRect();
+        popup.style.top  = (rect.bottom + 4) + 'px';
+        popup.style.left = rect.left + 'px';
+        popup.style.display = 'block';
+    }
+
+    function applyCmFilter(col) {
+        var colIndex = { tag:0, component:1, d1:2, d2:3, d3:4, d4:5, d5:6, d6:7, d7:8 }[col];
+        var checked = Array.from(document.querySelectorAll('#cmFilterOptions input:checked')).map(function(cb) { return cb.value; });
+        var rows = document.querySelectorAll('#cmTable tbody tr');
+        rows.forEach(function(row) {
+            var cell = row.cells[colIndex];
+            var val = cell ? (cell.innerText.trim() || '(Blank)') : '(Blank)';
+            row.style.display = (checked.includes('(All)') || checked.includes(val)) ? '' : 'none';
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+        var popup = document.getElementById('cmFilterPopup');
+        if (popup && popup.style.display !== 'none') {
+            if (!popup.contains(e.target) && !e.target.classList.contains('cm-filter-btn')) {
+                popup.style.display = 'none';
+            }
+        }
+    });
+
+    // ── Import Modal ─────────────────────────────────────────────────
+    function openImportModal() {
+        document.getElementById('importFileName').value = '';
+        document.getElementById('importFileInput').value = '';
+        document.getElementById('importModal').style.display = 'flex';
+    }
+    function closeImportModal() {
+        document.getElementById('importModal').style.display = 'none';
+    }
+    // ── Populate Corrosion Manual table from API results ─────────────────────
+    function populateCmTable(data) {
+        var levelClass = {
+            'High': 'cell-high', 'Medium': 'cell-medium',
+            'Low': 'cell-low',   'Negligible': 'cell-negligible',
+            'Not Susceptible': 'cell-na', 'N/A': ''
+        };
+
+        var tbody = document.getElementById('cmTableBody');
+        tbody.innerHTML = '';
+
+        if (!data || !Array.isArray(data) || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#999;padding:20px;font-style:italic;">ไม่มีข้อมูลในไฟล์</td></tr>';
+            return;
+        }
+
+        var mechs  = ['H2S','FlueGas','HCl','HTHA','Sulfidation','ThermalShock','HF'];
+        var counts = { Negligible:0, Low:0, Medium:0, High:0 };
+        var total  = 0;
+
+        data.forEach(function(row) {
+            var tr = document.createElement('tr');
+            tr.dataset.tag  = row.tag  || '';
+            tr.dataset.comp = row.component || '';
+
+            var esc = function(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+            var html = '<td>' + esc(row.tag) + '</td><td>' + esc(row.component) + '</td>';
+
+            mechs.forEach(function(m) {
+                var val = (row[m] !== undefined && row[m] !== null) ? String(row[m]) : '';
+                var cls = levelClass[val] || '';
+                html += '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + val + '</td>';
+                if (val && val !== 'N/A' && val !== 'Not Susceptible' && counts[val] !== undefined) {
+                    counts[val]++; total++;
+                }
+            });
+
+            tr.innerHTML = html;
+            tbody.appendChild(tr);
+        });
+
+        // Update summary bars
+        var order = ['Negligible','Low','Medium','High'];
+        var bars  = document.querySelectorAll('.bar-track');
+        var blbls = document.querySelectorAll('.bar-label');
+        order.forEach(function(lvl, i) {
+            var pct = total > 0 ? ((counts[lvl]||0)/total*100).toFixed(1) : '0.0';
+            if (bars[i])  { bars[i].style.width = pct+'%'; bars[i].textContent = pct+'%'; }
+            if (blbls[i]) { blbls[i].textContent = lvl; }
+        });
+    }
+
+    // ── Real Import: upload Excel → /api/analyze_excel ───────────────────────
+    function saveImport() {
+        var file = document.getElementById('importFileInput').files[0];
+        if (!file) { Swal.fire('กรุณาเลือกไฟล์', '', 'warning'); return; }
+
+        var formData = new FormData();
+        formData.append('file', file);
+
+        closeImportModal();
+        Swal.fire({ title: 'กำลังวิเคราะห์...', html: 'รอสักครู่ กำลังรัน 7 Damage Mechanism', allowOutsideClick: false, didOpen: function(){ Swal.showLoading(); } });
+
+        fetch('/api/analyze_excel', { method: 'POST', body: formData })
+            .then(function(r) {
+                if (!r.ok) return r.json().then(function(e){ throw new Error(e.error || 'Server error ' + r.status); });
+                return r.json();
+            })
+            .then(function(data) {
+                Swal.close();
+                if (data.error) { Swal.fire('Error', data.error, 'error'); return; }
+                populateCmTable(data);
+                buildDataRequirement(data);
+                Swal.fire({ title: 'วิเคราะห์สำเร็จ!', text: 'พบ ' + data.length + ' รายการ', icon: 'success', timer: 2000, showConfirmButton: false });
+                // Switch to Corrosion Manual tab
+                var cmTab = document.querySelector('.tab:nth-child(4)');
+                if (cmTab) switchTab('corrosion', cmTab);
+            })
+            .catch(function(err) {
+                Swal.close();
+                Swal.fire('เกิดข้อผิดพลาด', err.message, 'error');
+            });
+    }
+
+    // ── Toggle Process Composition component ─────────────────────────
+    function togglePcComponent(header) {
+        var body = header.nextElementSibling;
+        var icon = header.querySelector('.toggle-icon');
+        if (body.classList.contains('collapsed')) {
+            body.classList.remove('collapsed');
+            icon.innerHTML = '&#9660;';
+        } else {
+            body.classList.add('collapsed');
+            icon.innerHTML = '&#9650;';
+        }
+    }
+
+    // ── Toggle component section ─────────────────────────────────────
+    function toggleComponent(header) {
+        var body = header.nextElementSibling;
+        var icon = header.querySelector('.toggle-icon');
+        if (body.classList.contains('collapsed')) {
+            body.classList.remove('collapsed');
+            icon.innerHTML = '&#9660;';
+        } else {
+            body.classList.add('collapsed');
+            icon.innerHTML = '&#9650;';
+        }
+    }
+
+    // ── Global store for analysis results ───────────────────────────
+    var _cmData = [];
+
+    // ── Build Data Requirement section after import ──────────────────
+    function buildDataRequirement(data) {
+        _cmData = data;
+        var body = document.getElementById('cmDataReqBody');
+        body.innerHTML = '';
+
+        // Group by tag
+        var tagGroups = {};
+        data.forEach(function(row) {
+            if (!tagGroups[row.tag]) tagGroups[row.tag] = [];
+            tagGroups[row.tag].push(row);
+        });
+
+        var hasMissing = false;
+        var rowIdx = 0;  // unique index per component block, ไม่ขึ้นกับชื่อ
+
+        Object.keys(tagGroups).forEach(function(tag) {
+            var rows = tagGroups[tag];
+            var tagBlock = document.createElement('div');
+            var tagHtml  = '<div class="cm-tag-label">' + esc(tag) + '</div>';
+
+            rows.forEach(function(row) {
+                var info = buildMissingMechs(row);
+                if (!info.hasAnything) return;
+                hasMissing = true;
+
+                var sid = 'r' + rowIdx;  // unique: r0, r1, r2, ...
+                rowIdx++;
+
+                tagHtml += '<div class="cm-comp-block">';
+                tagHtml += '<div class="cm-comp-header" onclick="toggleCmComp(this)">';
+                tagHtml += '<span class="toggle-icon">&#9660;</span><span>Component</span>';
+                tagHtml += '<span style="margin-left:8px;color:#2b5797;font-weight:bold;">: ' + esc(row.component) + '</span>';
+                tagHtml += '</div>';
+                tagHtml += '<div class="cm-comp-body" data-sid="' + sid + '" data-tag="' + esc(row.tag) + '" data-comp="' + esc(row.component) + '">';
+
+                // ── Common fields (temp / DCR) — shown ONCE ────────────────
+                if (info.commonFields.length > 0) {
+                    if (info.naLabels.length > 0) {
+                        tagHtml += '<div class="cm-damage-section">ข้อมูลที่ขาด (มีผลต่อ: ' + info.naLabels.join(', ') + ')</div>';
+                    }
+                    info.commonFields.forEach(function(f) {
+                        tagHtml += '<div class="cm-field-row">';
+                        tagHtml += '<label class="cm-field-label">' + f.label + '</label>';
+                        tagHtml += '<input type="number" class="cm-input" id="' + f.id + '_' + sid + '"';
+                        tagHtml += ' placeholder="' + (f.placeholder||'') + '" step="any">';
+                        if (f.unit) tagHtml += '<span style="margin-left:6px;font-size:12px;color:#555;">' + f.unit + '</span>';
+                        tagHtml += '</div>';
+                    });
+                }
+
+                // ── Per-mechanism chemical toggles ─────────────────────────
+                info.chemMechs.forEach(function(m) {
+                    tagHtml += '<div class="cm-damage-section" style="margin-top:10px;">' + m.name + '</div>';
+                    tagHtml += '<div style="font-size:12px;color:#888;margin-bottom:8px;">' + m.note + '</div>';
+                    m.fields.forEach(function(f) {
+                        tagHtml += '<div class="cm-field-row">';
+                        tagHtml += '<label class="cm-field-label">' + f.label + '</label>';
+                        if (f.type === 'toggle') {
+                            tagHtml += '<div style="display:flex;gap:6px;">';
+                            tagHtml += '<button class="toggle-btn-dr" data-field="' + f.id + '" data-val="YES" onclick="setDrToggle(this)">YES</button>';
+                            tagHtml += '<button class="toggle-btn-dr" data-field="' + f.id + '" data-val="NO"  onclick="setDrToggle(this)">NO</button>';
+                            tagHtml += '</div>';
+                        } else {
+                            tagHtml += '<input type="number" class="cm-input" id="' + f.id + '_' + sid + '"';
+                            tagHtml += ' placeholder="' + (f.placeholder||'') + '" step="any">';
+                            if (f.unit) tagHtml += '<span style="margin-left:6px;font-size:12px;color:#555;">' + f.unit + '</span>';
+                        }
+                        tagHtml += '</div>';
+                    });
+                });
+
+                tagHtml += '</div></div>';
+            });
+
+            tagBlock.innerHTML = tagHtml;
+            body.appendChild(tagBlock);
+        });
+
+        if (!hasMissing) {
+            body.innerHTML = '<div style="color:#27ae60;font-size:13px;padding:8px 0;"><i class="fa-solid fa-circle-check"></i> ข้อมูลครบทุก Damage Mechanism แล้ว</div>';
+            return;
+        }
+
+        // Save / Cancel buttons
+        var actions = document.createElement('div');
+        actions.className = 'cm-actions';
+        actions.innerHTML = '<button class="cm-btn-save" onclick="saveDataRequirement()">Save &amp; Recalculate</button>' +
+                            '<button class="cm-btn-cancel" onclick="buildDataRequirement(_cmData)">Reset</button>';
+        body.appendChild(actions);
+    }
+
+    // Returns { hasAnything, commonFields, chemMechs, naLabels }
+    // commonFields = temp/DCR inputs shown ONCE per component (no duplicate IDs)
+    // chemMechs    = per-mechanism chemical toggle sections
+    // naLabels     = list of mechanism names that are N/A due to missing data
+    function buildMissingMechs(row) {
+        var needTemp = row.temp_missing || false;
+        var needDcr  = row.dcr_missing  || false;
+
+        // Collect which mechanisms are N/A due to missing numerical data
+        var naLabels = [];
+        if (row.H2S       === 'N/A' && !row.HCl_missing)  naLabels.push('H2S / H2 Corrosion');
+        if (row.FlueGas   === 'N/A')                        naLabels.push('Flue Gas Dew Point');
+        if (row.HCl       === 'N/A' && !row.HCl_missing)   naLabels.push('HCl Corrosion');
+        if (row.Sulfidation === 'N/A')                      naLabels.push('Sulfidation');
+        if (row.HF        === 'N/A' && !row.HF_missing)    naLabels.push('HF Corrosion');
+
+        // Common fields (ONE set per component, no duplicate IDs)
+        var commonFields = [];
+        if (naLabels.length > 0 || needTemp || needDcr) {
+            if (needTemp || row.FlueGas === 'N/A') commonFields.push({ id:'op_temp',   label:'Operating Temperature', type:'number', unit:'°C',   placeholder:'e.g. 120' });
+            commonFields.push({ id:'design_cr', label:'Design Corrosion Rate', type:'number', unit:'mm/y', placeholder:'e.g. 1.0' });
+        }
+
+        // Per-mechanism chemical toggles
+        var chemMechs = [];
+        if (row.HCl  === 'N/A' && row.HCl_missing)  chemMechs.push({ name:'HCl Corrosion',  note:'ไม่พบ HCl/Chloride ใน Fluid — ยืนยันว่ามีหรือไม่?',       fields:[{ id:'hcl_present', label:'HCl Present in Stream?', type:'toggle' }] });
+        if (row.HTHA === 'N/A' && row.HTHA_missing)  chemMechs.push({ name:'HTHA',            note:'ไม่พบ H₂/Hydrogen ใน Fluid — ยืนยันว่ามีหรือไม่?',         fields:[{ id:'h2_present', label:'H₂ Present in Stream?', type:'toggle' }, { id:'h2_pp', label:'H₂ Partial Pressure', type:'number', unit:'psia', placeholder:'e.g. 50' }] });
+        if (row.HF   === 'N/A' && row.HF_missing)    chemMechs.push({ name:'HF Corrosion',   note:'ไม่พบ HF/Hydrofluoric ใน Fluid — ยืนยันว่ามีหรือไม่?',     fields:[{ id:'hf_present', label:'HF Present in Stream?', type:'toggle' }] });
+
+        return { hasAnything: commonFields.length > 0 || chemMechs.length > 0, commonFields, chemMechs, naLabels };
+    }
+
+    function setDrToggle(btn) {
+        var field   = btn.dataset.field;
+        var val     = btn.dataset.val;
+        var parent  = btn.parentElement;
+        var already = btn.classList.contains('active-yes-dr') || btn.classList.contains('active-no-dr');
+
+        // Clear all buttons in this group
+        parent.querySelectorAll('.toggle-btn-dr').forEach(function(b) {
+            b.classList.remove('active-yes-dr', 'active-no-dr');
+        });
+
+        // If was already active → clicking again = deselect (do nothing more)
+        if (!already) {
+            btn.classList.add(val === 'YES' ? 'active-yes-dr' : 'active-no-dr');
+        }
+    }
+
+    function getDrToggleVal(compBody, fieldId) {
+        var yes = compBody.querySelector('.toggle-btn-dr[data-field="' + fieldId + '"].active-yes-dr');
+        if (yes) return 'YES';
+        var no  = compBody.querySelector('.toggle-btn-dr[data-field="' + fieldId + '"].active-no-dr');
+        if (no)  return 'NO';
+        return null; // ยังไม่เลือก
+    }
+
+    function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function safeId(s) { return String(s||'').replace(/[^a-zA-Z0-9]/g,'_'); }
+
+    // ── Save & Recalculate ────────────────────────────────────────────
+    function saveDataRequirement() {
+        var compBodies = document.querySelectorAll('#cmDataReqBody .cm-comp-body');
+        if (compBodies.length === 0) return;
+
+        var promises = [];
+        compBodies.forEach(function(cb) {
+            var tag  = cb.dataset.tag;
+            var comp = cb.dataset.comp;
+            var rowData = _cmData.find(function(r){ return r.tag === tag && r.component === comp; });
+            if (!rowData) return;
+
+            var sid = cb.dataset.sid;  // อ่านจาก data-sid ที่ unique เสมอ
+
+            function numVal(id) {
+                var el = document.getElementById(id + '_' + sid);
+                return el && el.value !== '' ? parseFloat(el.value) : null;
+            }
+
+            var payload = {
+                tag:               tag,
+                component:         comp,
+                material:          rowData.material,
+                op_temp:           rowData.op_temp,
+                op_temp_override:  numVal('op_temp'),
+                ph:                rowData.ph || 7.0,
+                design_cr:         rowData.design_cr != null ? rowData.design_cr : null,
+                design_cr_override: numVal('design_cr'),
+                acr:               rowData.acr || null,
+                equip_type:        rowData.equip_type || '',
+                cycling:           'No',
+                hcl_present: getDrToggleVal(cb, 'hcl_present') || 'SKIP',
+                h2_present:  getDrToggleVal(cb, 'h2_present')  || 'SKIP',
+                h2_pp:       numVal('h2_pp') || 50,
+                hf_present:  getDrToggleVal(cb, 'hf_present')  || 'SKIP'
+            };
+
+            promises.push(
+                fetch('/api/recalculate_row', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(updated) {
+                    var idx = _cmData.findIndex(function(r){ return r.tag === tag && r.component === comp; });
+                    if (idx < 0) return;
+                    var MECHS = ['H2S','FlueGas','HCl','HTHA','Sulfidation','ThermalShock','HF'];
+                    MECHS.forEach(function(m) { if (updated[m] !== undefined) _cmData[idx][m] = updated[m]; });
+                    ['HCl_missing','HTHA_missing','HF_missing','dcr_missing','temp_missing'].forEach(function(k) {
+                        if (updated[k] !== undefined) _cmData[idx][k] = updated[k];
+                    });
+                    // Update override values into the row so next rebuild reflects them
+                    if (payload.op_temp_override  !== null) _cmData[idx].op_temp   = payload.op_temp_override;
+                    if (payload.design_cr_override !== null) _cmData[idx].design_cr = payload.design_cr_override;
+                })
+                .catch(function(err) { console.error('recalc error:', tag, comp, err); })
+            );
+        });
+
+        Promise.all(promises).then(function() {
+            populateCmTable(_cmData);
+            buildDataRequirement(_cmData);
+            Swal.fire({ title: 'คำนวณใหม่แล้ว!', icon: 'success', timer: 1500, showConfirmButton: false });
+        });
+    }
+
     // ── Add new tag ──────────────────────────────────────────────────
     function addTag() {
-        var params = new URLSearchParams(window.location.search);
-        var plant = params.get('plant') || 'Plant 1';
-        var unit  = params.get('unit')  || 'Unit 1000';
-        window.location.href = '/add_tag_from_unit?plant=' + encodeURIComponent(plant) + '&unit=' + encodeURIComponent(unit);
+        var params  = new URLSearchParams(window.location.search);
+        var company = params.get('company') || '';
+        var plant   = params.get('plant')   || '';
+        var unit    = params.get('unit')    || '';
+        window.location.href = '/add_tag_from_unit?company=' + encodeURIComponent(company) + '&plant=' + encodeURIComponent(plant) + '&unit=' + encodeURIComponent(unit);
     }
 </script>
 
+
+<!-- ── Import Excel Modal ── -->
+<div id="importModal" style="
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.35); z-index:2000;
+    justify-content:center; align-items:center;"
+    onclick="if(event.target===this)closeImportModal()">
+    <div style="
+        background:#dce8f8; border-radius:12px; padding:28px 32px 24px;
+        width:400px; box-shadow:0 6px 24px rgba(0,0,0,0.3);
+        font-family:'Segoe UI',sans-serif;">
+        <h2 style="text-align:center; font-size:17px; font-weight:bold; color:#000; margin-bottom:22px;">
+            Import excel
+        </h2>
+        <div style="font-size:12px; color:#555; margin-bottom:6px;">Upload excel</div>
+        <div style="display:flex; border:1px solid #7a9fd4; border-radius:5px; overflow:hidden; background:white; margin-bottom:5px;">
+            <input type="text" id="importFileName" readonly placeholder=""
+                style="flex:1; border:none; outline:none; padding:8px 10px; font-size:13px; background:white; cursor:default;">
+            <label for="importFileInput" style="
+                background:#f0f0f0; border-left:1px solid #7a9fd4;
+                padding:8px 14px; font-size:13px; cursor:pointer;
+                display:flex; align-items:center; white-space:nowrap;
+                color:#333;">Browse</label>
+            <input type="file" id="importFileInput" accept=".xlsx,.xls" style="display:none"
+                onchange="document.getElementById('importFileName').value=this.files[0]?this.files[0].name:''">
+        </div>
+        <div style="font-size:11px; color:#555; margin-bottom:24px;">(Microsoft excel)</div>
+        <div style="display:flex; justify-content:center; gap:14px;">
+            <button onclick="saveImport()" style="
+                background:#2b5797; color:white; border:none; padding:9px 32px;
+                font-size:14px; border-radius:6px; cursor:pointer; font-weight:600;">Save</button>
+            <button onclick="closeImportModal()" style="
+                background:#5a6a80; color:white; border:none; padding:9px 22px;
+                font-size:14px; border-radius:6px; cursor:pointer; font-weight:600;">Cancel</button>
+        </div>
+    </div>
+</div>
 
 <!-- ── Add Corrosion Loop Modal ── -->
 <div id="clModal" style="
@@ -757,3 +1913,4 @@
 
 </body>
 </html>
+

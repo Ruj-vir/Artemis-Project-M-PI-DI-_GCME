@@ -290,7 +290,7 @@
 
         <div class="table-wrapper">
             <table id="companyTable">
-                <tr class="selected" onclick="goToPlant(this)" style="cursor:pointer;">
+                <tr class="selected" onclick="selectRow(this)" style="cursor:pointer;">
                     <td width="25%">
                         <span class="company-name">Company 1</span>
                         <span class="icons">
@@ -302,49 +302,49 @@
                     <td>Modified date: 25/02/2024</td>
                     <td>Modified by: 26009649</td>
                 </tr>
-                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                <tr onclick="selectRow(this)" style="cursor:pointer;">
                     <td width="25%"><span class="company-name">Company 2</span></td>
                     <td>Created date: 04/01/2022</td>
                     <td>Modified date: 04/01/2022</td>
                     <td>Modified by: 26009649</td>
                 </tr>
-                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                <tr onclick="selectRow(this)" style="cursor:pointer;">
                     <td width="25%"><span class="company-name">Company 3</span></td>
                     <td>Created date: 09/10/2023</td>
                     <td>Modified date: 09/10/2023</td>
                     <td>Modified by: 26009649</td>
                 </tr>
-                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                <tr onclick="selectRow(this)" style="cursor:pointer;">
                     <td width="25%"><span class="company-name">Company 4</span></td>
                     <td>Created date: 11/09/2023</td>
                     <td>Modified date: 11/09/2023</td>
                     <td>Modified by: 26009649</td>
                 </tr>
-                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                <tr onclick="selectRow(this)" style="cursor:pointer;">
                     <td width="25%"><span class="company-name">Company 5</span></td>
                     <td>Created date: 02/09/2023</td>
                     <td>Modified date: 02/09/2023</td>
                     <td>Modified by: 26009649</td>
                 </tr>
-                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                <tr onclick="selectRow(this)" style="cursor:pointer;">
                     <td width="25%"><span class="company-name">Company 6</span></td>
                     <td>Created date: 18/06/2023</td>
                     <td>Modified date: 18/06/2023</td>
                     <td>Modified by: 26009649</td>
                 </tr>
-                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                <tr onclick="selectRow(this)" style="cursor:pointer;">
                     <td width="25%"><span class="company-name">Company 7</span></td>
                     <td>Created date: 21/05/2023</td>
                     <td>Modified date: 21/05/2023</td>
                     <td>Modified by: 26009649</td>
                 </tr>
-                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                <tr onclick="selectRow(this)" style="cursor:pointer;">
                     <td width="25%"><span class="company-name">Company 8</span></td>
                     <td>Created date: 10/11/2023</td>
                     <td>Modified date: 10/11/2023</td>
                     <td>Modified by: 26009649</td>
                 </tr>
-                <tr onclick="goToPlant(this)" style="cursor:pointer;">
+                <tr onclick="selectRow(this)" style="cursor:pointer;">
                     <td width="25%"><span class="company-name">Company 9</span></td>
                     <td>Created date: 05/02/2024</td>
                     <td>Modified date: 05/02/2024</td>
@@ -400,12 +400,15 @@
 </div>
 
 <script>
-    // ── Row click → ไปหน้า Plant ──────────────────────────
-    function goToPlant(row) {
-        var name = row.querySelector('.company-name').innerText.trim();
-        window.location.href = '/plant_customer?company=' + encodeURIComponent(name);
+    // ── Row click → เลือก row (highlight เท่านั้น) ────────
+    function selectRow(row) {
+        document.querySelectorAll('#companyTable tr').forEach(function(r) {
+            r.classList.remove('selected');
+        });
+        row.classList.add('selected');
     }
 
+    // ── View button → navigate ไปหน้า Plant ───────────────
     function viewSelected() {
         var sel = document.querySelector('#companyTable tr.selected');
         if (!sel) { Swal.fire('กรุณาเลือก Company', '', 'warning'); return; }

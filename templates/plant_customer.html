@@ -393,7 +393,7 @@
 <body>
 
 <header>
-    <div class="brand">Artemis: Company 1</div>
+    <div class="brand" id="pageBrand">Artemis</div>
     <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:rgba(255,255,255,0.85);">
         <span><i class="fa-solid fa-circle-user"></i> {{ current_user }}</span>
         <a href="/logout" style="color:rgba(255,255,255,0.85);text-decoration:none;border:1px solid rgba(255,255,255,0.4);padding:5px 12px;border-radius:6px;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='transparent'">
@@ -516,7 +516,7 @@
             padding: 6px 10px;
             margin-bottom: 14px;
             background: transparent;
-        ">Add authorized user for Company 1 &gt; Plant 1 &gt; Unit 1000</div>
+        ">Add authorized user for ...</div>
         <input type="text" class="modal-input" id="authEmail" value="XXXX.X@pttgcgroup.com">
         <div class="modal-actions">
             <button class="btn-modal" onclick="closeAuthModal()">Send</button>
@@ -587,6 +587,10 @@
 </div>
 
 <script>
+    // ── อ่านค่า company จาก URL param ────────────────────────
+    var currentCompany = (new URLSearchParams(window.location.search)).get('company') || 'Company';
+    document.getElementById('pageBrand').textContent = 'Artemis: ' + currentCompany;
+
     // ── Row selection ──────────────────────────────────────
     function selectRow(row) {
         document.querySelectorAll(".unit-row").forEach(r => r.classList.remove("selected"));
@@ -599,7 +603,7 @@
         var unitName = sel.querySelector(".unit-name").innerText.trim();
         var plantNum = sel.dataset.plant;
         var plantName = getPlantName(plantNum);
-        window.location.href = '/unit_customer?plant=' + encodeURIComponent(plantName) + '&unit=' + encodeURIComponent(unitName);
+        window.location.href = '/unit_customer?company=' + encodeURIComponent(currentCompany) + '&plant=' + encodeURIComponent(plantName) + '&unit=' + encodeURIComponent(unitName);
     }
 
     function viewReassessment() {
@@ -624,7 +628,7 @@
         var unitName = unitEl ? unitEl.innerText.trim() : '';
         var plantNum = row.dataset.plant;
         var plantName = getPlantName(plantNum);
-        document.getElementById('uploadTitle').innerText = 'Company 1 > ' + plantName + (unitName ? ' > ' + unitName : '');
+        document.getElementById('uploadTitle').innerText = currentCompany + ' > ' + plantName + (unitName ? ' > ' + unitName : '');
         ['pfdFile','pidFile','corrosionFile','otherFile'].forEach(function(id) {
             document.getElementById(id).value = '';
             document.getElementById(id + 'Name').value = '';
@@ -714,7 +718,7 @@
     function openAuthModalPlant(plantId) {
         var plantRow = document.getElementById(plantId);
         var plantName = plantRow.querySelector('td:nth-child(2)').childNodes[0].textContent.trim();
-        openAuthModal('Company 1 > ' + plantName);
+        openAuthModal(currentCompany + ' > ' + plantName);
     }
 
     // เรียกจาก Unit row icon
@@ -723,7 +727,7 @@
         var unitName = row.querySelector('.unit-name').innerText.trim();
         var plantNum = row.dataset.plant;
         var plantName = getPlantName(plantNum);
-        openAuthModal('Company 1 > ' + plantName + ' > ' + unitName);
+        openAuthModal(currentCompany + ' > ' + plantName + ' > ' + unitName);
     }
 
     // ── New Plant Modal ────────────────────────────────────
@@ -841,7 +845,7 @@
 <div id="uploadModal" class="modal-overlay">
     <div class="upload-modal-content">
         <h2>Upload file</h2>
-        <div class="upload-subtitle" id="uploadTitle">Company 1 &gt; Plant 1 &gt; Unit 1000</div>
+        <div class="upload-subtitle" id="uploadTitle"></div>
 
         <!-- PFD File -->
         <div class="upload-row">
