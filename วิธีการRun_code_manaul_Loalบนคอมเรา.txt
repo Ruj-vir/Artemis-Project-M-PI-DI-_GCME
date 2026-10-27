@@ -17,7 +17,10 @@ podman compose logs -f nginx artemis
 
 Remote access: http://<server-ip>:8005/login-page
 Nginx forwards to artemis:8000 on the internal container network.
-SSO callback follows the incoming host and port by default.
+Compose defaults to SSO callback: https://artemis-2.gcmeapps.com/home
+Public login page: https://artemis-2.gcmeapps.com/login-page
+The public HTTPS proxy must forward to the Artemis server on port 8005.
+When running Python directly without SSO_CALLBACK_URL, callback follows the incoming host and port.
 For a public HTTPS domain, set SSO_CALLBACK_URL=https://<domain>/home
 in .env (see .env.example), then recreate with:
 podman compose up -d --build --force-recreate
