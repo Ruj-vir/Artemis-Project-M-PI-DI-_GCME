@@ -115,6 +115,11 @@
             <a href="/thermal_shock"><i class="fa-solid fa-temperature-arrow-down"></i> Thermal Shock</a>
             <a href="/hf_corrosion"><i class="fa-solid fa-biohazard"></i> HF Corrosion</a>
             <a href="/customer_company"><i class="fa-solid fa-building"></i> Customer Company</a>
+            {% if current_user == "26009623" %}
+            <a href="/admin/users" style="background:rgba(255,215,0,0.18); color:#ffe066; border:1px solid rgba(255,215,0,0.35);">
+                <i class="fa-solid fa-shield-halved"></i> Admin
+            </a>
+            {% endif %}
             <span class="sso-user"><i class="fa-solid fa-circle-user"></i> {{ current_user }}</span>
             <a href="/logout" class="sso-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
         </nav>
@@ -214,6 +219,21 @@
                     <p class="text-muted small mb-0">จัดการข้อมูล Customer Company</p>
                 </a>
             </div>
+            {% if current_user == "26009623" %}
+            <div class="col-md-4">
+                <a href="/admin/users" class="nav-card card shadow-sm d-block p-4"
+                   style="border: 1.5px solid #c8a800; background: linear-gradient(135deg, #fffbe6 0%, #fff8cc 100%);">
+                    <div class="icon-circle" style="background:rgba(200,168,0,0.12);">
+                        <i class="fa-solid fa-users-gear" style="color:#a07800; font-size:22px;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-1" style="color:#7a5c00;">
+                        <i class="fa-solid fa-shield-halved" style="font-size:13px; margin-right:4px;"></i>
+                        User Management
+                    </h5>
+                    <p class="small mb-0" style="color:#a07800;">จัดการสิทธิ์ผู้ใช้งานระบบ (Admin only)</p>
+                </a>
+            </div>
+            {% endif %}
         </div>
 
         <!-- Excel Upload card -->

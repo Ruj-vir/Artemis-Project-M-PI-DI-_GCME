@@ -15,7 +15,7 @@
             flex-direction: column;
         }
 
-        /* ─── Header ─────────────────────────────────────────────────────────── */
+        /* ─── Header ────────────────────────────────────────────────── */
         .artemis-header {
             background-color: #2b5797;
             color: white;
@@ -24,45 +24,168 @@
             display: flex;
             align-items: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            flex-shrink: 0;
         }
         .artemis-brand { font-size: 24px; font-weight: 700; letter-spacing: 1px; }
 
-        /* ─── Center Card ─────────────────────────────────────────────────────── */
+        /* ─── Center wrapper ─────────────────────────────────────────── */
         .login-wrapper {
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 24px;
         }
 
-        .login-card {
+        /* ─── Outer card (holds both panels) ────────────────────────── */
+        .login-outer {
+            display: flex;
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-            padding: 52px 48px 44px;
-            width: 380px;
-            text-align: center;
+            border-radius: 20px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+            overflow: hidden;
+            width: 720px;
+            min-height: 420px;
         }
 
-        .login-logo img {
-            width: 120px;
-            height: 120px;
+        /* ─── Left panel — Manual login ─────────────────────────────── */
+        .panel-manual {
+            flex: 1;
+            padding: 44px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-right: 1.5px solid #e8ecf2;
+        }
+
+        .panel-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+        }
+        .panel-sub {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 26px;
+        }
+
+        .form-label-sm {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 38px 10px 12px;
+            font-size: 14px;
+            border: 1.5px solid #d0d7e4;
+            border-radius: 8px;
+            outline: none;
+            color: #222;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #fafbfc;
+            margin-bottom: 16px;
+        }
+        .form-input:focus {
+            border-color: #2b5797;
+            box-shadow: 0 0 0 3px rgba(43,87,151,0.1);
+            background: white;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+        .input-wrap .fa-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bbb;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .input-wrap .fa-icon:hover { color: #888; }
+
+        .btn-login {
+            width: 100%;
+            background-color: #2b5797;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 11px 0;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 4px;
+        }
+        .btn-login:hover  { background-color: #1e3f6f; }
+        .btn-login:active { transform: scale(0.98); }
+
+        .forgot-link {
+            display: block;
+            text-align: right;
+            font-size: 12px;
+            color: #2b5797;
+            text-decoration: none;
+            margin-top: 10px;
+            margin-bottom: -4px;
+        }
+        .forgot-link:hover { text-decoration: underline; }
+
+        /* ─── Right panel — SSO ──────────────────────────────────────── */
+        .panel-sso {
+            flex: 1;
+            padding: 44px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f7f9fc;
+        }
+
+        .sso-logo img {
+            width: 80px;
+            height: 80px;
             object-fit: contain;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
-        .login-title {
-            font-size: 26px;
+        .sso-title {
+            font-size: 22px;
             font-weight: 700;
             color: #2b5797;
             letter-spacing: 1px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+        }
+        .sso-subtitle {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 28px;
+            text-align: center;
         }
 
-        .login-subtitle {
-            font-size: 13px;
-            color: #888;
-            margin-bottom: 36px;
+        .divider-or {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+            width: 100%;
+            color: #ccc;
+            font-size: 12px;
+        }
+        .divider-or::before,
+        .divider-or::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e0e0e0;
         }
 
         .btn-sso {
@@ -85,10 +208,24 @@
         .btn-sso:hover  { background-color: #1e3f6f; color: white; }
         .btn-sso:active { transform: scale(0.98); }
 
-        .login-footer {
-            margin-top: 28px;
-            font-size: 12px;
+        .sso-note {
+            font-size: 11px;
             color: #bbb;
+            text-align: center;
+            margin-top: 18px;
+            line-height: 1.6;
+        }
+
+        /* ─── Error alert ─────────────────────────────────────────────── */
+        .alert-error {
+            background: #fde8e8;
+            border: 1px solid #f5b7b1;
+            color: #922b21;
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 13px;
+            margin-bottom: 14px;
+            display: none;
         }
     </style>
 </head>
@@ -99,25 +236,112 @@
         <span class="artemis-brand">ARTEMIS</span>
     </header>
 
-    <!-- Login Card -->
+    <!-- Login Wrapper -->
     <div class="login-wrapper">
-        <div class="login-card">
-            <div class="login-logo">
-                <img src="/static/images/Logo_artemis.png" alt="Artemis Logo">
-            </div>
-            <div class="login-title">ARTEMIS</div>
-            <div class="login-subtitle">Corrosion Management System</div>
+        <div class="login-outer">
 
-            <a href="/login" class="btn-sso">
-                <i class="fa-solid fa-right-to-bracket"></i>
-                Log in with SSO
-            </a>
+            <!-- ── Left: Manual Login ── -->
+            <div class="panel-manual">
+                <div class="panel-title">เข้าสู่ระบบ</div>
+                <div class="panel-sub">กรอก Username และ Password ของคุณ</div>
 
-            <div class="login-footer">
-                ระบบนี้ใช้การยืนยันตัวตนผ่าน GCME SSO
+                <div id="alertError" class="alert-error">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span id="alertMsg">Username หรือ Password ไม่ถูกต้อง</span>
+                </div>
+
+                <form id="loginForm" onsubmit="handleManualLogin(event)">
+                    <label class="form-label-sm">Username</label>
+                    <div class="input-wrap">
+                        <input type="text" id="username" class="form-input"
+                               placeholder="26009XXX หรือ email" autocomplete="username">
+                        <i class="fa-solid fa-user fa-icon"></i>
+                    </div>
+
+                    <label class="form-label-sm">Password</label>
+                    <div class="input-wrap">
+                        <input type="password" id="password" class="form-input"
+                               placeholder="••••••••" autocomplete="current-password">
+                        <i class="fa-solid fa-eye fa-icon" id="togglePwd" onclick="togglePassword()"></i>
+                    </div>
+
+                    <a href="#" class="forgot-link">ลืมรหัสผ่าน?</a>
+
+                    <button type="submit" class="btn-login" style="margin-top: 16px;">
+                        <i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ
+                    </button>
+                </form>
             </div>
+
+            <!-- ── Right: SSO Login ── -->
+            <div class="panel-sso">
+                <div class="sso-logo">
+                    <img src="/static/images/Logo_artemis.png" alt="Artemis Logo">
+                </div>
+                <div class="sso-title">ARTEMIS</div>
+                <div class="sso-subtitle">Corrosion Management System</div>
+
+                <a href="/login" class="btn-sso">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    Log in with SSO
+                </a>
+
+                <div class="sso-note">
+                    ใช้บัญชี GCME SSO<br>
+                    (สำหรับพนักงาน PTT Global Chemical)
+                </div>
+            </div>
+
         </div>
     </div>
+
+<script>
+    function togglePassword() {
+        const pwd = document.getElementById('password');
+        const icon = document.getElementById('togglePwd');
+        if (pwd.type === 'password') {
+            pwd.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            pwd.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+
+    function handleManualLogin(e) {
+        e.preventDefault();
+        const user = document.getElementById('username').value.trim();
+        const pwd  = document.getElementById('password').value;
+
+        if (!user || !pwd) {
+            showError('กรุณากรอก Username และ Password');
+            return;
+        }
+
+        // ── ส่งไป backend endpoint /login/manual ──────────────────────
+        fetch('/login/manual', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: user, password: pwd }),
+        })
+        .then(r => {
+            if (r.redirected) { window.location.href = r.url; return; }
+            return r.json();
+        })
+        .then(data => {
+            if (!data) return;
+            if (data.error) { showError(data.error); return; }
+            window.location.href = '/';
+        })
+        .catch(() => showError('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้'));
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('alertError');
+        document.getElementById('alertMsg').textContent = msg;
+        el.style.display = 'block';
+    }
+</script>
 
 </body>
 </html>

@@ -12,14 +12,23 @@ from starlette.middleware.sessions import SessionMiddleware
 from typing import Optional
 
 # ─── SSO Imports (4 ไฟล์หลัก) ────────────────────────────────────────────────
-from auth_service import SESSION_SECRET, redirect_to_sso
+from auth_service import SESSION_SECRET, redirect_to_sso, save_auth
 from auth_guard import require_auth, NotAuthenticatedException
 from auth_routes import router as auth_router
 from auth_interceptor import AuthInterceptor
 
+# ─── User Store ───────────────────────────────────────────────────────────────
+from user_store import (
+    init_users_if_empty, verify_user, get_all_users,
+    create_user, update_user, delete_user, public_view, update_last_login,
+)
+
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
+
+# ─── Init users.json ถ้ายังไม่มี ─────────────────────────────────────────────
+init_users_if_empty()
 
 # ─── Middleware ───────────────────────────────────────────────────────────────
 app.add_middleware(AuthInterceptor)
@@ -288,9 +297,102 @@ def calculate_h2s_susceptibility(
 
 
 # ─── Protected Routes (ทุก route ใช้ Depends(require_auth)) ──────────────────
+
+ADMIN_ID = "26009623"
+
+
+# ── Manual Login ──────────────────────────────────────────────────────────────
+class ManualLoginInput(BaseModel):
+    username: str
+    password: str
+
+
+@app.post("/login/manual")
+async def manual_login(request: Request, data: ManualLoginInput):
+    user = verify_user(data.username, data.password)
+    if not user:
+        return JSONResponse(
+            status_code=401,
+            content={"error": "Username หรือ Password ไม่ถูกต้อง หรือบัญชีถูกปิดใช้งาน"},
+        )
+    save_auth(request, f"manual-{user['id']}", user["id"])
+    update_last_login(user["id"])
+    return JSONResponse(content={"success": True})
+
+
+# ── User CRUD API (admin only) ────────────────────────────────────────────────
+class UserCreateInput(BaseModel):
+    id: str
+    name: str
+    email: str
+    role: str
+    status: str = "Active"
+    password: str = ""
+    created_by: str = ADMIN_ID
+
+
+class UserUpdateInput(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    role: Optional[str] = None
+    status: Optional[str] = None
+    password: Optional[str] = None
+
+
+def _require_admin(current_user: str) -> bool:
+    return current_user == ADMIN_ID
+
+
+@app.get("/api/users")
+async def api_get_users(current_user: str = Depends(require_auth)):
+    if not _require_admin(current_user):
+        return JSONResponse(status_code=403, content={"error": "Forbidden"})
+    return JSONResponse(content=[public_view(u) for u in get_all_users()])
+
+
+@app.post("/api/users")
+async def api_create_user(data: UserCreateInput, current_user: str = Depends(require_auth)):
+    if not _require_admin(current_user):
+        return JSONResponse(status_code=403, content={"error": "Forbidden"})
+    try:
+        user = create_user(data.model_dump())
+        return JSONResponse(content=public_view(user))
+    except ValueError as e:
+        return JSONResponse(status_code=400, content={"error": str(e)})
+
+
+@app.put("/api/users/{user_id}")
+async def api_update_user(user_id: str, data: UserUpdateInput, current_user: str = Depends(require_auth)):
+    if not _require_admin(current_user):
+        return JSONResponse(status_code=403, content={"error": "Forbidden"})
+    updated = update_user(user_id, data.model_dump(exclude_none=True))
+    if not updated:
+        return JSONResponse(status_code=404, content={"error": "ไม่พบผู้ใช้นี้ในระบบ"})
+    return JSONResponse(content=public_view(updated))
+
+
+@app.delete("/api/users/{user_id}")
+async def api_delete_user(user_id: str, current_user: str = Depends(require_auth)):
+    if not _require_admin(current_user):
+        return JSONResponse(status_code=403, content={"error": "Forbidden"})
+    if user_id == ADMIN_ID:
+        return JSONResponse(status_code=400, content={"error": "ไม่สามารถลบบัญชี Admin หลักได้"})
+    if not delete_user(user_id):
+        return JSONResponse(status_code=404, content={"error": "ไม่พบผู้ใช้นี้ในระบบ"})
+    return JSONResponse(content={"success": True})
+
+
+# ── Pages ─────────────────────────────────────────────────────────────────────
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, current_user: str = Depends(require_auth)):
     return templates.TemplateResponse("index.html", {"request": request, "current_user": current_user})
+
+
+@app.get("/admin/users", response_class=HTMLResponse)
+async def admin_user_manage(request: Request, current_user: str = Depends(require_auth)):
+    return templates.TemplateResponse(
+        "admin_UserManage.html", {"request": request, "current_user": current_user}
+    )
 
 
 @app.post("/upload", response_class=HTMLResponse)
