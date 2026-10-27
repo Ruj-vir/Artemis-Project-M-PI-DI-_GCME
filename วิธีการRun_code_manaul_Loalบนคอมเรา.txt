@@ -1,0 +1,16 @@
+cd "C:\Users\26009623\Downloads\Coding_Artemis\Prototype_Data_Duplicate_ForAi"
+uvicorn main:app --reload --port 8005
+
+Open: http://localhost:8005
+
+Podman (run instead of local uvicorn):
+podman compose up -d --build
+Traffic: http://localhost:8005 -> nginx:80 -> artemis:8000
+Only Nginx publishes a host port. Artemis is internal to the compose network.
+Upload limit through Nginx: 50 MB (client_max_body_size in nginx.conf).
+
+Check status:
+podman compose ps
+
+View logs:
+podman compose logs -f nginx artemis

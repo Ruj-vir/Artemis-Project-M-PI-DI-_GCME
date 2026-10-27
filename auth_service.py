@@ -16,7 +16,7 @@ from fastapi.responses import RedirectResponse
 
 # ─── SSO Configuration ────────────────────────────────────────────────────────
 SSO_LOGIN_URL = "https://login.gcmeapps.com/signin/"
-SSO_CALLBACK_URL = "http://localhost:8000/home"   # SSO จะ redirect กลับมาที่นี่
+SSO_CALLBACK_URL = "http://localhost:8005/home"   # SSO จะ redirect กลับมาที่นี่
 SESSION_SECRET = "artemis-secret-key-change-in-production"
 
 
