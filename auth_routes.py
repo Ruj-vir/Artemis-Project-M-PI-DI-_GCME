@@ -28,9 +28,9 @@ async def login_page(request: Request):
 
 
 @router.get("/login")
-async def login_redirect():
+async def login_redirect(request: Request):
     """กด ปุ่ม Log in → redirect ไป SSO"""
-    return redirect_to_sso()
+    return redirect_to_sso(request)
 
 
 @router.get("/home/{user}/{token}")
@@ -49,7 +49,7 @@ async def sso_callback(
         return RedirectResponse(url="/", status_code=302)
 
     # ไม่มี token → redirect กลับ SSO ใหม่
-    return redirect_to_sso()
+    return redirect_to_sso(request)
 
 
 @router.get("/logout")

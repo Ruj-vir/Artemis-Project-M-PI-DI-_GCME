@@ -10,6 +10,7 @@ services:
       - ./static:/app/static
     environment:
       - SESSION_SECRET=${SESSION_SECRET:-artemis-secret-key-change-in-production}
+      - SSO_CALLBACK_URL=${SSO_CALLBACK_URL:-}
     restart: unless-stopped
     healthcheck:
       test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/login-page', timeout=5)" ]

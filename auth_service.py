@@ -8,6 +8,7 @@ auth_service.py — SSO Logic หลักทั้งหมด
   - บันทึก / ลบ session (token + user)
   - ดึง user ปัจจุบันจาก session
 """
+import os
 import urllib.parse
 from typing import Optional
 
@@ -16,15 +17,16 @@ from fastapi.responses import RedirectResponse
 
 # ─── SSO Configuration ────────────────────────────────────────────────────────
 SSO_LOGIN_URL = "https://login.gcmeapps.com/signin/"
-SSO_CALLBACK_URL = "http://localhost:8005/home"   # SSO จะ redirect กลับมาที่นี่
+SSO_CALLBACK_URL = os.environ.get("SSO_CALLBACK_URL", "").strip()
 SESSION_SECRET = "artemis-secret-key-change-in-production"
 
 
 # ─── Core Functions ───────────────────────────────────────────────────────────
 
-def redirect_to_sso() -> RedirectResponse:
+def redirect_to_sso(request: Request) -> RedirectResponse:
     """สร้าง redirect ไปหน้า login ของ SSO พร้อม callback URL"""
-    sso_url = SSO_LOGIN_URL + urllib.parse.quote(SSO_CALLBACK_URL, safe="")
+    callback_url = SSO_CALLBACK_URL or str(request.base_url).rstrip("/") + "/home"
+    sso_url = SSO_LOGIN_URL + urllib.parse.quote(callback_url, safe="")
     return RedirectResponse(url=sso_url, status_code=302)
 
 

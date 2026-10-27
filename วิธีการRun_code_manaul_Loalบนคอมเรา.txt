@@ -14,3 +14,10 @@ podman compose ps
 
 View logs:
 podman compose logs -f nginx artemis
+
+Remote access: http://<server-ip>:8005/login-page
+Nginx forwards to artemis:8000 on the internal container network.
+SSO callback follows the incoming host and port by default.
+For a public HTTPS domain, set SSO_CALLBACK_URL=https://<domain>/home
+in .env (see .env.example), then recreate with:
+podman compose up -d --build --force-recreate
